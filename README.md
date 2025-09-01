@@ -6,7 +6,7 @@ This repository provides a set of tools designed to facilitate Artificial Intell
   - **[OpenAI](docs/openai/README.md)**
   - **[Google Gemini](docs/google/README.md)**
   - **[Anthropic](docs/anthropic/README.md)** 
-  - APIs from other providers, such as Nvidia and Mistral, that implement the OpenAI API standards also work with ABAP AI tools Could, possibly requiring minor adjustments.
+  - APIs from other providers, such as Mistral, that implement the OpenAI API standards also work with ABAP AI tools Could, possibly requiring minor adjustments.
     - **[Mistral](docs/openai_compatible/mistral.md)** (cloud-based)
 - **Conversation Management**: Maintain and manage multi-turn conversations, with full access to conversation history for advanced chat scenarios.
 - **Tool/Function Calling**: Integrate ABAP business logic with LLMs using function/tool calling, allowing AI models to trigger ABAP methods.
@@ -128,7 +128,7 @@ ENDCLASS.
 
 ## Next Steps
 
-  Now that you've run your first ABAP AI applications, consider exploring additional features. 😊
+  Now that you've run your first ABAP AI Cloud applications, consider exploring additional features. 😊
 
   ### Choose Your API:
 
@@ -137,3 +137,4 @@ ENDCLASS.
   - [OpenAI Guide](docs/openai/README.md): Learn how to use ABAP AI with OpenAI models.
   - [Google Gemini Guide](docs/google/README.md): Learn how to use ABAP AI with Google Gemini models.
   - [Anthropic](docs/anthropic/README.md): Learn how to use ABAP AI with Google Gemini models.
+  - [Mistral](docs/openai_compatible/mistral.md): Learn how to use ABAP AI with Mistral models.
