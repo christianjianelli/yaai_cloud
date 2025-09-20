@@ -14,16 +14,14 @@ This repository provides a set of tools designed to facilitate Artificial Intell
 
 These features empower you to build intelligent, enterprise-ready ABAP applications that leverage the latest advancements in AI.
 
-## Installation
-You can install the ABAP AI tools Cloud into your SAP system using abapGit. 
-
   **Disclaimer:** ABAP AI tools Cloud is experimental and released under the MIT License. It is provided "as is", without warranty of any kind, express or implied. This means you use these tools at your own risk, and the authors are not liable for any damages or issues arising from their use.
 
 ## Prerequisites
  - **SAP ABAP Cloud**: You need an SAP BTP ABAP environment or SAP S/4HANA Cloud ABAP environment (a.k.a. Embedded Steampunk) .
- - **abapGit**: Ensure that `abapGit Repositories Eclipse ADT Plug-In` is installed. The BTP ABAP environment comes with a preinstalled official SAP distribution of abapGit.  You can find all information on the SAP Help website: https://help.sap.com/docs/btp/sap-business-technology-platform/working-with-abapgit?locale=en-US
+ - **abapGit**: Ensure that `abapGit Repositories Eclipse ADT Plug-In` is installed. You can find all information on the SAP Help website: https://help.sap.com/docs/btp/sap-business-technology-platform/working-with-abapgit?locale=en-US
 
 ## Installation
+You can install the ABAP AI tools Cloud into your ABAP Cloud system using abapGit. The BTP ABAP environment comes with a preinstalled official SAP distribution of abapGit.
 
 **Steps:**
 1. Create a package named `YAAI_CLOUD` (or choose a different name if you prefer 😉);
@@ -125,6 +123,30 @@ ENDCLASS.
 **Result (ABAP Console view):**
 
 ![Output of the ABAP AI quickstart example](docs/images/quickstart2.png)
+
+
+## User Interface - ABAP AI Chat
+In a BTP ABAP environment, the user interface must be a web application. ABAP AI tools Cloud includes a basic chat interface that you can use immediately or make a copy and change it to fit your requirements.
+
+While ABAP AI tools Cloud does not directly provide a SAPUI5 or SAP Fiori Elements chat user interface, this documentation explains how to integrate an ABAP AI chat into a SAPUI5 Freestyle application or a SAP Fiori Elements application.
+
+### HTTP Service
+ABAP AI tools Cloud provides several HTTP services, each offering a basic chat user interface for interacting with different LLM providers and models.
+
+**Available Chat UIs:**
+1. **OpenAI Chat UI** – Interact with OpenAI models through a simple web-based chat interface.
+2. **Anthropic Chat UI** – Communicate with Anthropic models using a dedicated chat UI.
+3. **Google Gemini Chat UI** – Access Google Gemini models via an integrated chat interface.
+4. **Mistral Chat UI** – Connect to Mistral models with a compatible chat UI.
+
+You can use these UIs as-is, or create a copy and modify it to fit your specific requirements.
+
+### SAPUI5 Freestyle Application
+SAPUI5 does not have all the controls needed to build a chat interface. There are many possible ways to build a chat interface in a web application. This documentation provides instructions on how to integrate a very basic chat user interface to keep the complexity as low as possible.  
+
+### SAP Fiori Elements
+
+
 
 ## Next Steps
 
