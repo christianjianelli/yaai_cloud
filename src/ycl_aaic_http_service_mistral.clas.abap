@@ -1,6 +1,6 @@
-CLASS ycl_aaic_http_service_openai DEFINITION
+CLASS ycl_aaic_http_service_mistral DEFINITION
   PUBLIC
-  CREATE PUBLIC .
+  CREATE PUBLIC.
 
   PUBLIC SECTION.
 
@@ -12,7 +12,7 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_http_service_openai IMPLEMENTATION.
+CLASS ycl_aaic_http_service_mistral IMPLEMENTATION.
 
   METHOD if_http_service_extension~handle_request.
 
@@ -54,18 +54,20 @@ CLASS ycl_aaic_http_service_openai IMPLEMENTATION.
               ls_request-model = l_model.
             ENDIF.
 
-            DATA(lo_aaic_conn) = NEW ycl_aaic_conn( i_api = yif_aaic_const=>c_openai ).
+            DATA(lo_aaic_conn) = NEW ycl_aaic_conn( i_api = yif_aaic_const=>c_mistral ).
 
             lo_aaic_conn->set_api_key( i_api_key = ls_request-apikey ).
 
-            DATA(lo_aaic_db) = NEW ycl_aaic_db( i_api = yif_aaic_const=>c_openai
+            DATA(lo_aaic_db) = NEW ycl_aaic_db( i_api = yif_aaic_const=>c_mistral
                                                 i_id = CONV #( ls_request-chatid ) ).
 
-            DATA(lo_aaic_openai) = NEW ycl_aaic_openai( i_model = ls_request-model
-                                                        i_o_connection = lo_aaic_conn
-                                                        i_o_persistence = lo_aaic_db ).
+            DATA(lo_aaic_mistral) = NEW ycl_aaic_openai( i_model = ls_request-model
+                                                         i_o_connection = lo_aaic_conn
+                                                         i_o_persistence = lo_aaic_db ).
 
-            lo_aaic_openai->chat(
+            lo_aaic_mistral->use_completions(    ).
+
+            lo_aaic_mistral->chat(
               EXPORTING
                 i_message  = ls_request-prompt
               IMPORTING
@@ -89,10 +91,10 @@ CLASS ycl_aaic_http_service_openai IMPLEMENTATION.
 
             DATA(l_chat_id) = request->get_form_field( i_name = 'chat_id' ).
 
-            DATA(lo_aaic_db_get) = NEW ycl_aaic_db( i_api = yif_aaic_const=>c_openai
+            DATA(lo_aaic_db_get) = NEW ycl_aaic_db( i_api = yif_aaic_const=>c_mistral
                                                     i_id = CONV #( l_chat_id ) ).
 
-            DATA(l_html) = NEW ycl_aaic_ui_chat( )->get_html( i_api = yif_aaic_const=>c_openai
+            DATA(l_html) = NEW ycl_aaic_ui_chat( )->get_html( i_api = yif_aaic_const=>c_mistral
                                                               i_chat_id = CONV #( lo_aaic_db_get->m_id ) ).
 
             response->set_text(

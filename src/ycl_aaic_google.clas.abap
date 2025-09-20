@@ -61,10 +61,13 @@ CLASS ycl_aaic_google IMPLEMENTATION.
 
   METHOD constructor.
 
-    me->_model = 'gemini-2.5-flash'.
-
-    IF i_model IS SUPPLIED.
+    IF i_model IS NOT INITIAL.
       me->_model = i_model.
+    ELSE.
+      SELECT SINGLE model FROM yaaic_model WHERE id = @yif_aaic_const=>c_google INTO @me->_model.
+      IF sy-subrc <> 0.
+        me->_model = 'gemini-2.5-flash'.
+      ENDIF.
     ENDIF.
 
     me->_temperature = 1.

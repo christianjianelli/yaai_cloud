@@ -73,7 +73,14 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
   METHOD constructor.
 
-    me->_model = COND #( WHEN i_model IS NOT INITIAL THEN i_model ELSE 'gpt-5-nano' ).
+    IF i_model IS NOT INITIAL.
+      me->_model = i_model.
+    ELSE.
+      SELECT SINGLE model FROM yaaic_model WHERE id = @yif_aaic_const=>c_openai INTO @me->_model.
+      IF sy-subrc <> 0.
+        me->_model = 'gpt-5-nano'.
+      ENDIF.
+    ENDIF.
 
     me->_system_instructions_role = 'developer'.
 
@@ -404,6 +411,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
           APPEND INITIAL LINE TO me->_messages ASSIGNING <ls_msg>.
 
           <ls_msg> = VALUE #( role = <ls_choices>-message-role
+                              type = 'message'
                               content = e_response ).
 
           IF me->_o_persistence IS BOUND.

@@ -60,10 +60,13 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
 
     me->m_anthropic_version = '2023-06-01'.
 
-    me->_model = 'claude-3-7-sonnet-latest'.
-
-    IF me->_model IS NOT INITIAL.
+    IF i_model IS NOT INITIAL.
       me->_model = i_model.
+    ELSE.
+      SELECT SINGLE model FROM yaaic_model WHERE id = @yif_aaic_const=>c_anthropic INTO @me->_model.
+      IF sy-subrc <> 0.
+        me->_model = 'claude-3-7-sonnet-latest'.
+      ENDIF.
     ENDIF.
 
     IF i_max_tokens IS NOT INITIAL.
