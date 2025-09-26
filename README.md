@@ -142,10 +142,10 @@ ABAP AI tools Cloud provides several HTTP services, each offering a basic chat u
 You can use these UIs as-is, or create a copy and modify it to fit your specific requirements.
 
 ### SAPUI5 Freestyle Application
-Since SAPUI5 does not have dedicated controls to build a chat interface we need to build a custom one. This documentation provides the instructions and the code for a basic chat interface for SAPUI5 Freestyle Applications. It is a simple starting point so you can quickly connect your app to the ABAP AI tools.   
+Since SAPUI5 does not have dedicated controls to build a chat interface we need to build a custom one. This documentation provides instructions and code for adding a basic chat interface to a SAPUI5 Freestyle application. It is a simple starting point so you can quickly connect your app to the ABAP AI tools.   
 
-### SAP Fiori Elements
-
+### SAP Fiori Elements Application
+Adding a chat to a SAP Fiori Elements Application is a more complex task. It requires a controller extension. 
 
 
 ## Next Steps
