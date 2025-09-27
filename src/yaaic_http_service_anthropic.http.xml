@@ -7,7 +7,7 @@
     <ID>YAAIC_HTTP_SERVICE_ANTHROPIC</ID>
     <VERSION>A</VERSION>
     <LANG>E</LANG>
-    <SHORTTEXT>ABAP AI tools Cloud - Google Anthropic</SHORTTEXT>
+    <SHORTTEXT>ABAP AI tools Cloud - Anthropic Chat</SHORTTEXT>
    </HTTPTEXT>
    <HTTPHDL>
     <UCONSERVHANDLER>

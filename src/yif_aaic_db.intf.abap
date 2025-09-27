@@ -31,6 +31,7 @@ INTERFACE yif_aaic_db
       i_id        TYPE uuid OPTIONAL
       i_message   TYPE csequence OPTIONAL
       i_data      TYPE data OPTIONAL
+      i_prompt    TYPE data OPTIONAL
     EXPORTING
       e_id        TYPE uuid
       e_persisted TYPE abap_bool.
@@ -50,6 +51,7 @@ INTERFACE yif_aaic_db
   METHODS get_chat
     IMPORTING
       i_id         TYPE uuid OPTIONAL
+      i_ui         TYPE abap_bool DEFAULT abap_false
     EXPORTING
       e_t_messages TYPE ty_messages_t
       e_t_tools    TYPE ty_tools_t

@@ -389,6 +389,8 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
                                           i_id = CONV #( i_chat_id ) ).
 
       lo_aaic_db->get_chat(
+        EXPORTING
+          i_ui = abap_true
         IMPORTING
           e_t_messages = DATA(lt_messages)
       ).

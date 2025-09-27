@@ -42,6 +42,7 @@ CLASS ycl_aaic_openai DEFINITION
         i_model           TYPE csequence OPTIONAL
         i_use_completions TYPE abap_bool DEFAULT abap_false
         i_t_history       TYPE yif_aaic_openai~ty_generate_messages_t OPTIONAL
+        i_o_prompt        TYPE REF TO yif_aaic_prompt OPTIONAL
         i_o_connection    TYPE REF TO yif_aaic_conn OPTIONAL
         i_o_persistence   TYPE REF TO yif_aaic_db OPTIONAL.
 
@@ -136,6 +137,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
           i_message    = i_message
           i_new        = i_new
           i_greeting   = i_greeting
+          i_o_prompt   = i_o_prompt
         IMPORTING
           e_response   = e_response
           e_failed     = e_failed
@@ -489,7 +491,9 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
     DATA lt_tools TYPE STANDARD TABLE OF yaaic_tools WITH DEFAULT KEY.
 
-    DATA l_tools TYPE string VALUE '[]'.
+    DATA: l_tools   TYPE string VALUE '[]',
+          l_message TYPE string,
+          l_prompt  TYPE string.
 
     CLEAR: e_response,
            e_failed.
@@ -559,14 +563,43 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
     ENDIF.
 
+    IF i_o_prompt IS BOUND.
+
+      l_prompt = i_o_prompt->get_prompt( ).
+
+      l_message = i_o_prompt->get_user_message( ).
+
+    ENDIF.
+
+    IF i_message IS SUPPLIED.
+
+      l_message = i_message.
+
+    ENDIF.
+
     APPEND INITIAL LINE TO me->_messages ASSIGNING <ls_msg>.
 
     <ls_msg> = VALUE #( role = 'user'
-                        content = i_message
+                        content = l_message
                         type = 'message' ).
 
+    IF l_prompt IS NOT INITIAL.
+
+      DATA(ls_prompt) = <ls_msg>.
+
+      ls_prompt-content = l_prompt.
+
+    ENDIF.
+
     IF me->_o_persistence IS BOUND.
-      me->_o_persistence->persist_message( i_data = <ls_msg> ).
+      " persist the user message and the augmented prompt
+      me->_o_persistence->persist_message( i_data = <ls_msg>
+                                           i_prompt = ls_prompt ).
+    ENDIF.
+
+    " In memory we keep the augmented prompt instead of the user message
+    IF l_prompt IS NOT INITIAL.
+      <ls_msg>-content = l_prompt.
     ENDIF.
 
     IF me->mo_function_calling IS BOUND.
@@ -588,7 +621,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
         ENDLOOP.
 
-        me->_o_persistence->persist_tools( lt_tools ).
+*        me->_o_persistence->persist_tools( lt_tools ).
 
       ENDIF.
 
@@ -772,6 +805,12 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       ENDIF.
 
     ENDDO.
+
+    IF e_response IS INITIAL.
+
+      e_response = 'We''re having a little trouble getting a complete answer to your question at the moment.'.
+
+    ENDIF.
 
     IF e_t_response IS REQUESTED.
 

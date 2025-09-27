@@ -112,6 +112,31 @@ CLASS ycl_aaic_db IMPLEMENTATION.
       ORDER BY PRIMARY KEY
       INTO CORRESPONDING FIELDS OF TABLE @e_t_messages.
 
+    IF i_ui = abap_false.
+
+      SELECT id, seqno, prompt
+        FROM yaaic_prompt
+        WHERE id = @l_id
+        ORDER BY PRIMARY KEY
+        INTO TABLE @DATA(lt_prompt).
+
+      LOOP AT lt_prompt ASSIGNING FIELD-SYMBOL(<ls_prompt>).
+
+        READ TABLE e_t_messages ASSIGNING FIELD-SYMBOL(<ls_message>)
+          WITH KEY id = <ls_prompt>-id
+                   seqno = <ls_prompt>-seqno
+          BINARY SEARCH.
+
+        IF sy-subrc = 0.
+
+          <ls_message>-msg = <ls_prompt>-prompt.
+
+        ENDIF.
+
+      ENDLOOP.
+
+    ENDIF.
+
     SELECT id, class_name, method_name, proxy_class, description, full_schema
       FROM yaaic_tools
       WHERE id = @i_id
@@ -233,6 +258,14 @@ CLASS ycl_aaic_db IMPLEMENTATION.
 
     ENDIF.
 
+    IF i_prompt IS SUPPLIED AND i_prompt IS NOT INITIAL.
+
+      DATA(ls_prompt) = VALUE yaaic_prompt( id = l_id
+                                            seqno = l_seqno
+                                            prompt = lo_aaic_util->serialize( i_prompt ) ).
+
+    ENDIF.
+
     IF ls_msg IS NOT INITIAL.
 
       ls_msg-msg_date = cl_abap_context_info=>get_system_date( ).
@@ -241,6 +274,12 @@ CLASS ycl_aaic_db IMPLEMENTATION.
       INSERT yaaic_msg FROM @ls_msg.
 
       e_persisted = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
+
+      IF ls_prompt IS NOT INITIAL.
+
+        INSERT yaaic_prompt FROM @ls_prompt.
+
+      ENDIF.
 
     ENDIF.
 
