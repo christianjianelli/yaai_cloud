@@ -78,7 +78,7 @@ CLASS ycl_aaic_http_service_openai IMPLEMENTATION.
             ELSE.
 
               lo_aaic_openai->set_system_instructions(
-                i_system_instructions = 'Please answer the user messages having the provided context in consideration.'
+                i_system_instructions = 'Please respond to the user, considering the provided context.'
               ).
 
               DATA(lo_aaic_prompt_template) = NEW ycl_aaic_prompt_template(

@@ -569,9 +569,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
       l_message = i_o_prompt->get_user_message( ).
 
-    ENDIF.
-
-    IF i_message IS SUPPLIED.
+    ELSE.
 
       l_message = i_message.
 
