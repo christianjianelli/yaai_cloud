@@ -179,8 +179,10 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
     DATA lr_data TYPE REF TO data.
 
-    DATA: l_json  TYPE string,
-          l_tools TYPE string VALUE '[]'.
+    DATA: l_json    TYPE string,
+          l_tools   TYPE string VALUE '[]',
+          l_message TYPE string,
+          l_prompt  TYPE string.
 
     CLEAR: e_response,
            e_failed.
@@ -252,14 +254,41 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
     ENDIF.
 
+    IF i_o_prompt IS BOUND.
+
+      l_prompt = i_o_prompt->get_prompt( ).
+
+      l_message = i_o_prompt->get_user_message( ).
+
+    ELSE.
+
+      l_message = i_message.
+
+    ENDIF.
+
     APPEND INITIAL LINE TO me->_messages ASSIGNING <ls_msg>.
 
     <ls_msg> = VALUE #( role = 'user'
-                        content = i_message
+                        content = l_message
                         type = 'message' ).
 
+    IF l_prompt IS NOT INITIAL.
+
+      DATA(ls_prompt) = <ls_msg>.
+
+      ls_prompt-content = l_prompt.
+
+    ENDIF.
+
     IF me->_o_persistence IS BOUND.
-      me->_o_persistence->persist_message( i_data = <ls_msg> ).
+      " persist the user message and the augmented prompt
+      me->_o_persistence->persist_message( i_data = <ls_msg>
+                                           i_prompt = ls_prompt ).
+    ENDIF.
+
+    " In memory we keep the augmented prompt instead of the user message
+    IF l_prompt IS NOT INITIAL.
+      <ls_msg>-content = l_prompt.
     ENDIF.
 
     IF me->mo_function_calling IS BOUND.

@@ -6,6 +6,10 @@ CLASS ycl_aaic_http_service_openai DEFINITION
 
     INTERFACES if_http_service_extension.
 
+    DATA m_system_instructions TYPE string.
+
+    METHODS constructor.
+
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -13,6 +17,15 @@ ENDCLASS.
 
 
 CLASS ycl_aaic_http_service_openai IMPLEMENTATION.
+
+  METHOD constructor.
+
+    "Default system instructions used when some context is provided alongside the user prompt.
+    "You can define your own system instructions by creating a new class inheriting from this class
+    "and change the system instructions in the constructor method of your class.
+    m_system_instructions = 'Please respond to the user, considering the provided context.'.
+
+  ENDMETHOD.
 
   METHOD if_http_service_extension~handle_request.
 
@@ -78,7 +91,7 @@ CLASS ycl_aaic_http_service_openai IMPLEMENTATION.
             ELSE.
 
               lo_aaic_openai->set_system_instructions(
-                i_system_instructions = 'Please respond to the user, considering the provided context.'
+                i_system_instructions = m_system_instructions
               ).
 
               DATA(lo_aaic_prompt_template) = NEW ycl_aaic_prompt_template(
