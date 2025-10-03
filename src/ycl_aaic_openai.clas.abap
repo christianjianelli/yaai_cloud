@@ -39,6 +39,7 @@ CLASS ycl_aaic_openai DEFINITION
 
     METHODS constructor
       IMPORTING
+        i_api             TYPE csequence OPTIONAL
         i_model           TYPE csequence OPTIONAL
         i_use_completions TYPE abap_bool DEFAULT abap_false
         i_t_history       TYPE yif_aaic_openai~ty_generate_messages_t OPTIONAL
@@ -77,7 +78,11 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
     IF i_model IS NOT INITIAL.
       me->_model = i_model.
     ELSE.
-      SELECT SINGLE model FROM yaaic_model WHERE id = @yif_aaic_const=>c_openai INTO @me->_model.
+      DATA(l_id) = yif_aaic_const=>c_openai.
+      IF i_api IS NOT INITIAL.
+        l_id = i_api.
+      ENDIF.
+      SELECT SINGLE model FROM yaaic_model WHERE id = @l_id INTO @me->_model.
       IF sy-subrc <> 0.
         me->_model = 'gpt-5-nano'.
       ENDIF.

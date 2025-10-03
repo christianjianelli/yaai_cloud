@@ -75,7 +75,8 @@ CLASS ycl_aaic_http_service_mistral IMPLEMENTATION.
             DATA(lo_aaic_db) = NEW ycl_aaic_db( i_api = yif_aaic_const=>c_mistral
                                                 i_id = CONV #( ls_request-chatid ) ).
 
-            DATA(lo_aaic_mistral) = NEW ycl_aaic_openai( i_model = ls_request-model
+            DATA(lo_aaic_mistral) = NEW ycl_aaic_openai( i_api = yif_aaic_const=>c_mistral
+                                                         i_model = ls_request-model
                                                          i_o_connection = lo_aaic_conn
                                                          i_o_persistence = lo_aaic_db ).
 
