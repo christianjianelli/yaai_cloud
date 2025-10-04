@@ -129,7 +129,7 @@ INTERFACE yif_aaic_google
       i_message    TYPE csequence OPTIONAL
       i_new        TYPE abap_bool DEFAULT abap_false
       i_greeting   TYPE csequence OPTIONAL
-      i_o_template TYPE REF TO yif_aaic_prompt_template OPTIONAL
+      i_o_prompt   TYPE REF TO yif_aaic_prompt OPTIONAL
     EXPORTING
       e_response   TYPE string
       e_failed     TYPE abap_bool

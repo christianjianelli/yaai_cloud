@@ -139,13 +139,13 @@ CLASS ycl_aaic_google IMPLEMENTATION.
 
     DATA: l_endpoint TYPE string,
           l_greeting TYPE string,
-          l_message  TYPE string.
+          l_message  TYPE string,
+          l_prompt   TYPE string.
 
     CLEAR: e_response,
            e_failed.
 
     FREE e_t_response.
-
 
     IF me->_o_connection IS NOT BOUND.
       me->_o_connection = NEW ycl_aaic_conn( i_api = yif_aaic_const=>c_google ).
@@ -187,14 +187,41 @@ CLASS ycl_aaic_google IMPLEMENTATION.
 
     ENDIF.
 
-    l_message = '{"text": ' && lo_aaic_util->serialize( i_message ) && '}'.
+    IF i_o_prompt IS BOUND.
+
+      l_prompt = i_o_prompt->get_prompt( ).
+
+      l_prompt = '{"text": ' && lo_aaic_util->serialize( l_prompt ) && '}'.
+
+      l_message = i_o_prompt->get_user_message( ).
+
+      l_message = '{"text": ' && lo_aaic_util->serialize( l_message ) && '}'.
+
+    ELSE.
+
+      l_message = i_message.
+
+      l_message = '{"text": ' && lo_aaic_util->serialize( l_message ) && '}'.
+
+    ENDIF.
 
     APPEND INITIAL LINE TO me->_chat_messages ASSIGNING <ls_msg>.
 
     <ls_msg> = VALUE #( role = 'user' parts = VALUE #( ( l_message ) ) ).
 
+    IF l_prompt IS NOT INITIAL.
+      DATA(ls_prompt) = <ls_msg>.
+      ls_prompt = VALUE #( role = 'user' parts = VALUE #( ( l_prompt ) ) ).
+    ENDIF.
+
     IF me->_o_persistence IS BOUND.
-      me->_o_persistence->persist_message( i_data = <ls_msg> ).
+      me->_o_persistence->persist_message( i_data = <ls_msg>
+                                           i_prompt = ls_prompt ).
+    ENDIF.
+
+    " In memory we keep the augmented prompt instead of the user message
+    IF l_prompt IS NOT INITIAL.
+      <ls_msg> = VALUE #( role = 'user' parts = VALUE #( ( l_prompt ) ) ).
     ENDIF.
 
     DO me->_max_tools_calls TIMES.
