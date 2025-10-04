@@ -33,6 +33,7 @@ CLASS ycl_aaic_google DEFINITION
     METHODS constructor
       IMPORTING
         i_model         TYPE csequence OPTIONAL
+        i_t_history     TYPE yif_aaic_google~ty_contents_t OPTIONAL
         i_o_connection  TYPE REF TO yif_aaic_conn OPTIONAL
         i_o_persistence TYPE REF TO yif_aaic_db OPTIONAL.
 
@@ -78,9 +79,18 @@ CLASS ycl_aaic_google IMPLEMENTATION.
       me->_o_connection = i_o_connection.
     ENDIF.
 
+    IF i_t_history IS SUPPLIED.
+      me->_chat_messages = i_t_history.
+    ENDIF.
+
     IF i_o_persistence IS SUPPLIED.
 
       me->_o_persistence = i_o_persistence.
+
+      me->_o_persistence->get_chat(
+        IMPORTING
+          e_t_msg_data = me->_chat_messages
+      ).
 
     ENDIF.
 
@@ -109,6 +119,7 @@ CLASS ycl_aaic_google IMPLEMENTATION.
         i_message    = i_message
         i_new        = i_new
         i_greeting   = i_greeting
+        i_o_prompt   = i_o_prompt
       IMPORTING
         e_response   = e_response
         e_t_response = e_t_response
@@ -258,7 +269,7 @@ CLASS ycl_aaic_google IMPLEMENTATION.
 
           ASSIGN ls_generate_request_sys TO <ls_generate_request>.
 
-          DATA(ls_msg) = VALUE yif_aaic_google~ty_contents_s( role = 'system' parts = VALUE #( ( l_message ) ) ).
+          DATA(ls_msg) = VALUE yif_aaic_google~ty_contents_s( role = 'system' parts = VALUE #( ( me->_system_instructions ) ) ).
 
           IF me->_o_persistence IS BOUND.
             me->_o_persistence->persist_system_instructions( i_data = ls_msg ).
