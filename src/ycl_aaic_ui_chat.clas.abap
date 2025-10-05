@@ -352,10 +352,17 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
 
   METHOD yif_aaic_ui_chat~get_html.
 
-    TYPES: BEGIN OF ty_msg,
+    TYPES: BEGIN OF ty_parts,
+             text TYPE string,
+           END OF ty_parts,
+
+           ty_parts_t TYPE STANDARD TABLE OF ty_parts WITH DEFAULT KEY,
+
+           BEGIN OF ty_msg,
              role    TYPE string,
              content TYPE string,
              text    TYPE string,
+             parts   TYPE ty_parts_t,
            END OF ty_msg.
 
     DATA ls_msg TYPE ty_msg.
@@ -397,6 +404,8 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
 
       LOOP AT lt_messages ASSIGNING FIELD-SYMBOL(<ls_message>).
 
+        CLEAR ls_msg.
+
         /ui2/cl_json=>deserialize(
           EXPORTING
             json = <ls_message>-msg
@@ -406,6 +415,16 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
 
         IF ls_msg-content IS INITIAL AND ls_msg-text IS NOT INITIAL.
           ls_msg-content = ls_msg-text.
+        ENDIF.
+
+        IF i_api = yif_aaic_const=>c_google.
+
+          LOOP AT ls_msg-parts ASSIGNING FIELD-SYMBOL(<ls_parts>).
+
+            ls_msg-content = ls_msg-content && <ls_parts>-text.
+
+          ENDLOOP.
+
         ENDIF.
 
         CASE ls_msg-role.
@@ -421,12 +440,12 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
             r_html = r_html && |<div class="message-timestamp">{ <ls_message>-msg_date+6(2) }/{ <ls_message>-msg_date+4(2) }/{ <ls_message>-msg_date(4) } { <ls_message>-msg_time TIME = USER }</div> { cl_abap_char_utilities=>newline }|.
             r_html = r_html && '</div>' && cl_abap_char_utilities=>newline.
 
-          WHEN 'assistant'.
+          WHEN 'assistant' or 'model'.
 
             r_html = r_html && '<div class="message llm-message">' && cl_abap_char_utilities=>newline.
             r_html = r_html && '<div class="message-bubble">' && cl_abap_char_utilities=>newline.
             r_html = r_html && '<div class="markdown-content">' && cl_abap_char_utilities=>newline.
-            r_html = r_html && '<p>' && ls_msg-content && '</p>' && cl_abap_char_utilities=>newline.
+            r_html = r_html && ls_msg-content && cl_abap_char_utilities=>newline.
             r_html = r_html && '</div>' && cl_abap_char_utilities=>newline.
             r_html = r_html && '</div>' && cl_abap_char_utilities=>newline.
             r_html = r_html && |<div class="message-timestamp">{ <ls_message>-msg_date+6(2) }/{ <ls_message>-msg_date+4(2) }/{ <ls_message>-msg_date(4) } { <ls_message>-msg_time TIME = USER }</div> { cl_abap_char_utilities=>newline }|.
@@ -458,7 +477,7 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
 
     r_html = r_html && '  document.querySelectorAll(".message.user-message .message-bubble p").forEach((p) => { p.innerHTML = marked.parse(p.textContent); });' && cl_abap_char_utilities=>newline.
 
-    r_html = r_html && '  document.querySelectorAll(".message.llm-message .message-bubble .markdown-content").forEach((el) => { el.innerHTML = marked.parse(el.textContent); });' && cl_abap_char_utilities=>newline.
+    r_html = r_html && '  document.querySelectorAll(".message.llm-message .message-bubble .markdown-content").forEach((el) => { el.innerHTML = marked.parse(el.innerHTML); });' && cl_abap_char_utilities=>newline.
 
     r_html = r_html && '  const userMessages = document.querySelectorAll(".user-message");' && cl_abap_char_utilities=>newline.
 
@@ -509,10 +528,10 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
     r_html = r_html && '    const container = document.querySelector(".message-container");' && cl_abap_char_utilities=>newline.
     r_html = r_html && '    const div = document.createElement("div");' && cl_abap_char_utilities=>newline.
     r_html = r_html && '    div.className = "message llm-message";' && cl_abap_char_utilities=>newline.
-    r_html = r_html && '    div.innerHTML = `<div class="message-bubble"><div class="markdown-content">${message}</div></div><div class="message-timestamp">${timestamp}</div>`;' && cl_abap_char_utilities=>newline.
+    r_html = r_html && '    div.innerHTML = `<div class="message-bubble"><div class="markdown-content"></div></div><div class="message-timestamp">${timestamp}</div>`;' && cl_abap_char_utilities=>newline.
     r_html = r_html && '    container.appendChild(div);' && cl_abap_char_utilities=>newline.
     r_html = r_html && '    const markdownDiv = div.querySelector(".markdown-content");' && cl_abap_char_utilities=>newline.
-    r_html = r_html && '    markdownDiv.innerHTML = marked.parse(markdownDiv.textContent);' && cl_abap_char_utilities=>newline.
+    r_html = r_html && '    markdownDiv.innerHTML = marked.parse(message);' && cl_abap_char_utilities=>newline.
     r_html = r_html && '    setTimeout(() => { div.scrollIntoView({ behavior: "smooth", block: "start" }); }, 300);' && cl_abap_char_utilities=>newline.
     r_html = r_html && '  }' && cl_abap_char_utilities=>newline.
 
@@ -523,7 +542,7 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
     r_html = r_html && '    div.innerHTML = `<div class="message-bubble"><p>${message}</p></div><div class="message-timestamp">${timestamp}</div>`;' && cl_abap_char_utilities=>newline.
     r_html = r_html && '    container.appendChild(div);' && cl_abap_char_utilities=>newline.
     r_html = r_html && '    const p = div.querySelector(".message-bubble p");' && cl_abap_char_utilities=>newline.
-    r_html = r_html && '    p.innerHTML = marked.parse(p.textContent);' && cl_abap_char_utilities=>newline.
+    r_html = r_html && '    p.innerHTML = marked.parse(p.innerHTML);' && cl_abap_char_utilities=>newline.
     r_html = r_html && '    setTimeout(() => { div.scrollIntoView({ behavior: "smooth", block: "start" }); }, 300);' && cl_abap_char_utilities=>newline.
     r_html = r_html && '  }' && cl_abap_char_utilities=>newline.
 
