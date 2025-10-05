@@ -25,8 +25,9 @@ CLASS ycl_aaic_db DEFINITION
 
     METHODS constructor
       IMPORTING
-        i_api TYPE csequence
-        i_id  TYPE uuid OPTIONAL.
+        i_api     TYPE csequence
+        i_id      TYPE uuid OPTIONAL
+        i_preload TYPE abap_bool DEFAULT abap_false.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -46,13 +47,17 @@ CLASS ycl_aaic_db IMPLEMENTATION.
 
       me->m_id = i_id.
 
-      me->get_chat(
-        EXPORTING
-          i_id         = me->m_id
-        IMPORTING
-          e_t_messages = me->mt_messages
-          e_t_tools    = me->mt_tools
-      ).
+      IF i_preload = abap_true.
+
+        me->get_chat(
+          EXPORTING
+            i_id         = me->m_id
+          IMPORTING
+            e_t_messages = me->mt_messages
+            e_t_tools    = me->mt_tools
+        ).
+
+      ENDIF.
 
     ENDIF.
 

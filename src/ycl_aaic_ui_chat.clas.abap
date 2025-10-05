@@ -365,6 +365,8 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
              parts   TYPE ty_parts_t,
            END OF ty_msg.
 
+    DATA lt_anthropic_chat_response TYPE STANDARD TABLE OF yif_aaic_anthropic=>ty_response_content_s.
+
     DATA ls_msg TYPE ty_msg.
 
     DATA l_timestamp TYPE string.
@@ -417,6 +419,38 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
           ls_msg-content = ls_msg-text.
         ENDIF.
 
+        IF i_api = yif_aaic_const=>c_anthropic.
+
+          IF ls_msg-role = 'user'.
+
+            /ui2/cl_json=>deserialize(
+             EXPORTING
+               json = ls_msg-content
+             CHANGING
+               data = ls_msg-content
+           ).
+
+          ELSE.
+
+            /ui2/cl_json=>deserialize(
+              EXPORTING
+                json = ls_msg-content
+              CHANGING
+                data = lt_anthropic_chat_response
+            ).
+
+            LOOP AT lt_anthropic_chat_response INTO DATA(ls_anthropic_chat_response).
+
+              IF ls_anthropic_chat_response-type = 'text'.
+                ls_msg-content = ls_anthropic_chat_response-text.
+              ENDIF.
+
+            ENDLOOP.
+
+          ENDIF.
+
+        ENDIF.
+
         IF i_api = yif_aaic_const=>c_google.
 
           LOOP AT ls_msg-parts ASSIGNING FIELD-SYMBOL(<ls_parts>).
@@ -440,7 +474,7 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
             r_html = r_html && |<div class="message-timestamp">{ <ls_message>-msg_date+6(2) }/{ <ls_message>-msg_date+4(2) }/{ <ls_message>-msg_date(4) } { <ls_message>-msg_time TIME = USER }</div> { cl_abap_char_utilities=>newline }|.
             r_html = r_html && '</div>' && cl_abap_char_utilities=>newline.
 
-          WHEN 'assistant' or 'model'.
+          WHEN 'assistant' OR 'model'.
 
             r_html = r_html && '<div class="message llm-message">' && cl_abap_char_utilities=>newline.
             r_html = r_html && '<div class="message-bubble">' && cl_abap_char_utilities=>newline.

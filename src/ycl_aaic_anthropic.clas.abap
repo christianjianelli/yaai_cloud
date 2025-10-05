@@ -81,6 +81,17 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
       me->_o_connection = i_o_connection.
     ENDIF.
 
+    IF i_o_persistence IS SUPPLIED.
+
+      me->_o_persistence = i_o_persistence.
+
+      me->_o_persistence->get_chat(
+        IMPORTING
+          e_t_msg_data = me->_chat_messages
+      ).
+
+    ENDIF.
+
   ENDMETHOD.
 
 
@@ -121,6 +132,7 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
     DATA ls_anthropic_chat_response TYPE yif_aaic_anthropic~ty_anthropic_chat_response_s.
 
     DATA: l_message TYPE string,
+          l_prompt  TYPE string,
           l_tools   TYPE string VALUE '[]'.
 
     CLEAR: e_response,
@@ -158,10 +170,38 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
 
     APPEND INITIAL LINE TO me->_chat_messages ASSIGNING <ls_msg>.
 
-    <ls_msg> = VALUE #( role = 'user' content = lo_aaic_util->serialize( i_data = i_message ) ).
+    IF i_o_prompt IS BOUND.
+
+      l_prompt = i_o_prompt->get_prompt( ).
+
+      l_message = i_o_prompt->get_user_message( ).
+
+    ELSE.
+
+      l_message = i_message.
+
+    ENDIF.
+
+*    <ls_msg> = VALUE #( role = 'user' content = lo_aaic_util->serialize( i_data = l_message ) ).
+    <ls_msg> = VALUE #( role = 'user' content = l_message ).
+
+    IF l_prompt IS NOT INITIAL.
+
+      DATA(ls_prompt) = <ls_msg>.
+
+      ls_prompt-content = l_prompt.
+
+    ENDIF.
 
     IF me->_o_persistence IS BOUND.
-      me->_o_persistence->persist_message( i_data = <ls_msg> ).
+      " persist the user message and the augmented prompt
+      me->_o_persistence->persist_message( i_data = <ls_msg>
+                                           i_prompt = ls_prompt ).
+    ENDIF.
+
+    " In memory we keep the augmented prompt instead of the user message
+    IF l_prompt IS NOT INITIAL.
+      <ls_msg>-content = l_prompt.
     ENDIF.
 
     IF me->mo_function_calling IS BOUND.
@@ -421,6 +461,7 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
         i_message    = i_message
         i_new        = i_new
         i_greeting   = i_greeting
+        i_o_prompt   = i_o_prompt
       IMPORTING
         e_response   = e_response
         e_failed     = e_failed

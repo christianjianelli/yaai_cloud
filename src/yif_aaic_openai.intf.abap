@@ -83,12 +83,12 @@ INTERFACE yif_aaic_openai
          END OF ty_type_message_chat_comp_s.
 
   TYPES: BEGIN OF ty_openai_generate_request_s,
-           model       TYPE string,
-           stream      TYPE abap_bool,
-           input       TYPE /ui2/cl_json=>json,
-           text        TYPE ty_type_text_s,
-           reasoning   TYPE ty_type_reasoning_s,
-           tools       TYPE /ui2/cl_json=>json,
+           model     TYPE string,
+           stream    TYPE abap_bool,
+           input     TYPE /ui2/cl_json=>json,
+           text      TYPE ty_type_text_s,
+           reasoning TYPE ty_type_reasoning_s,
+           tools     TYPE /ui2/cl_json=>json,
          END OF ty_openai_generate_request_s.
 
   TYPES: BEGIN OF ty_openai_generate_req_wt_s,
@@ -250,6 +250,7 @@ INTERFACE yif_aaic_openai
       i_new        TYPE abap_bool DEFAULT abap_false
       i_greeting   TYPE csequence OPTIONAL
       i_o_prompt   TYPE REF TO yif_aaic_prompt OPTIONAL
+        PREFERRED PARAMETER i_message
     EXPORTING
       e_response   TYPE string
       e_failed     TYPE abap_bool
@@ -261,6 +262,7 @@ INTERFACE yif_aaic_openai
       i_new        TYPE abap_bool DEFAULT abap_false
       i_greeting   TYPE csequence OPTIONAL
       i_o_prompt   TYPE REF TO yif_aaic_prompt OPTIONAL
+        PREFERRED PARAMETER i_message
     EXPORTING
       e_response   TYPE string
       e_failed     TYPE abap_bool

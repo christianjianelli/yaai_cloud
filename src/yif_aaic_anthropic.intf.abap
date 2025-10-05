@@ -5,7 +5,7 @@ INTERFACE yif_aaic_anthropic
 
   TYPES: BEGIN OF ty_chat_message_s,
            role    TYPE string,
-           content TYPE /ui2/cl_json=>json,
+           content TYPE string,
          END OF ty_chat_message_s,
 
          BEGIN OF ty_chat_message_think_s,
@@ -109,9 +109,11 @@ INTERFACE yif_aaic_anthropic
 
   METHODS chat
     IMPORTING
-      i_message    TYPE csequence
+      i_message    TYPE csequence OPTIONAL
       i_new        TYPE abap_bool DEFAULT abap_false
       i_greeting   TYPE csequence OPTIONAL
+      i_o_prompt   TYPE REF TO yif_aaic_prompt OPTIONAL
+        PREFERRED PARAMETER i_message
     EXPORTING
       e_response   TYPE string
       e_failed     TYPE abap_bool

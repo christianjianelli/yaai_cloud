@@ -6,6 +6,10 @@ CLASS ycl_aaic_http_srvc_anthropic DEFINITION
 
     INTERFACES if_http_service_extension.
 
+    DATA m_system_instructions TYPE string.
+
+    METHODS constructor.
+
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -14,13 +18,23 @@ ENDCLASS.
 
 CLASS ycl_aaic_http_srvc_anthropic IMPLEMENTATION.
 
+  METHOD constructor.
+
+    "Default system instructions used when some context is provided alongside the user prompt.
+    "You can define your own system instructions by creating a new class inheriting from this class
+    "and change the system instructions in the constructor method of your class.
+    m_system_instructions = 'Please respond to the user, considering the provided context.'.
+
+  ENDMETHOD.
+
   METHOD if_http_service_extension~handle_request.
 
     TYPES: BEGIN OF ty_request,
-             chatid TYPE string,
-             apikey TYPE string,
-             prompt TYPE string,
-             model  TYPE string,
+             chatid  TYPE string,
+             apikey  TYPE string,
+             prompt  TYPE string,
+             context TYPE string,
+             model   TYPE string,
            END OF ty_request,
 
            BEGIN OF ty_response,
@@ -65,12 +79,41 @@ CLASS ycl_aaic_http_srvc_anthropic IMPLEMENTATION.
                                                               i_o_connection = lo_aaic_conn
                                                               i_o_persistence = lo_aaic_db ).
 
-            lo_aaic_anthropic->chat(
-              EXPORTING
-                i_message  = ls_request-prompt
-              IMPORTING
-                e_response = ls_response-message
-            ).
+
+
+            IF ls_request-context IS INITIAL.
+
+              lo_aaic_anthropic->chat(
+                EXPORTING
+                  i_message  = ls_request-prompt
+                IMPORTING
+                  e_response = ls_response-message
+              ).
+
+            ELSE.
+
+              lo_aaic_anthropic->set_system_instructions(
+                i_system_instructions = m_system_instructions
+              ).
+
+              DATA(lo_aaic_prompt_template) = NEW ycl_aaic_prompt_template(
+                i_template_text = |**User message**: %USER_MESSAGE% \n\n**Context**:\n\n %CONTEXT% \n\n|
+              ).
+
+              DATA(lo_aaic_prompt) = NEW ycl_aaic_prompt(
+                i_o_prompt_template = lo_aaic_prompt_template
+                i_s_params          = VALUE yif_aaic_prompt=>ty_params_basic_s( user_message = ls_request-prompt
+                                                                                context = ls_request-context )
+              ).
+
+              lo_aaic_anthropic->yif_aaic_chat~chat(
+                EXPORTING
+                  i_o_prompt = lo_aaic_prompt
+                IMPORTING
+                  e_response = ls_response-message
+              ).
+
+            ENDIF.
 
             ls_response-chatid = lo_aaic_db->m_id.
 
