@@ -132,7 +132,7 @@ In a BTP ABAP environment, the user interface must be a web application. ABAP AI
 
 While ABAP AI tools Cloud does not directly provide a SAPUI5 or SAP Fiori Elements chat user interface, this documentation explains how to integrate an ABAP AI chat into a SAPUI5 Freestyle application or a SAP Fiori Elements application.
 
-### HTTP Service
+### HTTP Services
 ABAP AI tools Cloud provides several HTTP services, each offering a basic chat user interface for interacting with different LLM providers and models.
 
 **Available Chat UIs:**
@@ -153,6 +153,10 @@ Adding a chat to a SAP Fiori Elements Application is a more complex task. It req
 ## Next Steps
 
   Now that you've run your first ABAP AI Cloud applications, consider exploring additional features. 😊
+
+  ### Read the documentation
+
+  - [ABAP AI tools Cloud Documentation](docs/README.md)
 
   ### Choose Your API:
 
