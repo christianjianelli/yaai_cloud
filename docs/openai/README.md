@@ -80,3 +80,12 @@ ENDCLASS.
 **Result (ABAP Console view):**
 
 ![Output of the ABAP AI quickstart example](../images/quickstart2.png)
+
+## Explore ABAP AI Features
+  - **Prompt Templates:** Learn how to define and use [prompt templates](../prompt_templates.md) for more dynamic and reusable prompts.
+  - **LLM System Instructions:** Pass [system instructions](system_instructions.md) to guide the behavior of the language model for specific tasks.
+  - **Tool/Function Calling:** Enable LLM applications to trigger ABAP logic using [tools](function_calling.md).
+  - **Retrieval-Augmented Generation (RAG):** Enhance your LLM applications by incorporating [external knowledge sources and retrieval mechanisms](../rag.md).
+
+## OpenAI API Documentation
+  - [OpenAI developer platform](https://platform.openai.com/docs/overview)  
