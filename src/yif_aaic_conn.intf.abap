@@ -12,9 +12,11 @@ INTERFACE yif_aaic_conn
   DATA: mt_msg         TYPE yif_aaic_log=>ty_messages_t READ-ONLY,
         mt_http_header TYPE STANDARD TABLE OF ty_http_header_s READ-ONLY.
 
-  DATA: m_api                   TYPE string READ-ONLY,
-        m_base_url              TYPE string READ-ONLY,
-        m_endpoint              TYPE string READ-ONLY.
+  DATA: m_api              TYPE string READ-ONLY,
+        m_base_url         TYPE string READ-ONLY,
+        m_endpoint         TYPE string READ-ONLY,
+        m_get_x_csrf_token TYPE abap_bool READ-ONLY,
+        m_basic_auth       TYPE string READ-ONLY.
 
   EVENTS on_request_send.
   EVENTS on_response_received.
@@ -68,5 +70,6 @@ INTERFACE yif_aaic_conn
     IMPORTING
       i_name TYPE csequence.
 
+  METHODS get_x_csrf_token.
 
 ENDINTERFACE.

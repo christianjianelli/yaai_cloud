@@ -15,6 +15,8 @@ CLASS ycl_aaic_conn DEFINITION
     ALIASES mt_msg FOR yif_aaic_conn~mt_msg.
     ALIASES m_api FOR yif_aaic_conn~m_api.
     ALIASES m_base_url FOR yif_aaic_conn~m_base_url.
+    ALIASES m_basic_auth FOR yif_aaic_conn~m_basic_auth.
+    ALIASES m_get_x_csrf_token FOR yif_aaic_conn~m_get_x_csrf_token.
 
     ALIASES create FOR yif_aaic_conn~create.
     ALIASES set_body FOR yif_aaic_conn~set_body.
@@ -23,12 +25,15 @@ CLASS ycl_aaic_conn DEFINITION
     ALIASES set_api_key FOR yif_aaic_conn~set_api_key.
     ALIASES set_base_url FOR yif_aaic_conn~set_base_url.
     ALIASES get_error_text FOR yif_aaic_conn~get_error_text.
+    ALIASES get_x_csrf_token FOR yif_aaic_conn~get_x_csrf_token.
 
     METHODS
       constructor
         IMPORTING
-          i_api       TYPE string OPTIONAL
-          i_o_api_key TYPE REF TO yif_aaic_api_key OPTIONAL.
+          i_api              TYPE string OPTIONAL
+          i_basic_auth       TYPE string OPTIONAL
+          i_get_x_csrf_token TYPE abap_bool DEFAULT abap_false
+          i_o_api_key        TYPE REF TO yif_aaic_api_key OPTIONAL.
 
   PROTECTED SECTION.
 
@@ -65,6 +70,14 @@ CLASS ycl_aaic_conn IMPLEMENTATION.
 
     IF i_o_api_key IS SUPPLIED.
       me->mo_api_key = i_o_api_key.
+    ENDIF.
+
+    IF i_basic_auth IS SUPPLIED.
+      me->m_basic_auth = i_basic_auth.
+    ENDIF.
+
+    IF i_get_x_csrf_token IS SUPPLIED.
+      me->m_get_x_csrf_token = i_get_x_csrf_token.
     ENDIF.
 
   ENDMETHOD.
@@ -233,6 +246,12 @@ CLASS ycl_aaic_conn IMPLEMENTATION.
 
         ENDIF.
 
+        IF me->m_get_x_csrf_token = abap_true.
+
+          me->get_x_csrf_token( ).
+
+        ENDIF.
+
         me->_o_http_response = me->_o_http_client->execute( i_method = if_web_http_client=>post ).
 
         e_response = me->_o_http_response->get_text( ).
@@ -347,6 +366,39 @@ CLASS ycl_aaic_conn IMPLEMENTATION.
     DATA(lo_request) = me->_o_http_client->get_http_request( ).
 
     lo_request->set_text( i_json ).
+
+  ENDMETHOD.
+
+  METHOD yif_aaic_conn~get_x_csrf_token.
+
+    TRY.
+
+        DATA(lo_request) = me->_o_http_client->get_http_request( ).
+
+        lo_request->set_header_field(
+          EXPORTING
+            i_name  = 'Authorization'
+            i_value = |Basic { me->m_basic_auth }|
+        ).
+
+        lo_request->set_header_field(
+          EXPORTING
+            i_name  = 'x-csrf-token'
+            i_value = 'fetch'
+        ).
+
+        DATA(lo_http_response) = me->_o_http_client->execute( i_method = if_web_http_client=>get ).
+
+        DATA(l_x_csrf_token) = _o_http_response->get_header_field( i_name = 'x-csrf-token' ).
+
+        lo_request->set_header_field(
+          EXPORTING
+            i_name  = 'x-csrf-token'
+            i_value = l_x_csrf_token
+        ).
+
+      CATCH cx_web_http_client_error ##NO_HANDLER.
+    ENDTRY.
 
   ENDMETHOD.
 
