@@ -15,6 +15,7 @@ CLASS ycl_aaic_openai DEFINITION
     ALIASES use_completions FOR yif_aaic_openai~use_completions.
     ALIASES set_system_instructions FOR yif_aaic_openai~set_system_instructions.
     ALIASES set_connection FOR yif_aaic_openai~set_connection.
+    ALIASES set_endpoint FOR yif_aaic_openai~set_endpoint.
     ALIASES set_persistence FOR yif_aaic_openai~set_persistence.
     ALIASES set_temperature FOR yif_aaic_openai~set_temperature.
     ALIASES set_reasoning_effort FOR yif_aaic_openai~set_reasoning_effort.
@@ -29,6 +30,7 @@ CLASS ycl_aaic_openai DEFINITION
     ALIASES get_conversation_chat_comp FOR yif_aaic_openai~get_conversation_chat_comp.
 
     ALIASES mo_function_calling FOR yif_aaic_openai~mo_function_calling.
+    ALIASES m_endpoint FOR yif_aaic_openai~m_endpoint.
 
     CLASS-DATA m_ref TYPE REF TO ycl_aaic_openai READ-ONLY.
 
@@ -311,9 +313,13 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
     DATA(lo_aaic_util) = NEW ycl_aaic_util( ).
 
+    IF me->m_endpoint IS INITIAL.
+      me->m_endpoint = yif_aaic_const=>c_openai_completions_endpoint.
+    ENDIF.
+
     DO me->_max_tools_calls TIMES.
 
-      IF me->_o_connection->create( i_endpoint = yif_aaic_const=>c_openai_completions_endpoint ).
+      IF me->_o_connection->create( i_endpoint = me->m_endpoint ).
 
         FREE me->_openai_chat_comp_response.
 
@@ -489,7 +495,11 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       me->_o_connection = NEW ycl_aaic_conn( i_api = yif_aaic_const=>c_openai ).
     ENDIF.
 
-    IF me->_o_connection->create( i_endpoint = yif_aaic_const=>c_openai_embed_endpoint ).
+    IF me->m_endpoint IS INITIAL.
+      me->m_endpoint = yif_aaic_const=>c_openai_embed_endpoint.
+    ENDIF.
+
+    IF me->_o_connection->create( i_endpoint = me->m_endpoint ).
 
       DATA(lo_aaic_util) = NEW ycl_aaic_util( ).
 
@@ -525,9 +535,9 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
     DATA lt_tools TYPE STANDARD TABLE OF yaaic_tools WITH DEFAULT KEY.
 
-    DATA: l_tools   TYPE string VALUE '[]',
-          l_message TYPE string,
-          l_prompt  TYPE string.
+    DATA: l_tools    TYPE string VALUE '[]',
+          l_message  TYPE string,
+          l_prompt   TYPE string.
 
     CLEAR: e_response,
            e_failed.
@@ -665,9 +675,13 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
     DATA(lo_aaic_util) = NEW ycl_aaic_util( ).
 
+    IF me->m_endpoint IS INITIAL.
+      me->m_endpoint = yif_aaic_const=>c_openai_generate_endpoint.
+    ENDIF.
+
     DO me->_max_tools_calls TIMES.
 
-      IF me->_o_connection->create( i_endpoint = yif_aaic_const=>c_openai_generate_endpoint ).
+      IF me->_o_connection->create( i_endpoint = me->m_endpoint ).
 
         FREE me->_openai_generate_response.
 
@@ -1022,6 +1036,12 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
   METHOD yif_aaic_openai~use_completions.
 
     me->_use_completions = i_use_completions.
+
+  ENDMETHOD.
+
+  METHOD yif_aaic_openai~set_endpoint.
+
+    me->m_endpoint = i_endpoint.
 
   ENDMETHOD.
 

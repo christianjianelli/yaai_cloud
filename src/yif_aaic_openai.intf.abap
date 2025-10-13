@@ -190,6 +190,8 @@ INTERFACE yif_aaic_openai
 
   DATA: mo_function_calling TYPE REF TO yif_aaic_func_call_openai READ-ONLY.
 
+  DATA: m_endpoint TYPE string READ-ONLY.
+
   METHODS use_completions
     IMPORTING
       i_use_completions TYPE abap_bool DEFAULT abap_true.
@@ -218,6 +220,10 @@ INTERFACE yif_aaic_openai
   METHODS set_connection
     IMPORTING
       i_o_connection TYPE REF TO yif_aaic_conn.
+
+  METHODS set_endpoint
+    IMPORTING
+      i_endpoint TYPE csequence.
 
   METHODS set_persistence
     IMPORTING

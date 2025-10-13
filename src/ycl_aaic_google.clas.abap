@@ -20,8 +20,10 @@ CLASS ycl_aaic_google DEFINITION
     ALIASES chat FOR yif_aaic_chat~chat.
     ALIASES generate FOR yif_aaic_google~generate.
     ALIASES get_conversation FOR yif_aaic_google~get_conversation.
+    ALIASES set_endpoint FOR yif_aaic_google~set_endpoint.
 
     ALIASES mo_function_calling FOR yif_aaic_google~mo_function_calling.
+    ALIASES m_endpoint FOR yif_aaic_google~m_endpoint.
 
     CLASS-METHODS get_instance
       IMPORTING
@@ -164,7 +166,11 @@ CLASS ycl_aaic_google IMPLEMENTATION.
 
     DATA(l_apikey_url_placeholder) = |{ yif_aaic_const=>c_placeholder_pattern }APIKEY{ yif_aaic_const=>c_placeholder_pattern }|.
 
-    l_endpoint = |/v1beta/models/{ me->_model }:generateContent|.
+    IF me->m_endpoint IS NOT INITIAL.
+      l_endpoint = me->m_endpoint.
+    ELSE.
+      l_endpoint = |/v1beta/models/{ me->_model }:generateContent|.
+    ENDIF.
 
     me->_o_connection->add_http_header_param(
       EXPORTING
@@ -535,6 +541,12 @@ CLASS ycl_aaic_google IMPLEMENTATION.
     IF me->_o_persistence IS BOUND.
       me->_o_persistence->persist_message( i_data = ls_contents ).
     ENDIF.
+
+  ENDMETHOD.
+
+  METHOD yif_aaic_google~set_endpoint.
+
+    me->m_endpoint = i_endpoint.
 
   ENDMETHOD.
 

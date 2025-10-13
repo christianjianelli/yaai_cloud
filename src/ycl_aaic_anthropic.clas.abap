@@ -15,12 +15,14 @@ CLASS ycl_aaic_anthropic DEFINITION
     ALIASES set_temperature FOR yif_aaic_anthropic~set_temperature.
     ALIASES set_system_instructions FOR yif_aaic_anthropic~set_system_instructions.
     ALIASES set_connection FOR yif_aaic_anthropic~set_connection.
+    ALIASES set_endpoint FOR yif_aaic_anthropic~set_endpoint.
     ALIASES bind_tools FOR yif_aaic_anthropic~bind_tools.
     ALIASES chat FOR yif_aaic_anthropic~chat.
     ALIASES get_conversation FOR yif_aaic_anthropic~get_conversation.
 
     ALIASES mo_function_calling FOR yif_aaic_anthropic~mo_function_calling.
     ALIASES m_anthropic_version FOR yif_aaic_anthropic~m_anthropic_version.
+    ALIASES m_endpoint FOR yif_aaic_anthropic~m_endpoint.
 
     CLASS-DATA m_ref TYPE REF TO ycl_aaic_anthropic READ-ONLY.
 
@@ -231,9 +233,13 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
         i_value = |{ yif_aaic_const=>c_placeholder_pattern }APIKEY{ yif_aaic_const=>c_placeholder_pattern }|
     ).
 
+    IF me->m_endpoint IS INITIAL.
+      me->m_endpoint = yif_aaic_const=>c_anthropic_messages_endpoint.
+    ENDIF.
+
     DO me->_max_tools_calls TIMES.
 
-      IF me->_o_connection->create( i_endpoint = yif_aaic_const=>c_anthropic_messages_endpoint ).
+      IF me->_o_connection->create( i_endpoint = me->m_endpoint ).
 
         FREE ls_anthropic_chat_response.
 
@@ -469,4 +475,11 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
     ).
 
   ENDMETHOD.
+
+  METHOD yif_aaic_anthropic~set_endpoint.
+
+    m_endpoint = i_endpoint.
+
+  ENDMETHOD.
+
 ENDCLASS.

@@ -64,7 +64,8 @@ INTERFACE yif_aaic_anthropic
 
   DATA: mo_function_calling TYPE REF TO yif_aaic_func_call_anthropic READ-ONLY.
 
-  DATA m_anthropic_version TYPE string READ-ONLY.
+  DATA: m_anthropic_version TYPE string READ-ONLY,
+        m_endpoint          TYPE string READ-ONLY.
 
   METHODS set_version
     IMPORTING
@@ -89,6 +90,10 @@ INTERFACE yif_aaic_anthropic
   METHODS set_connection
     IMPORTING
       i_o_connection TYPE REF TO yif_aaic_conn.
+
+  METHODS set_endpoint
+    IMPORTING
+      i_endpoint TYPE csequence.
 
   METHODS set_persistence
     IMPORTING
