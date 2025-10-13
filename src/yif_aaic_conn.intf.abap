@@ -16,7 +16,8 @@ INTERFACE yif_aaic_conn
         m_base_url         TYPE string READ-ONLY,
         m_endpoint         TYPE string READ-ONLY,
         m_get_x_csrf_token TYPE abap_bool READ-ONLY,
-        m_basic_auth       TYPE string READ-ONLY.
+        m_username         TYPE string READ-ONLY,
+        m_password         TYPE string READ-ONLY.
 
   EVENTS on_request_send.
   EVENTS on_response_received.
@@ -69,7 +70,5 @@ INTERFACE yif_aaic_conn
   METHODS remove_http_header_param
     IMPORTING
       i_name TYPE csequence.
-
-  METHODS get_x_csrf_token.
 
 ENDINTERFACE.
