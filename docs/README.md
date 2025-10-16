@@ -2,11 +2,11 @@
 This repository provides a set of tools designed to facilitate Artificial Intelligence capabilities within **ABAP Cloud** environments.
 
 ## Key Features
-- **Multi-Provider LLM API Support**: ABAP AI tools Cloud support seamless integration with multiple large language model APIs, giving you flexibility in choosing your provider and deployment model. The list of supported APIs will continue to grow as the project evolves. Currently supported APIs include:
+- **Multi-Provider LLM API Support**: ABAP AI tools Cloud supports seamless integration with multiple large language model APIs, giving you flexibility in choosing your provider and deployment model. The list of supported APIs will continue to grow as the project evolves. Currently supported APIs include:
   - **[OpenAI](openai/README.md)**
   - **[Google Gemini](google/README.md)**
   - **[Anthropic](anthropic/README.md)** 
-  - APIs from other providers, such as Mistral, that implement the OpenAI API standards also work with ABAP AI tools Could, possibly requiring minor adjustments.
+  - APIs from other providers, such as Mistral, that implement the OpenAI API standards also work with ABAP AI tools Cloud, possibly requiring minor adjustments.
     - **[Mistral](openai_compatible/README.md)** (cloud-based)
 - **Conversation Management**: Maintain and manage multi-turn conversations, with full access to conversation history for advanced chat scenarios.
 - **Tool/Function Calling**: Integrate ABAP business logic with LLMs using function/tool calling, allowing AI models to trigger ABAP methods.
@@ -17,11 +17,11 @@ These features empower you to build intelligent, enterprise-ready ABAP applicati
   **Disclaimer:** ABAP AI tools Cloud is experimental and released under the MIT License. It is provided "as is", without warranty of any kind, express or implied. This means you use these tools at your own risk, and the authors are not liable for any damages or issues arising from their use.
 
 ## Prerequisites
- - **SAP ABAP Cloud**: You need an SAP BTP ABAP environment or SAP S/4HANA Cloud ABAP environment (a.k.a. Embedded Steampunk) .
+ - **SAP ABAP Cloud**: You need an SAP BTP ABAP environment or SAP S/4HANA Cloud ABAP environment (a.k.a. Embedded Steampunk).
  - **abapGit**: Ensure that `abapGit Repositories Eclipse ADT Plug-In` is installed. You can find all information on the SAP Help website: https://help.sap.com/docs/btp/sap-business-technology-platform/working-with-abapgit?locale=en-US
 
 ## User Interface - ABAP AI Chat
-In a BTP ABAP environment, the user interface must be a web application. ABAP AI tools Cloud includes a basic chat interface that you can use immediately or make a copy and change it to fit your requirements.
+In a BTP ABAP environment, the user interface must be a web application. ABAP AI tools Cloud includes a basic chat interface that you can use immediately or create a copy and modify it to fit your requirements.
 
 While ABAP AI tools Cloud does not directly provide a SAPUI5 or SAP Fiori Elements chat user interface, this documentation explains how to integrate an ABAP AI chat into a SAPUI5 Freestyle application or a SAP Fiori Elements application.
 
@@ -37,7 +37,7 @@ ABAP AI tools Cloud provides several HTTP services, each offering a basic chat u
 You can use these UIs as-is, or create a copy and modify it to fit your specific requirements.
 
 ### SAPUI5 Freestyle Application
-Since SAPUI5 does not have dedicated controls to build a chat interface we need to build a custom one. This documentation provides instructions and code for adding a basic chat interface to a SAPUI5 Freestyle application. It is a simple starting point so you can quickly connect your app to the ABAP AI tools.   
+Since SAPUI5 does not have dedicated controls to build a chat interface, we need to build a custom one. This documentation provides instructions and code for adding a basic chat interface to a SAPUI5 Freestyle application. It is a simple starting point so you can quickly connect your app to the ABAP AI tools.   
 
 ### SAP Fiori Elements Application
 Adding a chat to a SAP Fiori Elements Application is a more complex task. It requires a controller extension. 

@@ -29,11 +29,11 @@ You can install the ABAP AI tools Cloud into your ABAP Cloud system using abapGi
 
    ![Installation step](docs/images/install1.png)
 
-4. Inform the URL `https://github.com/christianjianelli/yaai_cloud.git`:
+4. Enter the URL `https://github.com/christianjianelli/yaai_cloud.git`:
 
    ![Installation step](docs/images/install2.png)
 
-5. Inform the package:
+5. Specify the package:
 
    ![Installation step](docs/images/install3.png)
 
@@ -47,7 +47,7 @@ You can install the ABAP AI tools Cloud into your ABAP Cloud system using abapGi
 
 7. Activate the imported objects as needed.
 
-You have now successfully installed the `ABAP AI tools Cloud!`!
+You have now successfully installed the `ABAP AI tools Cloud`.
 
 ## Quickstart
 
@@ -128,7 +128,7 @@ ENDCLASS.
 
 
 ## User Interface - ABAP AI Chat
-In a BTP ABAP environment, the user interface must be a web application. ABAP AI tools Cloud includes a basic chat interface that you can use immediately or make a copy and change it to fit your requirements.
+In a BTP ABAP environment, the user interface must be a web application. ABAP AI tools Cloud includes a basic chat interface that you can use immediately or create a copy and modify it to fit your requirements.
 
 While ABAP AI tools Cloud does not directly provide a SAPUI5 or SAP Fiori Elements chat user interface, this documentation explains how to integrate an ABAP AI chat into a SAPUI5 Freestyle application or a SAP Fiori Elements application.
 
@@ -164,5 +164,5 @@ Adding a chat to a SAP Fiori Elements Application is a more complex task. It req
 
   - [OpenAI Guide](docs/openai/README.md): Learn how to use ABAP AI with OpenAI models.
   - [Google Gemini Guide](docs/google/README.md): Learn how to use ABAP AI with Google Gemini models.
-  - [Anthropic](docs/anthropic/README.md): Learn how to use ABAP AI with Google Gemini models.
+  - [Anthropic](docs/anthropic/README.md): Learn how to use ABAP AI with Anthropic models.
   - [Mistral](docs/openai_compatible/mistral.md): Learn how to use ABAP AI with Mistral models.
