@@ -50,7 +50,6 @@ Adding a chat to a SAP Fiori Elements Application is a more complex task. It req
 
 [SAP Fiori Elements Guide](ui/fe.md): Learn how to integrate ABAP AI tool cloud capabilities into SAP Fiori Elements Applications. 
 
-
 ## Get Started
 
   - [Installation](installation.md): See how to install ABAP AI.
@@ -69,3 +68,6 @@ Adding a chat to a SAP Fiori Elements Application is a more complex task. It req
 - [Prompt Templates](prompt_templates.md): Learn how to use Prompt Templates.
 - [Function Calling](function_calling.md): Learn how to use Function Calling.
 - [Retrieval-Augmented Generation (RAG)](rag.md): Enhance your LLM applications by incorporating external knowledge sources and retrieval mechanisms.
+
+## Examples
+- [ABAP AI tools Cloud - Usage Examples](https://github.com/christianjianelli/yaai_cloud_examples): Repository with practical examples demonstrating how to use the ABAP AI tools Cloud

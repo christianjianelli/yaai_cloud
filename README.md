@@ -174,3 +174,7 @@ Adding a chat to a SAP Fiori Elements Application is a more complex task. It req
   - [Google Gemini Guide](docs/google/README.md): Learn how to use ABAP AI with Google Gemini models.
   - [Anthropic](docs/anthropic/README.md): Learn how to use ABAP AI with Anthropic models.
   - [Mistral](docs/openai_compatible/mistral.md): Learn how to use ABAP AI with Mistral models.
+
+  ### Usage Examples
+  
+  - [ABAP AI tools Cloud - Usage Examples](https://github.com/christianjianelli/yaai_cloud_examples): Repository with practical examples demonstrating how to use the ABAP AI tools Cloud 
