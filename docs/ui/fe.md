@@ -8,6 +8,9 @@ This app demonstrates how to integrate ABAP AI tool cloud capabilities into SAP 
 > SAPUI5 does not include dedicated controls for building a chat interface. A custom solution is required.  
 > This documentation provides the steps for implementing a custom chat UI within your SAP Fiori Elements Application.
 
+> **Source Code Repository:** 
+> https://github.com/christianjianelli/yaai_cloud_fiori
+
 ---
 
 ## Overview of Chat Integration
