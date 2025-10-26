@@ -246,6 +246,7 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
         DATA(l_json) = lo_aaic_util->serialize( i_data = VALUE yif_aaic_anthropic~ty_anthropic_chat_request_s( model = me->_model
                                                                                                                temperature = me->_temperature
                                                                                                                max_tokens = me->_max_tokens
+                                                                                                               stream = abap_false
                                                                                                                system = me->_system_instructions
                                                                                                                messages = me->_chat_messages
                                                                                                                tools = l_tools ) ).
