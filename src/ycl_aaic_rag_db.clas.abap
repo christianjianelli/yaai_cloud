@@ -32,6 +32,17 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
 
     CLEAR e_id.
 
+    SELECT id FROM yaaic_rag
+      WHERE filename = @i_filename
+      INTO @DATA(l_id)
+      UP TO 1 ROWS.
+    ENDSELECT.
+
+    IF sy-subrc = 0.
+      e_error = |File { i_filename } already exists in the database|.
+      RETURN.
+    ENDIF.
+
     ls_aaic_rag-id = xco_cp=>uuid( )->value.
     ls_aaic_rag-filename = i_filename.
 
@@ -90,19 +101,25 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
            e_keywords,
            e_content.
 
-    SELECT SINGLE FROM yaaic_rag FIELDS id, filename, description, keywords
+    SELECT FROM yaaic_rag FIELDS id, filename, description, keywords
       WHERE id = @i_id
-      INTO @DATA(ls_rag).
+         OR filename = @i_filename
+      INTO @DATA(ls_rag)
+      UP TO 1 ROWS.
+    ENDSELECT.
 
     IF sy-subrc <> 0.
+      e_error = |File { i_filename } not found in the database|.
       RETURN.
     ENDIF.
 
-    SELECT FROM yaaic_rag_data FIELDS id, bin_data
-      WHERE id = @i_id
+    SELECT FROM yaaic_rag_data FIELDS id, line_no, bin_data
+      WHERE id = @ls_rag-id
+      ORDER BY PRIMARY KEY
       INTO TABLE @DATA(lt_rag_data).
 
     IF sy-subrc <> 0.
+      e_error = |File { i_filename } not found in the database|.
       RETURN.
     ENDIF.
 
@@ -161,9 +178,12 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    SELECT SINGLE FROM yaaic_rag FIELDS id, description, keywords
+    SELECT FROM yaaic_rag FIELDS id, description, keywords
       WHERE id = @i_id
-      INTO @DATA(ls_rag).
+         OR filename = @i_filename
+      INTO @DATA(ls_rag)
+      UP TO 1 ROWS.
+    ENDSELECT.
 
     IF sy-subrc = 0.
 
@@ -174,6 +194,12 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
       IF i_keywords IS SUPPLIED.
         ls_rag-keywords = i_keywords.
       ENDIF.
+
+    ELSE.
+
+      e_error = |File { i_filename } not found in the database|.
+
+      RETURN.
 
     ENDIF.
 
@@ -192,10 +218,18 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
 
     e_deleted = abap_false.
 
-    DELETE FROM yaaic_rag WHERE id = @i_id.
+    DELETE FROM yaaic_rag
+      WHERE id = @i_id
+         OR filename = @i_filename.
 
     IF sy-subrc = 0.
       e_deleted = abap_true.
+    ELSE.
+
+      e_error = |File { i_filename } not found in the database|.
+
+      RETURN.
+
     ENDIF.
 
   ENDMETHOD.

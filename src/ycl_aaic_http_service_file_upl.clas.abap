@@ -49,7 +49,7 @@ CLASS ycl_aaic_http_service_file_upl IMPLEMENTATION.
 
             response->set_text( |File { l_filename } uploaded successfully. Id: { l_id } | ).
 
-          CATCH cx_web_message_error.
+          CATCH cx_web_message_error ##NO_HANDLER.
 
         ENDTRY.
 
