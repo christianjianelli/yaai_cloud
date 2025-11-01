@@ -14,15 +14,9 @@ INTERFACE yif_aaic_agent
 
   METHODS get_system_instructions
     IMPORTING
-              i_agent_id           TYPE yaaic_agent-id OPTIONAL
-              i_agent_name         TYPE yaaic_agent-name OPTIONAL
-    RETURNING VALUE(r_sys_inst_id) TYPE yaaic_agent-sys_inst_id.
-
-  METHODS get_rag_data
-    IMPORTING
-              i_agent_id          TYPE yaaic_agent-id OPTIONAL
-              i_agent_name        TYPE yaaic_agent-name OPTIONAL
-    RETURNING VALUE(r_rag_ctx_id) TYPE yaaic_agent-rag_ctx_id.
+              i_agent_id                   TYPE yaaic_agent-id OPTIONAL
+              i_agent_name                 TYPE yaaic_agent-name OPTIONAL
+    RETURNING VALUE(r_system_instructions) TYPE string.
 
   METHODS get_tools
     IMPORTING
