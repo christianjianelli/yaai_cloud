@@ -207,6 +207,26 @@ CLASS ycl_aaic_http_service_openai IMPLEMENTATION.
                    i_text = l_response_text
                 ).
 
+              WHEN 'mermaid'.
+
+                DATA(lo_diagram_openai) = NEW ycl_aaic_diagram_openai( ).
+
+                DATA(lt_chat_messages) = lo_diagram_openai->get_chat_messages(
+                  EXPORTING
+                    i_chat_id = l_chat_id
+                ).
+
+                LOOP AT lt_chat_messages ASSIGNING FIELD-SYMBOL(<ls_chat_message>).
+
+                  lo_diagram_openai->add_message( <ls_chat_message> ).
+
+                ENDLOOP.
+
+                response->set_text(
+                  EXPORTING
+                   i_text = lo_diagram_openai->get_diagram( )
+                ).
+
               WHEN OTHERS.
 
                 response->set_text(
