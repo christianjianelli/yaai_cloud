@@ -149,14 +149,17 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
 
   METHOD if_oo_adt_classrun~main.
 
-    DATA(ls_agent) = VALUE yaaic_agent( name = 'Travel AI Assistant'
+*    DELETE FROM yaaic_agent.
+*    DELETE FROM yaaic_agent_tool.
+
+    DATA(ls_agent) = VALUE yaaic_agent( name = 'travel-fiori-ai-assistant'
                                         description = 'Travel Fiori App AI Assistant'
                                         sys_inst_id = '2A9448FCE52F1FD0AD850377D753B845'
                                         rag_ctx_id = '7EA3422BA1AC1FE0AD8503D109246C64' ).
 
     DATA(lt_agent_tools) = VALUE yif_aaic_agent_db=>ty_agent_tools_t( ( class_name = 'ycl_aaic_rag_tools'
                                                                         method_name = 'get_documentation'
-                                                                        description = 'Use this method to retrieve the complete App documentation' ) ).
+                                                                        description = 'Use this method to retrieve the complete documentation of the Travel Fiori App' ) ).
 
     me->create(
       EXPORTING
