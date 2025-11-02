@@ -152,26 +152,27 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
 *    DELETE FROM yaaic_agent.
 *    DELETE FROM yaaic_agent_tool.
 
-    DATA(ls_agent) = VALUE yaaic_agent( name = 'travel-fiori-ai-assistant'
-                                        description = 'Travel Fiori App AI Assistant'
-                                        sys_inst_id = '2A9448FCE52F1FD0AD850377D753B845'
-                                        rag_ctx_id = '7EA3422BA1AC1FE0AD8503D109246C64' ).
-
-    DATA(lt_agent_tools) = VALUE yif_aaic_agent_db=>ty_agent_tools_t( ( class_name = 'ycl_aaic_rag_tools'
-                                                                        method_name = 'get_documentation'
-                                                                        description = 'Use this method to retrieve the complete documentation of the Travel Fiori App' ) ).
-
-    me->create(
-      EXPORTING
-        i_s_agent       = ls_agent
-        i_t_agent_tools = lt_agent_tools
-      IMPORTING
-        e_id            = DATA(l_id)
-        e_error         = DATA(l_error)
-    ).
-
-    out->write( l_id ).
-    out->write( l_error ).
+*    DATA(ls_agent) = VALUE yaaic_agent( name = 'travel-fiori-ai-assistant'
+*                                        description = 'Travel Fiori App AI Assistant'
+*                                        sys_inst_id = '2A9448FCE52F1FD0AD850377D753B845'
+*                                        rag_ctx_id = '7EA3422BA1AC1FE0AD8503D109246C64'
+*                                        prompt_template = '**User message**: %USER_MESSAGE% \n\n**Context**:\n\n %CONTEXT% \n\n' ).
+*
+*    DATA(lt_agent_tools) = VALUE yif_aaic_agent_db=>ty_agent_tools_t( ( class_name = 'ycl_aaic_rag_tools'
+*                                                                        method_name = 'get_documentation'
+*                                                                        description = 'Use this method to retrieve the complete documentation of the Travel Fiori App' ) ).
+*
+*    me->create(
+*      EXPORTING
+*        i_s_agent       = ls_agent
+*        i_t_agent_tools = lt_agent_tools
+*      IMPORTING
+*        e_id            = DATA(l_id)
+*        e_error         = DATA(l_error)
+*    ).
+*
+*    out->write( l_id ).
+*    out->write( l_error ).
 
   ENDMETHOD.
 

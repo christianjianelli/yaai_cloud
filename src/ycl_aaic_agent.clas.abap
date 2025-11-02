@@ -11,6 +11,7 @@ CLASS ycl_aaic_agent DEFINITION
 
     ALIASES get_system_instructions FOR yif_aaic_agent~get_system_instructions.
     ALIASES get_tools FOR yif_aaic_agent~get_tools.
+    ALIASES get_prompt_template FOR yif_aaic_agent~get_prompt_template.
 
   PROTECTED SECTION.
 
@@ -87,15 +88,63 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
 
   ENDMETHOD.
 
+  METHOD yif_aaic_agent~get_prompt_template.
+
+    DATA ls_agent TYPE yaaic_agent.
+
+    FREE r_prompt_template.
+
+    IF i_agent_id IS SUPPLIED.
+
+      SELECT SINGLE id, name, prompt_template
+        FROM yaaic_agent
+        WHERE id = @i_agent_id
+        INTO CORRESPONDING FIELDS OF @ls_agent.
+
+    ELSEIF i_agent_name IS SUPPLIED.
+
+      SELECT id, name, prompt_template
+        FROM yaaic_agent
+        WHERE name = @i_agent_name
+        INTO CORRESPONDING FIELDS OF @ls_agent
+        UP TO 1 ROWS.
+      ENDSELECT.
+
+    ENDIF.
+
+    r_prompt_template = ls_agent-prompt_template.
+
+  ENDMETHOD.
+
   METHOD if_oo_adt_classrun~main.
 
-*    DATA(l_system_instructions) = me->get_system_instructions( CONV #( '2A9448FCE52F1FD0ADF57A93331E5848' ) ).
+*    DATA(l_agent_id) = '7EA3422BA1AC1FE0AE835528E8F90C68'.
 *
-*    DATA(lt_tools) = me->get_tools( CONV #( '2A9448FCE52F1FD0ADF57A93331E5848' ) ).
+*    DATA(l_system_instructions) = me->get_system_instructions( CONV #( l_agent_id ) ).
+*
+*    DATA(lt_tools) = me->get_tools( CONV #( l_agent_id ) ).
+*
+*    DATA(l_prompt_template) = me->get_prompt_template( CONV #( l_agent_id ) ).
 *
 *    out->write( l_system_instructions ).
 *
 *    out->write( lt_tools ).
+*
+*    out->write( l_prompt_template ).
+
+*    DATA(l_agent_name) = 'travel-fiori-ai-assistant'.
+*
+*    DATA(l_system_instructions) = me->get_system_instructions( i_agent_name = CONV #( l_agent_name ) ).
+*
+*    DATA(lt_tools) = me->get_tools( i_agent_name = CONV #( l_agent_name ) ).
+*
+*    DATA(l_prompt_template) = me->get_prompt_template( i_agent_name = CONV #( l_agent_name ) ).
+*
+*    out->write( l_system_instructions ).
+*
+*    out->write( lt_tools ).
+*
+*    out->write( l_prompt_template ).
 
   ENDMETHOD.
 
