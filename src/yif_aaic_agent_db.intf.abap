@@ -31,7 +31,6 @@ INTERFACE yif_aaic_agent_db
   METHODS delete
     IMPORTING
       i_agent_id   TYPE yaaic_agent-id OPTIONAL
-      i_agent_name TYPE yaaic_agent-name OPTIONAL
     EXPORTING
       e_deleted    TYPE abap_bool
       e_error      TYPE string.
