@@ -7,6 +7,8 @@ CLASS ycl_aaic_agent DEFINITION
 
     INTERFACES yif_aaic_agent.
 
+    INTERFACES if_oo_adt_classrun.
+
     ALIASES get_system_instructions FOR yif_aaic_agent~get_system_instructions.
     ALIASES get_tools FOR yif_aaic_agent~get_tools.
 
@@ -82,6 +84,18 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
     ENDIF.
 
     r_t_agent_tools = CORRESPONDING #( lt_tools ).
+
+  ENDMETHOD.
+
+  METHOD if_oo_adt_classrun~main.
+
+*    DATA(l_system_instructions) = me->get_system_instructions( CONV #( '2A9448FCE52F1FD0ADF57A93331E5848' ) ).
+*
+*    DATA(lt_tools) = me->get_tools( CONV #( '2A9448FCE52F1FD0ADF57A93331E5848' ) ).
+*
+*    out->write( l_system_instructions ).
+*
+*    out->write( lt_tools ).
 
   ENDMETHOD.
 
