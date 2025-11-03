@@ -184,7 +184,6 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
 
     ENDIF.
 
-*    <ls_msg> = VALUE #( role = 'user' content = lo_aaic_util->serialize( i_data = l_message ) ).
     <ls_msg> = VALUE #( role = 'user' content = l_message ).
 
     IF l_prompt IS NOT INITIAL.

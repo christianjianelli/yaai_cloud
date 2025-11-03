@@ -423,14 +423,7 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
 
           IF ls_msg-role = 'user'.
 
-            /ui2/cl_json=>deserialize(
-             EXPORTING
-               json = ls_msg-content
-             CHANGING
-               data = ls_msg-content
-           ).
-
-          ELSE.
+            FREE lt_anthropic_chat_response.
 
             /ui2/cl_json=>deserialize(
               EXPORTING
@@ -439,11 +432,49 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
                 data = lt_anthropic_chat_response
             ).
 
-            LOOP AT lt_anthropic_chat_response INTO DATA(ls_anthropic_chat_response).
+            IF lt_anthropic_chat_response IS NOT INITIAL.
 
-              IF ls_anthropic_chat_response-type = 'text'.
-                ls_msg-content = ls_anthropic_chat_response-text.
+              CLEAR ls_msg-content.
+
+              LOOP AT lt_anthropic_chat_response ASSIGNING FIELD-SYMBOL(<ls_anthropic_chat_response>).
+
+                IF <ls_anthropic_chat_response>-type <> 'text'.
+                  CONTINUE.
+                ENDIF.
+
+                ls_msg-content = <ls_anthropic_chat_response>-text.
+
+              ENDLOOP.
+
+            ELSE.
+
+              /ui2/cl_json=>deserialize(
+               EXPORTING
+                 json = ls_msg-content
+               CHANGING
+                 data = ls_msg-content
+             ).
+
+            ENDIF.
+
+          ELSE.
+
+            FREE lt_anthropic_chat_response.
+
+            /ui2/cl_json=>deserialize(
+              EXPORTING
+                json = ls_msg-content
+              CHANGING
+                data = lt_anthropic_chat_response
+            ).
+
+            LOOP AT lt_anthropic_chat_response ASSIGNING <ls_anthropic_chat_response>.
+
+              IF <ls_anthropic_chat_response>-type <> 'text'.
+                CONTINUE.
               ENDIF.
+
+              ls_msg-content = <ls_anthropic_chat_response>-text.
 
             ENDLOOP.
 
@@ -461,31 +492,35 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
 
         ENDIF.
 
-        CASE ls_msg-role.
+        IF ls_msg-content IS NOT INITIAL.
 
-          WHEN 'user'.
+          CASE ls_msg-role.
 
-            r_html = r_html && '<div class="message user-message">' && cl_abap_char_utilities=>newline.
-            r_html = r_html && '<div class="message-bubble">' && cl_abap_char_utilities=>newline.
-            r_html = r_html && '<div class="markdown-content">' && cl_abap_char_utilities=>newline.
-            r_html = r_html && '<p>' && ls_msg-content && '</p>' && cl_abap_char_utilities=>newline.
-            r_html = r_html && '</div>' && cl_abap_char_utilities=>newline.
-            r_html = r_html && '</div>' && cl_abap_char_utilities=>newline.
-            r_html = r_html && |<div class="message-timestamp">{ <ls_message>-msg_date+6(2) }/{ <ls_message>-msg_date+4(2) }/{ <ls_message>-msg_date(4) } { <ls_message>-msg_time TIME = USER }</div> { cl_abap_char_utilities=>newline }|.
-            r_html = r_html && '</div>' && cl_abap_char_utilities=>newline.
+            WHEN 'user'.
 
-          WHEN 'assistant' OR 'model'.
+              r_html = r_html && '<div class="message user-message">' && cl_abap_char_utilities=>newline.
+              r_html = r_html && '<div class="message-bubble">' && cl_abap_char_utilities=>newline.
+              r_html = r_html && '<div class="markdown-content">' && cl_abap_char_utilities=>newline.
+              r_html = r_html && '<p>' && ls_msg-content && '</p>' && cl_abap_char_utilities=>newline.
+              r_html = r_html && '</div>' && cl_abap_char_utilities=>newline.
+              r_html = r_html && '</div>' && cl_abap_char_utilities=>newline.
+              r_html = r_html && |<div class="message-timestamp">{ <ls_message>-msg_date+6(2) }/{ <ls_message>-msg_date+4(2) }/{ <ls_message>-msg_date(4) } { <ls_message>-msg_time TIME = USER }</div> { cl_abap_char_utilities=>newline }|.
+              r_html = r_html && '</div>' && cl_abap_char_utilities=>newline.
 
-            r_html = r_html && '<div class="message llm-message">' && cl_abap_char_utilities=>newline.
-            r_html = r_html && '<div class="message-bubble">' && cl_abap_char_utilities=>newline.
-            r_html = r_html && '<div class="markdown-content">' && cl_abap_char_utilities=>newline.
-            r_html = r_html && ls_msg-content && cl_abap_char_utilities=>newline.
-            r_html = r_html && '</div>' && cl_abap_char_utilities=>newline.
-            r_html = r_html && '</div>' && cl_abap_char_utilities=>newline.
-            r_html = r_html && |<div class="message-timestamp">{ <ls_message>-msg_date+6(2) }/{ <ls_message>-msg_date+4(2) }/{ <ls_message>-msg_date(4) } { <ls_message>-msg_time TIME = USER }</div> { cl_abap_char_utilities=>newline }|.
-            r_html = r_html && '</div>' && cl_abap_char_utilities=>newline.
+            WHEN 'assistant' OR 'model'.
 
-        ENDCASE.
+              r_html = r_html && '<div class="message llm-message">' && cl_abap_char_utilities=>newline.
+              r_html = r_html && '<div class="message-bubble">' && cl_abap_char_utilities=>newline.
+              r_html = r_html && '<div class="markdown-content">' && cl_abap_char_utilities=>newline.
+              r_html = r_html && ls_msg-content && cl_abap_char_utilities=>newline.
+              r_html = r_html && '</div>' && cl_abap_char_utilities=>newline.
+              r_html = r_html && '</div>' && cl_abap_char_utilities=>newline.
+              r_html = r_html && |<div class="message-timestamp">{ <ls_message>-msg_date+6(2) }/{ <ls_message>-msg_date+4(2) }/{ <ls_message>-msg_date(4) } { <ls_message>-msg_time TIME = USER }</div> { cl_abap_char_utilities=>newline }|.
+              r_html = r_html && '</div>' && cl_abap_char_utilities=>newline.
+
+          ENDCASE.
+
+        ENDIF.
 
       ENDLOOP.
 
