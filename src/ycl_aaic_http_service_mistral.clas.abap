@@ -6,26 +6,15 @@ CLASS ycl_aaic_http_service_mistral DEFINITION
 
     INTERFACES if_http_service_extension.
 
-    DATA m_system_instructions TYPE string.
-
-    METHODS constructor.
-
   PROTECTED SECTION.
+
   PRIVATE SECTION.
+
 ENDCLASS.
 
 
 
 CLASS ycl_aaic_http_service_mistral IMPLEMENTATION.
-
-  METHOD constructor.
-
-    "Default system instructions used when some context is provided alongside the user prompt.
-    "You can define your own system instructions by creating a new class inheriting from this class
-    "and change the system instructions in the constructor method of your class.
-    m_system_instructions = 'Please respond to the user, considering the provided context.'.
-
-  ENDMETHOD.
 
   METHOD if_http_service_extension~handle_request.
 
@@ -76,6 +65,8 @@ CLASS ycl_aaic_http_service_mistral IMPLEMENTATION.
 
             DATA(l_model) = request->get_form_field( i_name = 'model' ).
 
+            DATA(l_agent_id) = request->get_form_field( i_name = 'agent' ).
+
             IF l_model IS NOT INITIAL AND ls_request-model IS INITIAL.
               ls_request-model = l_model.
             ENDIF.
@@ -94,6 +85,38 @@ CLASS ycl_aaic_http_service_mistral IMPLEMENTATION.
 
             lo_aaic_mistral->use_completions( ).
 
+            IF l_agent_id IS NOT INITIAL.
+
+              DATA(lo_agent) = NEW ycl_aaic_agent( ).
+
+              DATA(l_system_instructions) = lo_agent->get_system_instructions( CONV #( l_agent_id ) ).
+
+              DATA(lt_agent_tools) = lo_agent->get_tools( CONV #( l_agent_id ) ).
+
+              lo_aaic_mistral->set_system_instructions(
+                i_system_instructions = l_system_instructions
+                i_system_instructions_role = 'system'
+              ).
+
+              IF lt_agent_tools[] IS NOT INITIAL.
+
+                DATA(lo_function_calling) = NEW ycl_aaic_func_call_openai( ).
+
+                LOOP AT lt_agent_tools ASSIGNING FIELD-SYMBOL(<ls_agent_tool>).
+
+                  lo_function_calling->add_methods( VALUE #( ( class_name = <ls_agent_tool>-class_name
+                                                               method_name = <ls_agent_tool>-method_name
+                                                               proxy_class = <ls_agent_tool>-proxy_class
+                                                               description = <ls_agent_tool>-description ) ) ).
+
+                ENDLOOP.
+
+                lo_aaic_mistral->bind_tools( lo_function_calling ).
+
+              ENDIF.
+
+            ENDIF.
+
             IF ls_request-context IS INITIAL.
 
               lo_aaic_mistral->chat(
@@ -105,12 +128,17 @@ CLASS ycl_aaic_http_service_mistral IMPLEMENTATION.
 
             ELSE.
 
-              lo_aaic_mistral->set_system_instructions(
-                i_system_instructions = m_system_instructions
-              ).
+              " Default template
+              DATA(l_prompt_template) = |**User message**: %USER_MESSAGE% \n\n**Context**:\n\n %CONTEXT% \n\n|.
+
+              IF l_agent_id IS NOT INITIAL.
+
+                l_prompt_template = lo_agent->get_prompt_template( CONV #( l_agent_id ) ).
+
+              ENDIF.
 
               DATA(lo_aaic_prompt_template) = NEW ycl_aaic_prompt_template(
-                i_template_text = |**User message**: %USER_MESSAGE% \n\n**Context**:\n\n %CONTEXT% \n\n|
+                i_template_text = l_prompt_template
               ).
 
               DATA(lo_aaic_prompt) = NEW ycl_aaic_prompt(

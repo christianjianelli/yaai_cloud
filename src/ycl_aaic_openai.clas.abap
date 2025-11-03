@@ -90,7 +90,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       ENDIF.
     ENDIF.
 
-    me->_system_instructions_role = 'developer'.
+    "me->_system_instructions_role = 'developer'.
 
     me->_messages = i_t_history.
 
@@ -158,6 +158,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
           i_message    = i_message
           i_new        = i_new
           i_greeting   = i_greeting
+          i_o_prompt   = i_o_prompt
         IMPORTING
           e_response   = e_response
           e_failed     = e_failed

@@ -124,6 +124,7 @@ CLASS ycl_aaic_http_service_openai IMPLEMENTATION.
 
             ELSE.
 
+              " Default template
               DATA(l_prompt_template) = |**User message**: %USER_MESSAGE% \n\n**Context**:\n\n %CONTEXT% \n\n|.
 
               IF l_agent_id IS NOT INITIAL.
