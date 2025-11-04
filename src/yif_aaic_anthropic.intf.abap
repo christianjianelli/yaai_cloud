@@ -39,11 +39,12 @@ INTERFACE yif_aaic_anthropic
          END OF ty_anthropic_chat_request_s.
 
   TYPES: BEGIN OF ty_response_content_s,
-           type  TYPE string,
-           text  TYPE string,
-           id    TYPE string,
-           name  TYPE string,
-           input TYPE /ui2/cl_json=>json,
+           type    TYPE string,
+           text    TYPE string,
+           id      TYPE string,
+           name    TYPE string,
+           input   TYPE /ui2/cl_json=>json,
+           content TYPE string,
          END OF ty_response_content_s.
 
   TYPES: ty_content_t TYPE STANDARD TABLE OF ty_response_content_s WITH NON-UNIQUE KEY type.

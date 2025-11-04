@@ -24,14 +24,23 @@ INTERFACE yif_aaic_diagram_openai
 
     get_chat_messages
       IMPORTING
-        i_chat_id TYPE csequence
+                i_chat_id           TYPE csequence
       RETURNING VALUE(r_t_messages) TYPE yif_aaic_openai=>ty_generate_messages_t,
 
-    get_diagram RETURNING VALUE(r_diagram) TYPE string,
+    get_diagram
+      IMPORTING
+                i_chat_id        TYPE csequence OPTIONAL
+      RETURNING VALUE(r_diagram) TYPE string,
 
     add_participant
       IMPORTING
         i_participant TYPE string,
+
+    add_step
+      IMPORTING
+        i_sender  TYPE string
+        i_target  TYPE string
+        i_content TYPE string,
 
     add_message
       IMPORTING

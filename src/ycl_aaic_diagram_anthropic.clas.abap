@@ -11,6 +11,7 @@ CLASS ycl_aaic_diagram_anthropic DEFINITION
     ALIASES: get_chat_messages FOR yif_aaic_diagram_anthropic~get_chat_messages,
              get_diagram FOR yif_aaic_diagram_anthropic~get_diagram,
              add_participant FOR yif_aaic_diagram_anthropic~add_participant,
+             add_step FOR yif_aaic_diagram_anthropic~add_step,
              add_message FOR yif_aaic_diagram_anthropic~add_message,
              parse_json FOR yif_aaic_diagram_anthropic~parse_json,
              escape_text FOR yif_aaic_diagram_anthropic~escape_text,
@@ -43,7 +44,7 @@ CLASS ycl_aaic_diagram_anthropic IMPLEMENTATION.
 
   ENDMETHOD.
 
-  METHOD get_chat_messages.
+  METHOD yif_aaic_diagram_anthropic~get_chat_messages.
 
     NEW ycl_aaic_db( i_api = yif_aaic_const=>c_anthropic
                      i_id = CONV #( i_chat_id ) )->get_chat(
@@ -68,7 +69,7 @@ CLASS ycl_aaic_diagram_anthropic IMPLEMENTATION.
 
   ENDMETHOD.
 
-  METHOD parse_json.
+  METHOD yif_aaic_diagram_anthropic~parse_json.
 
     NEW ycl_aaic_util( )->deserialize(
       EXPORTING
@@ -79,7 +80,7 @@ CLASS ycl_aaic_diagram_anthropic IMPLEMENTATION.
 
   ENDMETHOD.
 
-  METHOD escape_text.
+  METHOD yif_aaic_diagram_anthropic~escape_text.
 
     " Start with the original text
     r_escaped_text = i_text.
@@ -95,7 +96,7 @@ CLASS ycl_aaic_diagram_anthropic IMPLEMENTATION.
 
   ENDMETHOD.
 
-  METHOD add_participant.
+  METHOD yif_aaic_diagram_anthropic~add_participant.
 
     READ TABLE me->mt_participants TRANSPORTING NO FIELDS
       WITH KEY participant = to_lower( i_participant ).
@@ -106,68 +107,169 @@ CLASS ycl_aaic_diagram_anthropic IMPLEMENTATION.
 
   ENDMETHOD.
 
-  METHOD add_message.
+  METHOD yif_aaic_diagram_anthropic~add_step.
+
+    DATA: l_line    TYPE string,
+          l_content TYPE string,
+          l_len     TYPE i,
+          l_suffix  TYPE string.
+
+    me->add_participant( i_sender ).
+    me->add_participant( i_target ).
+
+    l_content = me->escape_text( i_content ).
+
+    l_len = COND #( WHEN strlen( l_content ) < me->m_maxlen THEN strlen( l_content ) ELSE me->m_maxlen ).
+
+    IF strlen( i_content ) > l_len.
+      l_suffix = '...'.
+    ENDIF.
+
+    " Build mermaid line
+    l_line = |{ i_sender } ->> { i_target }: { substring( val = l_content off = 0 len = l_len ) }{ l_suffix }|.
+
+    " Append to diagram
+    APPEND VALUE #( step = l_line && cl_abap_char_utilities=>newline ) TO mt_steps.
+
+  ENDMETHOD.
+
+  METHOD yif_aaic_diagram_anthropic~add_message.
+
+    DATA lt_anthropic_chat_response TYPE STANDARD TABLE OF yif_aaic_anthropic=>ty_response_content_s.
 
     DATA: l_role   TYPE string,
           l_line   TYPE string,
           l_sender TYPE string,
           l_target TYPE string,
           l_len    TYPE i,
-          l_3p     TYPE string.
+          l_suffix TYPE string.
 
 
-*    DATA(ls_msg) = i_s_msg.
-*
-*    ls_msg-content = me->escape_text( ls_msg-content ).
-*    ls_msg-arguments = me->escape_text( ls_msg-arguments ).
-*    ls_msg-output = me->escape_text( ls_msg-output ).
-*
-*    CASE to_lower( ls_msg-type ).
-*
-*      WHEN 'message'.
-*
-*        l_sender = to_mixed( to_upper( ls_msg-role ) ).
-*
-*        l_target = to_mixed( to_upper( COND #( WHEN to_lower( ls_msg-role ) = 'user' THEN 'Assistant' ELSE 'User' ) ) ).
-*
-*      WHEN 'function_call'.
-*
-*        l_sender = 'Assistant'.
-*
-*        l_target = 'Tool'.
-*
-*        ls_msg-content = |Tool call: { ls_msg-name }|.
-*
-*      WHEN 'function_call_output'.
-*
-*        l_sender = 'Tool'.
-*
-*        l_target = 'Assistant'.
-*
-*        ls_msg-content = |Tool response: { ls_msg-output }|.
-*
-*    ENDCASE.
-*
-*    me->add_participant( l_sender ).
-*    me->add_participant( l_target ).
-*
-*    l_len = COND #( WHEN strlen( ls_msg-content ) < me->m_maxlen THEN strlen( ls_msg-content ) ELSE me->m_maxlen ).
-*
-*    IF strlen( ls_msg-content ) > l_len.
-*      l_3p = '...'.
-*    ENDIF.
-*
-*    " Build mermaid line
-*    l_line = |{ l_sender } ->> { l_target }: { substring( val = ls_msg-content off = 0 len = l_len ) }{ l_3p }|.
-*
-*    " Append to diagram
-*    APPEND VALUE #( step = l_line && cl_abap_char_utilities=>newline ) TO mt_steps.
+    DATA(ls_msg) = i_s_msg.
+
+    IF ls_msg-role = 'user'.
+
+      FREE lt_anthropic_chat_response.
+
+      /ui2/cl_json=>deserialize(
+        EXPORTING
+          json = ls_msg-content
+        CHANGING
+          data = lt_anthropic_chat_response
+      ).
+
+      IF lt_anthropic_chat_response IS NOT INITIAL.
+
+        CLEAR ls_msg-content.
+
+        LOOP AT lt_anthropic_chat_response ASSIGNING FIELD-SYMBOL(<ls_anthropic_chat_response>).
+
+          CASE <ls_anthropic_chat_response>-type.
+
+            WHEN 'text'.
+
+              l_sender = to_mixed( to_upper( ls_msg-role ) ).
+              l_target = 'Assistant'.
+
+              ls_msg-content = <ls_anthropic_chat_response>-text.
+
+            WHEN 'tool_result'.
+
+              l_sender = 'Tool'.
+              l_target = 'Assistant'.
+
+              ls_msg-content = <ls_anthropic_chat_response>-content.
+
+          ENDCASE.
+
+          me->add_step(
+            i_sender  = l_sender
+            i_target  = l_target
+            i_content = ls_msg-content
+          ).
+
+        ENDLOOP.
+
+      ELSE.
+
+        /ui2/cl_json=>deserialize(
+          EXPORTING
+            json = ls_msg-content
+          CHANGING
+            data = ls_msg-content
+        ).
+
+        l_sender = to_mixed( to_upper( ls_msg-role ) ).
+        l_target = 'Assistant'.
+
+        me->add_step(
+          i_sender  = l_sender
+          i_target  = l_target
+          i_content = ls_msg-content
+        ).
+
+      ENDIF.
+
+    ELSE.
+
+      FREE lt_anthropic_chat_response.
+
+      /ui2/cl_json=>deserialize(
+        EXPORTING
+          json = ls_msg-content
+        CHANGING
+          data = lt_anthropic_chat_response
+      ).
+
+      LOOP AT lt_anthropic_chat_response ASSIGNING <ls_anthropic_chat_response>.
+
+        CASE <ls_anthropic_chat_response>-type.
+
+          WHEN 'text'.
+
+            ls_msg-content = <ls_anthropic_chat_response>-text.
+
+            l_sender = to_mixed( to_upper( ls_msg-role ) ).
+            l_target = 'User'.
+
+          WHEN 'tool_use'.
+
+            ls_msg-content = <ls_anthropic_chat_response>-name.
+
+            l_sender = to_mixed( to_upper( ls_msg-role ) ).
+            l_target = 'Tool'.
+
+        ENDCASE.
+
+        me->add_step(
+          i_sender  = l_sender
+          i_target  = l_target
+          i_content = ls_msg-content
+        ).
+
+        ls_msg-content = <ls_anthropic_chat_response>-text.
+
+      ENDLOOP.
+
+    ENDIF.
 
   ENDMETHOD.
 
-  METHOD get_diagram.
+  METHOD yif_aaic_diagram_anthropic~get_diagram.
 
     r_diagram = me->m_diagram.
+
+    IF i_chat_id IS SUPPLIED.
+
+      DATA(lt_messages) = me->get_chat_messages( i_chat_id ).
+
+      LOOP AT lt_messages ASSIGNING FIELD-SYMBOL(<ls_message>).
+
+        me->add_message( <ls_message> ).
+
+      ENDLOOP.
+
+    ENDIF.
 
     LOOP AT me->mt_participants ASSIGNING FIELD-SYMBOL(<ls_participant>).
 
@@ -185,20 +287,7 @@ CLASS ycl_aaic_diagram_anthropic IMPLEMENTATION.
 
   METHOD if_oo_adt_classrun~main.
 
-    me->get_chat_messages(
-      EXPORTING
-        i_chat_id    = '2A9448FCE52F1FD0ADC4327EDD69B846'
-      RECEIVING
-        r_t_messages = DATA(lt_messages)
-    ).
-
-    LOOP AT lt_messages ASSIGNING FIELD-SYMBOL(<ls_message>).
-
-      me->add_message( <ls_message> ).
-
-    ENDLOOP.
-
-    out->write( me->get_diagram( ) ).
+    out->write( me->get_diagram( '7EA3422BA1AC1FE0AE910DC49DEBCC68' ) ).
 
   ENDMETHOD.
 
