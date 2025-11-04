@@ -235,6 +235,13 @@ CLASS ycl_aaic_http_srvc_anthropic IMPLEMENTATION.
                    i_text = l_response_text
                 ).
 
+              WHEN 'mermaid'.
+
+                response->set_text(
+                  EXPORTING
+                   i_text = NEW ycl_aaic_diagram_anthropic( )->get_diagram( l_chat_id )
+                ).
+
               WHEN OTHERS.
 
                 response->set_text(
