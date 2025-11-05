@@ -135,121 +135,84 @@ CLASS ycl_aaic_diagram_google IMPLEMENTATION.
 
   METHOD yif_aaic_diagram_google~add_message.
 
-    DATA lt_google_chat_response TYPE STANDARD TABLE OF yif_aaic_google=>ty_contents_s.
+    DATA ls_parts TYPE yif_aaic_diagram_google=>ty_parts_s.
 
-    DATA: l_role   TYPE string,
-          l_line   TYPE string,
-          l_sender TYPE string,
-          l_target TYPE string,
-          l_len    TYPE i,
-          l_suffix TYPE string.
+    DATA: l_role    TYPE string,
+          l_line    TYPE string,
+          l_sender  TYPE string,
+          l_target  TYPE string,
+          l_content TYPE string,
+          l_len     TYPE i,
+          l_suffix  TYPE string.
 
 
     DATA(ls_msg) = i_s_msg.
 
+    IF ls_msg-parts IS NOT INITIAL.
+
+      /ui2/cl_json=>deserialize(
+        EXPORTING
+          json = ls_msg-parts[ 1 ]
+        CHANGING
+          data = ls_parts
+      ).
+
+    ENDIF.
+
     IF ls_msg-role = 'user'.
 
-      FREE lt_google_chat_response.
+      CLEAR l_content.
 
-*      /ui2/cl_json=>deserialize(
-*        EXPORTING
-*          json = ls_msg-parts
-*        CHANGING
-*          data = lt_google_chat_response
-*      ).
+      IF ls_parts-text IS NOT INITIAL.
 
-*      IF lt_google_chat_response IS NOT INITIAL.
+        l_sender = 'User'.
+        l_target = 'Assistant'.
+        l_content = ls_parts-text.
 
-*        CLEAR ls_msg-content.
-*
-*        LOOP AT lt_google_chat_response ASSIGNING FIELD-SYMBOL(<ls_google_chat_response>).
-*
-*          CASE <ls_google_chat_response>-type.
-*
-*            WHEN 'text'.
-*
-*              l_sender = to_mixed( to_upper( ls_msg-role ) ).
-*              l_target = 'Assistant'.
-*
-*              ls_msg-content = <ls_google_chat_response>-text.
-*
-*            WHEN 'tool_result'.
-*
-*              l_sender = 'Tool'.
-*              l_target = 'Assistant'.
-*
-*              ls_msg-content = <ls_google_chat_response>-content.
-*
-*          ENDCASE.
-*
-*          me->add_step(
-*            i_sender  = l_sender
-*            i_target  = l_target
-*            i_content = ls_msg-content
-*          ).
-*
-*        ENDLOOP.
-*
-*      ELSE.
-*
-*        /ui2/cl_json=>deserialize(
-*          EXPORTING
-*            json = ls_msg-content
-*          CHANGING
-*            data = ls_msg-content
-*        ).
-*
-*        l_sender = to_mixed( to_upper( ls_msg-role ) ).
-*        l_target = 'Assistant'.
-*
-*        me->add_step(
-*          i_sender  = l_sender
-*          i_target  = l_target
-*          i_content = ls_msg-content
-*        ).
-*
-*      ENDIF.
-*
+
+
+      ENDIF.
+
+      me->add_step(
+        i_sender  = l_sender
+        i_target  = l_target
+        i_content = l_content
+      ).
+
+
     ELSE.
 
-*      FREE lt_google_chat_response.
-*
-*      /ui2/cl_json=>deserialize(
-*        EXPORTING
-*          json = ls_msg-content
-*        CHANGING
-*          data = lt_google_chat_response
-*      ).
-*
-*      LOOP AT lt_google_chat_response ASSIGNING <ls_google_chat_response>.
-*
-*        CASE <ls_google_chat_response>-type.
-*
-*          WHEN 'text'.
-*
-*            ls_msg-content = <ls_google_chat_response>-text.
-*
-*            l_sender = to_mixed( to_upper( ls_msg-role ) ).
-*            l_target = 'User'.
-*
-*          WHEN 'tool_use'.
-*
-*            ls_msg-content = <ls_google_chat_response>-name.
-*
-*            l_sender = to_mixed( to_upper( ls_msg-role ) ).
-*            l_target = 'Tool'.
-*
-*        ENDCASE.
-*
-*        me->add_step(
-*          i_sender  = l_sender
-*          i_target  = l_target
-*          i_content = ls_msg-content
-*        ).
-*
-*        ls_msg-content = <ls_google_chat_response>-text.
-*
-*      ENDLOOP.
+      CLEAR l_content.
+
+      IF ls_parts-text IS NOT INITIAL.
+
+        l_sender = 'Assistant'.
+        l_target = 'User'.
+        l_content = ls_parts-text.
+
+      ELSEIF ls_parts-function_call IS NOT INITIAL.
+
+        l_sender = 'Assistant'.
+        l_target = 'Tool'.
+        l_content = ls_parts-function_call-name.
+
+      ELSEIF ls_parts-function_response IS NOT INITIAL.
+
+        l_sender = 'Tool'.
+        l_target = 'Assistant'.
+        l_content = ls_parts-function_response-response.
+
+      ENDIF.
+
+      IF l_content IS NOT INITIAL.
+
+        me->add_step(
+          i_sender  = l_sender
+          i_target  = l_target
+          i_content = l_content
+        ).
+
+      ENDIF.
 
     ENDIF.
 
@@ -287,7 +250,7 @@ CLASS ycl_aaic_diagram_google IMPLEMENTATION.
 
   METHOD if_oo_adt_classrun~main.
 
-    out->write( me->get_diagram( '7EA3422BA1AC1FE0AE910DC49DEBCC68' ) ).
+    out->write( me->get_diagram( '7EA3422BA1AC1FE0AECED4FFDCC80C6F' ) ).
 
   ENDMETHOD.
 

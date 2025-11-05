@@ -12,7 +12,13 @@ INTERFACE yif_aaic_diagram_google
          BEGIN OF ty_replacement_s,
            from_char TYPE c LENGTH 1,
            to_string TYPE string,
-         END OF ty_replacement_s.
+         END OF ty_replacement_s,
+
+         BEGIN OF ty_parts_s,
+           text              TYPE string,
+           function_call     TYPE yif_aaic_google=>ty_function_call_s,
+           function_response TYPE yif_aaic_google=>ty_function_response_s,
+         END OF ty_parts_s.
 
   DATA: mt_participants TYPE STANDARD TABLE OF ty_participant_s READ-ONLY,
         mt_steps        TYPE STANDARD TABLE OF ty_step_s READ-ONLY,
