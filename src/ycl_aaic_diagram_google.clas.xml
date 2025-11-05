@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>YCL_AAIC_DIAGRAM_ANTHROPIC</CLSNAME>
+    <CLSNAME>YCL_AAIC_DIAGRAM_GOOGLE</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>ABAP AI tools Cloud - Anthropic Mermaid Diagram</DESCRIPT>
+    <DESCRIPT>ABAP AI tools Cloud - Google Mermaid Diagram</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>
