@@ -1,10 +1,12 @@
 INTERFACE yif_aaic_func_call_tools
   PUBLIC.
 
-  METHODS get_list
+  METHODS get_available_tools
+    RETURNING VALUE(r_response) TYPE string.
+
+  METHODS request_tools
     IMPORTING
-              i_chat_id         TYPE yaaic_chat-id OPTIONAL
-              i_agent_id        TYPE yaaic_agent-id OPTIONAL
+              i_t_tools         TYPE ytt_aaic_tool_request
     RETURNING VALUE(r_response) TYPE string.
 
 ENDINTERFACE.

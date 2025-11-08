@@ -360,8 +360,6 @@ CLASS ycl_aaic_db IMPLEMENTATION.
 
   METHOD yif_aaic_db~persist_tools.
 
-    DELETE FROM yaaic_tools WHERE id = @me->m_id.
-
     IF i_t_tools[] IS INITIAL.
       RETURN.
     ENDIF.
@@ -374,7 +372,7 @@ CLASS ycl_aaic_db IMPLEMENTATION.
 
     ENDLOOP.
 
-    INSERT yaaic_tools FROM TABLE @lt_tools.
+    INSERT yaaic_tools FROM TABLE @lt_tools ACCEPTING DUPLICATE KEYS.
 
     e_persisted = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
 

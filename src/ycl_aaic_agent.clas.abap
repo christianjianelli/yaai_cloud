@@ -16,9 +16,9 @@ CLASS ycl_aaic_agent DEFINITION
     ALIASES m_chat_id FOR yif_aaic_agent~m_chat_id.
 
     METHODS constructor
-       IMPORTING
-         i_agent_id TYPE yaaic_agent-id OPTIONAL
-         i_chat_id  TYPE yaaic_chat-id OPTIONAL.
+      IMPORTING
+        i_agent_id TYPE yaaic_agent-id OPTIONAL
+        i_chat_id  TYPE yaaic_chat-id OPTIONAL.
 
   PROTECTED SECTION.
 
@@ -97,7 +97,7 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
         INNER JOIN yaaic_agent_tool AS b
         ON a~id = b~id
         WHERE a~id = @me->m_agent_id
-          AND load_on_demand = @abap_false
+          AND load_on_demand = @i_load_on_demand_tools
         INTO TABLE @DATA(lt_tools).
 
     ELSEIF i_agent_name IS SUPPLIED.
@@ -107,7 +107,7 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
         INNER JOIN yaaic_agent_tool AS b
         ON a~id = b~id
         WHERE a~name = @i_agent_name
-        AND load_on_demand = @abap_false
+        AND load_on_demand = @i_load_on_demand_tools
         INTO TABLE @lt_tools.
 
       IF sy-subrc = 0.
@@ -116,7 +116,9 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
 
     ENDIF.
 
-    IF me->m_chat_id IS NOT INITIAL AND me->m_agent_id IS NOT INITIAL.
+    IF i_load_on_demand_tools = abap_false AND
+       me->m_chat_id IS NOT INITIAL AND
+       me->m_agent_id IS NOT INITIAL.
 
       SELECT a~id, b~class_name, b~method_name, b~proxy_class, b~description
         FROM yaaic_tools AS a
@@ -181,7 +183,7 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
 *
 *    out->write( l_prompt_template ).
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 *    DATA(l_agent_name) = 'travel-fiori-ai-assistant'.
 *

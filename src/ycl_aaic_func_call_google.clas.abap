@@ -116,34 +116,38 @@ CLASS ycl_aaic_func_call_google IMPLEMENTATION.
         e_t_components       = DATA(lt_components)
     ).
 
-    TRY.
+    IF lt_components[] IS NOT INITIAL.
 
-        " Create a structure with the importing parameters
-        lo_struct_descr = cl_abap_structdescr=>create( lt_components ).
+      TRY.
 
-        CREATE DATA lr_data TYPE HANDLE lo_struct_descr.
+          " Create a structure with the importing parameters
+          lo_struct_descr = cl_abap_structdescr=>create( lt_components ).
 
-        ASSIGN lr_data->* TO <ls_data>.
+          CREATE DATA lr_data TYPE HANDLE lo_struct_descr.
 
-      CATCH cx_sy_create_data_error INTO DATA(lo_ex).
+          ASSIGN lr_data->* TO <ls_data>.
 
-        r_response = |An error occurred while calling the function/tool. Error description: { lo_ex->get_text( ) }|.
+        CATCH cx_sy_create_data_error INTO DATA(lo_ex).
 
-        RAISE EVENT on_tool_call_error EXPORTING error_text = r_response.
+          r_response = |An error occurred while calling the function/tool. Error description: { lo_ex->get_text( ) }|.
 
-    ENDTRY.
+          RAISE EVENT on_tool_call_error EXPORTING error_text = r_response.
 
-    IF <ls_data> IS NOT ASSIGNED.
-      RETURN.
+      ENDTRY.
+
+      IF <ls_data> IS NOT ASSIGNED.
+        RETURN.
+      ENDIF.
+
+      " Deserialize the JSON passing its data to the corresponding importing parameters of the method that is going to be called
+      /ui2/cl_json=>deserialize(
+        EXPORTING
+          json = i_json
+        CHANGING
+          data = <ls_data>
+      ).
+
     ENDIF.
-
-    " Deserialize the JSON passing its data to the corresponding importing parameters of the method that is going to be called
-    /ui2/cl_json=>deserialize(
-      EXPORTING
-        json = i_json
-      CHANGING
-        data = <ls_data>
-    ).
 
     " Fill the parameters table to dynamically pass the importing parameters in the method call
     LOOP AT lt_components INTO DATA(ls_components).
