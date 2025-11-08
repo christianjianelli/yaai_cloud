@@ -301,15 +301,6 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       <ls_msg>-content = l_prompt.
     ENDIF.
 
-    IF me->mo_function_calling IS BOUND.
-
-      me->mo_function_calling->get_tools_chat_completions(
-        IMPORTING
-          e_tools = l_tools
-      ).
-
-    ENDIF.
-
     IF me->_o_connection IS NOT BOUND.
       me->_o_connection = NEW ycl_aaic_conn( i_api = yif_aaic_const=>c_openai ).
     ENDIF.
@@ -325,6 +316,15 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       IF me->_o_connection->create( i_endpoint = me->m_endpoint ).
 
         FREE me->_openai_chat_comp_response.
+
+        IF me->mo_function_calling IS BOUND.
+
+          me->mo_function_calling->get_tools_chat_completions(
+            IMPORTING
+              e_tools = l_tools
+          ).
+
+        ENDIF.
 
         IF l_tools = '[]'.
 

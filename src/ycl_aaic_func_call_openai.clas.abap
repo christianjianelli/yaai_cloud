@@ -197,6 +197,16 @@ CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
 
     IF lt_parameters[] IS NOT INITIAL.
 
+      FREE lt_components.
+
+      lo_aaic_util->get_method_importing_params(
+        EXPORTING
+          i_class_name   = ls_method-class_name
+          i_method_name  = 'CONSTRUCTOR'
+        IMPORTING
+          e_t_components = lt_components
+      ).
+
       RAISE EVENT on_tool_call
         EXPORTING
           class_name = ls_method-class_name
@@ -205,7 +215,20 @@ CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
 
       TRY.
 
-          CREATE OBJECT lo_class TYPE (ls_method-class_name).
+          READ TABLE lt_components TRANSPORTING NO FIELDS
+            WITH KEY name = 'I_O_AGENT'.
+
+          IF sy-subrc = 0.
+
+            CREATE OBJECT lo_class TYPE (ls_method-class_name)
+              EXPORTING
+                i_o_agent = me->_o_agent.
+
+          ELSE.
+
+            CREATE OBJECT lo_class TYPE (ls_method-class_name).
+
+          ENDIF.
 
           CALL METHOD lo_class->(ls_method-method_name)
             PARAMETER-TABLE lt_parameters.
@@ -314,6 +337,31 @@ CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
     DATA lt_tools TYPE yif_aaic_func_call_openai~ty_tools_chat_completion_t.
 
     DATA(lo_aaic_util) = NEW ycl_aaic_util( ).
+
+    IF i_o_agent IS SUPPLIED AND i_o_agent IS BOUND.
+
+      me->_o_agent = i_o_agent.
+
+    ENDIF.
+
+    IF me->_o_agent IS BOUND.
+
+      DATA(lt_agent_tools) = me->_o_agent->get_tools( ).
+
+      LOOP AT lt_agent_tools ASSIGNING FIELD-SYMBOL(<ls_agent_tool>).
+
+        APPEND VALUE #( class_name = <ls_agent_tool>-class_name
+                        method_name = <ls_agent_tool>-method_name
+                        proxy_class = <ls_agent_tool>-proxy_class
+                        description = <ls_agent_tool>-description ) TO me->mt_methods.
+
+      ENDLOOP.
+
+      SORT me->mt_methods BY class_name method_name.
+
+      DELETE ADJACENT DUPLICATES FROM me->mt_methods COMPARING class_name method_name.
+
+    ENDIF.
 
     LOOP AT me->mt_methods ASSIGNING FIELD-SYMBOL(<ls_method>).
 
