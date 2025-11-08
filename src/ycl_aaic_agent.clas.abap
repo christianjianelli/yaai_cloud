@@ -127,7 +127,7 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
         AND a~method_name = b~method_name
         WHERE a~id = @me->m_chat_id
           AND b~id = @me->m_agent_id
-        APPENDING TABLE @lt_tools.
+        APPENDING CORRESPONDING FIELDS OF TABLE @lt_tools.
 
     ENDIF.
 
@@ -198,6 +198,13 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
 *    out->write( lt_tools ).
 *
 *    out->write( l_prompt_template ).
+
+    """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+*    me->m_agent_id = '7EA3422BA1AC1FE0AF9BF54114B1CC74'.
+*    me->m_chat_id = '7EA3422BA1AC1FE0AF9BD3BB7CD18C74'.
+*
+*    out->write( me->get_tools( ) ).
 
   ENDMETHOD.
 

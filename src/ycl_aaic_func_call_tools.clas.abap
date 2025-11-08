@@ -52,6 +52,14 @@ CLASS ycl_aaic_func_call_tools IMPLEMENTATION.
 
     DATA(lt_tools) = me->_o_agent->get_tools( i_load_on_demand_tools = abap_true ).
 
+    IF lt_tools IS INITIAL.
+
+      r_response = 'No tools found.'.
+
+      RETURN.
+
+    ENDIF.
+
     DATA(lo_aaic_util) = NEW ycl_aaic_util( ).
 
     r_response = lo_aaic_util->serialize(
@@ -63,6 +71,76 @@ CLASS ycl_aaic_func_call_tools IMPLEMENTATION.
 
   METHOD yif_aaic_func_call_tools~request_tools.
 
+    FREE r_response.
+
+    IF me->_o_agent IS NOT BOUND.
+
+      r_response = 'Error! No Agent Instance available to retrieve the list of tools.'.
+
+      RETURN.
+
+    ENDIF.
+
+    DATA(lt_tools) = me->_o_agent->get_tools( i_load_on_demand_tools = abap_true ).
+
+    IF lt_tools IS INITIAL.
+
+      r_response = 'No tools found.'.
+
+      RETURN.
+
+    ENDIF.
+
+    DATA(lt_tools_req) = lt_tools.
+
+    LOOP AT lt_tools ASSIGNING FIELD-SYMBOL(<ls_tool>).
+
+      READ TABLE i_t_tools TRANSPORTING NO FIELDS
+        WITH KEY
+          class_name = <ls_tool>-class_name
+          method_name = <ls_tool>-method_name.
+
+      IF sy-subrc <> 0.
+
+        DELETE lt_tools_req
+          WHERE class_name = <ls_tool>-class_name
+            AND method_name = <ls_tool>-method_name.
+
+      ENDIF.
+
+    ENDLOOP.
+
+    FREE lt_tools.
+
+    IF lt_tools_req IS INITIAL.
+
+      r_response = 'No tools found.'.
+
+      RETURN.
+
+    ENDIF.
+
+    SELECT SINGLE api
+      FROM yaaic_chat
+      WHERE id = @me->_o_agent->m_chat_id
+      INTO @DATA(l_api).
+
+    DATA(lo_aaic_db) = NEW ycl_aaic_db( i_api = l_api
+                                        i_id = me->_o_agent->m_chat_id ).
+
+    lo_aaic_db->persist_tools(
+      EXPORTING
+        i_t_tools   = CORRESPONDING #( lt_tools_req )
+      IMPORTING
+        e_persisted = DATA(l_persisted)
+    ).
+
+    IF l_persisted = abap_false.
+      r_response = 'Error! Tools were found but not persisted in the database.'.
+      RETURN.
+    ENDIF.
+
+    r_response = 'The JSON schema of the required tools is now available.'.
 
   ENDMETHOD.
 
@@ -74,6 +152,16 @@ CLASS ycl_aaic_func_call_tools IMPLEMENTATION.
 *    ).
 *
 *    out->write( me->get_available_tools( ) ).
+
+*    DATA(lo_aaic_db) = NEW ycl_aaic_db( i_api = yif_aaic_const=>c_openai ).
+*
+*    me->_o_agent = NEW ycl_aaic_agent(
+*      i_agent_id = CONV #( '7EA3422BA1AC1FE0AF9AFAC0DF03AC74' )
+*      i_chat_id  = lo_aaic_db->m_id
+*    ).
+*
+*    out->write( me->request_tools( EXPORTING i_t_tools = VALUE #( ( class_name = 'zcl_aaic_math_tools'
+*                                                                    method_name = 'add' ) ) ) ).
 
   ENDMETHOD.
 
