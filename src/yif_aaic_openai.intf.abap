@@ -256,6 +256,7 @@ INTERFACE yif_aaic_openai
       i_new        TYPE abap_bool DEFAULT abap_false
       i_greeting   TYPE csequence OPTIONAL
       i_o_prompt   TYPE REF TO yif_aaic_prompt OPTIONAL
+      i_o_agent    TYPE REF TO yif_aaic_agent OPTIONAL
         PREFERRED PARAMETER i_message
     EXPORTING
       e_response   TYPE string
@@ -268,6 +269,7 @@ INTERFACE yif_aaic_openai
       i_new        TYPE abap_bool DEFAULT abap_false
       i_greeting   TYPE csequence OPTIONAL
       i_o_prompt   TYPE REF TO yif_aaic_prompt OPTIONAL
+      i_o_agent    TYPE REF TO yif_aaic_agent OPTIONAL
         PREFERRED PARAMETER i_message
     EXPORTING
       e_response   TYPE string

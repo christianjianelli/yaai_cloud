@@ -14,6 +14,7 @@ INTERFACE yif_aaic_chat
       i_new        TYPE abap_bool DEFAULT abap_false
       i_greeting   TYPE csequence OPTIONAL
       i_o_prompt   TYPE REF TO yif_aaic_prompt OPTIONAL
+      i_o_agent    TYPE REF TO yif_aaic_agent OPTIONAL
     EXPORTING
       e_id         TYPE uuid
       e_response   TYPE string

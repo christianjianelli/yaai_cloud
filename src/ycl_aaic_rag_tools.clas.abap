@@ -5,20 +5,24 @@ CLASS ycl_aaic_rag_tools DEFINITION
 
   PUBLIC SECTION.
 
-    METHODS get_documentation
-      IMPORTING
-                i_filename        TYPE string
-      RETURNING VALUE(r_response) TYPE string.
+    INTERFACES yif_aaic_rag_tools.
+
+    ALIASES: get_documentation FOR yif_aaic_rag_tools~get_documentation,
+             create_documentation FOR yif_aaic_rag_tools~create_documentation,
+             update_documentation FOR yif_aaic_rag_tools~update_documentation,
+             get_list_of_documents FOR yif_aaic_rag_tools~get_list_of_documents.
 
   PROTECTED SECTION.
+
   PRIVATE SECTION.
+
 ENDCLASS.
 
 
 
 CLASS ycl_aaic_rag_tools IMPLEMENTATION.
 
-  METHOD get_documentation.
+  METHOD yif_aaic_rag_tools~get_documentation.
 
     NEW ycl_aaic_rag_db( )->read(
       EXPORTING
@@ -26,6 +30,18 @@ CLASS ycl_aaic_rag_tools IMPLEMENTATION.
       IMPORTING
         e_content  = r_response
     ).
+
+  ENDMETHOD.
+
+  METHOD yif_aaic_rag_tools~create_documentation.
+
+  ENDMETHOD.
+
+  METHOD yif_aaic_rag_tools~update_documentation.
+
+  ENDMETHOD.
+
+  METHOD yif_aaic_rag_tools~get_list_of_documents.
 
   ENDMETHOD.
 

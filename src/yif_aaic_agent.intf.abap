@@ -22,6 +22,7 @@ INTERFACE yif_aaic_agent
   METHODS get_tools
     IMPORTING
               i_agent_id             TYPE yaaic_agent-id OPTIONAL
+              i_chat_id              TYPE yaaic_chat-id OPTIONAL
               i_agent_name           TYPE yaaic_agent-name OPTIONAL
                 PREFERRED PARAMETER i_agent_id
     RETURNING VALUE(r_t_agent_tools) TYPE ty_agent_tools_t.

@@ -12,6 +12,9 @@ CLASS ycl_aaic_agent DEFINITION
     ALIASES get_system_instructions FOR yif_aaic_agent~get_system_instructions.
     ALIASES get_tools FOR yif_aaic_agent~get_tools.
     ALIASES get_prompt_template FOR yif_aaic_agent~get_prompt_template.
+    ALIASES m_agent_id FOR yif_aaic_agent~m_agent_id.
+
+    METHODS constructor IMPORTING i_agent_id TYPE yaaic_agent-id OPTIONAL.
 
   PROTECTED SECTION.
 
@@ -23,17 +26,29 @@ ENDCLASS.
 
 CLASS ycl_aaic_agent IMPLEMENTATION.
 
+  METHOD constructor.
+
+    me->m_agent_id = i_agent_id.
+
+  ENDMETHOD.
+
   METHOD yif_aaic_agent~get_system_instructions.
 
     DATA ls_agent TYPE yaaic_agent.
 
     FREE r_system_instructions.
 
+    DATA(l_agent_id) = me->m_agent_id.
+
     IF i_agent_id IS SUPPLIED.
+      l_agent_id = i_agent_id.
+    ENDIF.
+
+    IF l_agent_id IS NOT INITIAL.
 
       SELECT SINGLE id, name, sys_inst_id
         FROM yaaic_agent
-        WHERE id = @i_agent_id
+        WHERE id = @l_agent_id
         INTO CORRESPONDING FIELDS OF @ls_agent.
 
     ELSEIF i_agent_name IS SUPPLIED.
@@ -64,13 +79,20 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
 
     FREE r_t_agent_tools.
 
+    DATA(l_agent_id) = me->m_agent_id.
+
     IF i_agent_id IS SUPPLIED.
+      l_agent_id = i_agent_id.
+    ENDIF.
+
+    IF l_agent_id IS NOT INITIAL.
 
       SELECT a~id, a~name, b~class_name, b~method_name, b~proxy_class, b~description
         FROM yaaic_agent AS a
         INNER JOIN yaaic_agent_tool AS b
         ON a~id = b~id
         WHERE a~id = @i_agent_id
+          AND load_on_demand = @abap_false
         INTO TABLE @DATA(lt_tools).
 
     ELSEIF i_agent_name IS SUPPLIED.
@@ -80,7 +102,25 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
         INNER JOIN yaaic_agent_tool AS b
         ON a~id = b~id
         WHERE a~name = @i_agent_name
+        AND load_on_demand = @abap_false
         INTO TABLE @lt_tools.
+
+      IF sy-subrc = 0.
+        l_agent_id = lt_tools[ 1 ]-id.
+      ENDIF.
+
+    ENDIF.
+
+    IF i_chat_id IS SUPPLIED AND l_agent_id IS NOT INITIAL.
+
+      SELECT a~id, b~class_name, b~method_name, b~proxy_class, b~description
+        FROM yaaic_tools AS a
+        INNER JOIN yaaic_agent_tool AS b
+        ON a~class_name = b~class_name
+        AND a~method_name = b~method_name
+        WHERE a~id = @i_chat_id
+          AND b~id = @l_agent_id
+        APPENDING TABLE @lt_tools.
 
     ENDIF.
 
@@ -94,11 +134,17 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
 
     FREE r_prompt_template.
 
+    DATA(l_agent_id) = me->m_agent_id.
+
     IF i_agent_id IS SUPPLIED.
+      l_agent_id = i_agent_id.
+    ENDIF.
+
+    IF l_agent_id IS NOT INITIAL.
 
       SELECT SINGLE id, name, prompt_template
         FROM yaaic_agent
-        WHERE id = @i_agent_id
+        WHERE id = @l_agent_id
         INTO CORRESPONDING FIELDS OF @ls_agent.
 
     ELSEIF i_agent_name IS SUPPLIED.

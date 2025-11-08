@@ -645,31 +645,6 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       <ls_msg>-content = l_prompt.
     ENDIF.
 
-    IF me->mo_function_calling IS BOUND.
-
-      me->mo_function_calling->get_tools(
-        IMPORTING
-          e_tools = l_tools
-      ).
-
-      IF me->_o_persistence IS BOUND.
-
-        LOOP AT me->mo_function_calling->mt_methods ASSIGNING FIELD-SYMBOL(<ls_method>).
-
-          APPEND VALUE #( class_name = <ls_method>-class_name
-                          method_name = <ls_method>-method_name
-                          proxy_class = <ls_method>-proxy_class
-                          description = <ls_method>-description
-                          full_schema = <ls_method>-full_schema ) TO lt_tools.
-
-        ENDLOOP.
-
-*        me->_o_persistence->persist_tools( lt_tools ).
-
-      ENDIF.
-
-    ENDIF.
-
     IF me->_o_connection IS NOT BOUND.
       me->_o_connection = NEW ycl_aaic_conn( i_api = yif_aaic_const=>c_openai ).
     ENDIF.
@@ -685,6 +660,17 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       IF me->_o_connection->create( i_endpoint = me->m_endpoint ).
 
         FREE me->_openai_generate_response.
+
+        IF me->mo_function_calling IS BOUND.
+
+          me->mo_function_calling->get_tools(
+            EXPORTING
+              i_o_agent = i_o_agent
+            IMPORTING
+              e_tools = l_tools
+          ).
+
+        ENDIF.
 
         IF me->_model CP 'gpt-5*'.
 
