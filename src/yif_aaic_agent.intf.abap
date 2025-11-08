@@ -10,7 +10,8 @@ INTERFACE yif_aaic_agent
 
          ty_agent_tools_t TYPE STANDARD TABLE OF ty_agent_tool_s WITH DEFAULT KEY.
 
-  DATA: m_agent_id TYPE yaaic_agent-id READ-ONLY.
+  DATA: m_agent_id TYPE yaaic_agent-id READ-ONLY,
+        m_chat_id  TYPE yaaic_agent-id READ-ONLY.
 
   METHODS get_system_instructions
     IMPORTING

@@ -145,6 +145,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
           i_new        = i_new
           i_greeting   = i_greeting
           i_o_prompt   = i_o_prompt
+          i_o_agent    = i_o_agent
         IMPORTING
           e_response   = e_response
           e_failed     = e_failed
@@ -159,6 +160,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
           i_new        = i_new
           i_greeting   = i_greeting
           i_o_prompt   = i_o_prompt
+          i_o_agent    = i_o_agent
         IMPORTING
           e_response   = e_response
           e_failed     = e_failed

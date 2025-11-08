@@ -19,15 +19,31 @@ CLASS ycl_aaic_func_call_openai DEFINITION
     ALIASES remove_method FOR yif_aaic_func_call_openai~remove_method.
     ALIASES call_tool FOR yif_aaic_func_call_openai~call_tool.
 
+    METHODS constructor
+      IMPORTING
+        i_o_agent TYPE REF TO yif_aaic_agent OPTIONAL.
+
   PROTECTED SECTION.
 
   PRIVATE SECTION.
+
+    DATA _o_agent TYPE REF TO yif_aaic_agent.
 
 ENDCLASS.
 
 
 
 CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
+
+  METHOD constructor.
+
+    IF i_o_agent IS SUPPLIED.
+
+      me->_o_agent = i_o_agent.
+
+    ENDIF.
+
+  ENDMETHOD.
 
   METHOD yif_aaic_func_call_openai~add_methods.
 
@@ -110,10 +126,10 @@ CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
 
     lo_aaic_util->get_method_importing_params(
       EXPORTING
-        i_class_name         = ls_method-class_name
-        i_method_name        = ls_method-method_name
+        i_class_name   = ls_method-class_name
+        i_method_name  = ls_method-method_name
       IMPORTING
-        e_t_components       = DATA(lt_components)
+        e_t_components = DATA(lt_components)
     ).
 
     IF lt_components IS NOT INITIAL.
@@ -225,7 +241,13 @@ CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
 
     IF i_o_agent IS SUPPLIED AND i_o_agent IS BOUND.
 
-      DATA(lt_agent_tools) = i_o_agent->get_tools( ).
+      me->_o_agent = i_o_agent.
+
+    ENDIF.
+
+    IF me->_o_agent IS BOUND.
+
+      DATA(lt_agent_tools) = me->_o_agent->get_tools( ).
 
       LOOP AT lt_agent_tools ASSIGNING FIELD-SYMBOL(<ls_agent_tool>).
 
