@@ -156,6 +156,9 @@ INTERFACE yif_aaic_openai
            object  TYPE string,
            model   TYPE string,
            error   TYPE ty_error_s,
+           message TYPE string,
+           type    TYPE string,
+           code    TYPE string,
            choices TYPE ty_choices_t,
          END OF ty_openai_chat_comp_resp_s.
 

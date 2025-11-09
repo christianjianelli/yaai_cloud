@@ -91,7 +91,7 @@ CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
 
     IF ls_method IS INITIAL.
 
-      r_response = 'The function/tool called is not available.'.
+      r_response = |The function/tool called { i_tool_name } is not available.|.
 
       RAISE EVENT on_tool_call_error EXPORTING error_text = r_response.
 
@@ -114,7 +114,7 @@ CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
 
     IF sy-subrc <> 0.
 
-      r_response = 'The function/tool called is not available.'.
+      r_response = |The function/tool called { i_tool_name } is not available.|.
 
       RAISE EVENT on_tool_call_error EXPORTING error_text = r_response.
 
@@ -145,13 +145,13 @@ CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
 
         CATCH cx_sy_struct_attributes INTO DATA(lo_ex_struct_attributes).
 
-          r_response = |An error occurred while calling the function/tool. Error description: { lo_ex_struct_attributes->get_text( ) }|.
+          r_response = |An error occurred while calling the function/tool { i_tool_name }. Error description: { lo_ex_struct_attributes->get_text( ) }|.
 
           RAISE EVENT on_tool_call_error EXPORTING error_text = r_response.
 
         CATCH cx_sy_create_data_error INTO DATA(lo_ex_create_data_error).
 
-          r_response = |An error occurred while calling the function/tool. Error description: { lo_ex_create_data_error->get_text( ) }|.
+          r_response = |An error occurred while calling the function/tool { i_tool_name }. Error description: { lo_ex_create_data_error->get_text( ) }|.
 
           RAISE EVENT on_tool_call_error EXPORTING error_text = r_response.
 
@@ -245,7 +245,7 @@ CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
               cx_sy_dyn_call_param_not_found
               cx_sy_ref_is_initial INTO lo_ex_root.
 
-          r_response = |An error occurred while calling the function/tool. Error description: { lo_ex_root->get_text( ) }|.
+          r_response = |An error occurred while calling the function/tool { i_tool_name }. Error description: { lo_ex_root->get_text( ) }|.
 
           RAISE EVENT on_tool_call_error EXPORTING error_text = r_response.
 

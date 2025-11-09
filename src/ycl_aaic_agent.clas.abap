@@ -201,10 +201,12 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
 
     """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-*    me->m_agent_id = '7EA3422BA1AC1FE0AF9BF54114B1CC74'.
-*    me->m_chat_id = '7EA3422BA1AC1FE0AF9BD3BB7CD18C74'.
-*
-*    out->write( me->get_tools( ) ).
+    me->m_agent_id = '7EA3422BA1AC1FE0AF9BF54114B1CC74'.
+    me->m_chat_id = '2A9448FCE52F1FD0AFB19E6C3E30184D'.
+
+    out->write( me->get_tools( ) ).
+
+
 
   ENDMETHOD.
 

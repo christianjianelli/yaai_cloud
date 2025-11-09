@@ -311,6 +311,12 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       me->m_endpoint = yif_aaic_const=>c_openai_completions_endpoint.
     ENDIF.
 
+    IF i_o_agent IS BOUND AND me->mo_function_calling IS NOT BOUND.
+
+      me->mo_function_calling = NEW ycl_aaic_func_call_openai( i_o_agent ).
+
+    ENDIF.
+
     DO me->_max_tools_calls TIMES.
 
       IF me->_o_connection->create( i_endpoint = me->m_endpoint ).
@@ -374,6 +380,11 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
             e_data = me->_openai_chat_comp_response
         ).
 
+        IF me->_openai_chat_comp_response-object = 'error'.
+          e_response = |**Error!** { me->_openai_chat_comp_response-code } { me->_openai_chat_comp_response-message }|.
+          EXIT.
+        ENDIF.
+
         DATA(l_function_call) = abap_false.
 
         LOOP AT me->_openai_chat_comp_response-choices ASSIGNING FIELD-SYMBOL(<ls_choices>).
@@ -409,12 +420,16 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
                 e_data = lr_data
             ).
 
-            DATA(lo_typedescr) = cl_abap_typedescr=>describe_by_data_ref( lr_data ).
+            IF lr_data IS NOT INITIAL.
 
-            " Make sure the deserialized object is a JSON string before assigning it
-            IF lo_typedescr->type_kind = cl_abap_typedescr=>typekind_string.
+              DATA(lo_typedescr) = cl_abap_typedescr=>describe_by_data_ref( lr_data ).
 
-              ASSIGN lr_data->* TO <l_data>.
+              " Make sure the deserialized object is a JSON string before assigning it
+              IF lo_typedescr->type_kind = cl_abap_typedescr=>typekind_string.
+
+                ASSIGN lr_data->* TO <l_data>.
+
+              ENDIF.
 
             ENDIF.
 
@@ -538,9 +553,9 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
     DATA lt_tools TYPE STANDARD TABLE OF yaaic_tools WITH DEFAULT KEY.
 
-    DATA: l_tools    TYPE string VALUE '[]',
-          l_message  TYPE string,
-          l_prompt   TYPE string.
+    DATA: l_tools   TYPE string VALUE '[]',
+          l_message TYPE string,
+          l_prompt  TYPE string.
 
     CLEAR: e_response,
            e_failed.
@@ -760,12 +775,16 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
               e_data = lr_data
           ).
 
-          DATA(lo_typedescr) = cl_abap_typedescr=>describe_by_data_ref( lr_data ).
+          IF lr_data IS NOT INITIAL.
 
-          " Make sure the deserialized object is a JSON string before assigning it
-          IF lo_typedescr->type_kind = cl_abap_typedescr=>typekind_string.
+            DATA(lo_typedescr) = cl_abap_typedescr=>describe_by_data_ref( lr_data ).
 
-            ASSIGN lr_data->* TO <l_data>.
+            " Make sure the deserialized object is a JSON string before assigning it
+            IF lo_typedescr->type_kind = cl_abap_typedescr=>typekind_string.
+
+              ASSIGN lr_data->* TO <l_data>.
+
+            ENDIF.
 
           ENDIF.
 

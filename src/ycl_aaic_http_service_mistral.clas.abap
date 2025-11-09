@@ -87,33 +87,17 @@ CLASS ycl_aaic_http_service_mistral IMPLEMENTATION.
 
             IF l_agent_id IS NOT INITIAL.
 
-              DATA(lo_agent) = NEW ycl_aaic_agent( ).
+              DATA(lo_agent) = NEW ycl_aaic_agent(
+                i_agent_id = CONV #( l_agent_id )
+                i_chat_id  = lo_aaic_db->m_id
+              ).
 
               DATA(l_system_instructions) = lo_agent->get_system_instructions( CONV #( l_agent_id ) ).
-
-              DATA(lt_agent_tools) = lo_agent->get_tools( CONV #( l_agent_id ) ).
 
               lo_aaic_mistral->set_system_instructions(
                 i_system_instructions = l_system_instructions
                 i_system_instructions_role = 'system'
               ).
-
-              IF lt_agent_tools[] IS NOT INITIAL.
-
-                DATA(lo_function_calling) = NEW ycl_aaic_func_call_openai( ).
-
-                LOOP AT lt_agent_tools ASSIGNING FIELD-SYMBOL(<ls_agent_tool>).
-
-                  lo_function_calling->add_methods( VALUE #( ( class_name = <ls_agent_tool>-class_name
-                                                               method_name = <ls_agent_tool>-method_name
-                                                               proxy_class = <ls_agent_tool>-proxy_class
-                                                               description = <ls_agent_tool>-description ) ) ).
-
-                ENDLOOP.
-
-                lo_aaic_mistral->bind_tools( lo_function_calling ).
-
-              ENDIF.
 
             ENDIF.
 
@@ -122,6 +106,7 @@ CLASS ycl_aaic_http_service_mistral IMPLEMENTATION.
               lo_aaic_mistral->chat(
                 EXPORTING
                   i_message  = ls_request-prompt
+                  i_o_agent  = lo_agent
                 IMPORTING
                   e_response = ls_response-message
               ).
@@ -150,6 +135,7 @@ CLASS ycl_aaic_http_service_mistral IMPLEMENTATION.
               lo_aaic_mistral->chat(
                 EXPORTING
                   i_o_prompt = lo_aaic_prompt
+                  i_o_agent  = lo_agent
                 IMPORTING
                   e_response = ls_response-message
               ).
@@ -237,6 +223,13 @@ CLASS ycl_aaic_http_service_mistral IMPLEMENTATION.
                 response->set_text(
                   EXPORTING
                    i_text = l_response_text
+                ).
+
+              WHEN 'mermaid'.
+
+                response->set_text(
+                  EXPORTING
+                   i_text = NEW ycl_aaic_diagram_openai( )->get_diagram( l_chat_id )
                 ).
 
               WHEN OTHERS.
