@@ -268,7 +268,8 @@ To use a proxy class for function calling, simply specify its name in the `proxy
 ```abap
 DATA(lo_function_calling) = NEW ycl_aaic_func_call_openai( ).
 
-lo_function_calling->add_methods( VALUE #( ( class_name = 'zcl_aaic_math_tools_proxy'
+lo_function_calling->add_methods( VALUE #( ( class_name = 'zcl_aaic_math_tools'
                                              method_name = 'add'
+                                             proxy_class = 'zcl_aaic_math_tools_proxy'
                                              description = 'Use this method to add two numbers (i_num1 + i_num2)' ) ) ).
 ```
