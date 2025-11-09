@@ -100,7 +100,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
     me->_reasoning_effort = yif_aaic_openai~mc_reasoning_effort_medium.
 
-    me->_max_tools_calls = 5.
+    me->_max_tools_calls = 10.
 
     IF i_o_connection IS SUPPLIED.
       me->_o_connection = i_o_connection.
@@ -657,6 +657,12 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       me->m_endpoint = yif_aaic_const=>c_openai_generate_endpoint.
     ENDIF.
 
+    IF i_o_agent IS BOUND AND me->mo_function_calling IS NOT BOUND.
+
+      me->mo_function_calling = NEW ycl_aaic_func_call_openai( i_o_agent ).
+
+    ENDIF.
+
     DO me->_max_tools_calls TIMES.
 
       IF me->_o_connection->create( i_endpoint = me->m_endpoint ).
@@ -666,8 +672,6 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
         IF me->mo_function_calling IS BOUND.
 
           me->mo_function_calling->get_tools(
-            EXPORTING
-              i_o_agent = i_o_agent
             IMPORTING
               e_tools = l_tools
           ).

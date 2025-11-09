@@ -99,6 +99,10 @@ CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
 
     ENDIF.
 
+    IF ls_method-proxy_class IS NOT INITIAL.
+      ls_method-class_name = to_upper( ls_method-proxy_class ).
+    ENDIF.
+
     CALL METHOD cl_abap_classdescr=>describe_by_name
       EXPORTING
         p_name         = ls_method-class_name  " Type name
@@ -116,10 +120,6 @@ CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
 
       RETURN.
 
-    ENDIF.
-
-    IF ls_method-proxy_class IS NOT INITIAL.
-      ls_method-class_name = ls_method-proxy_class.
     ENDIF.
 
     DATA(lo_aaic_util) = NEW ycl_aaic_util( ).
