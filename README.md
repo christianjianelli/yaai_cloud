@@ -14,7 +14,7 @@ This repository provides a set of tools designed to facilitate Artificial Intell
 
 These features empower you to build intelligent, enterprise-ready ABAP applications that leverage the latest advancements in AI.
 
-  **Disclaimer:** ABAP AI tools Cloud is experimental and released under the MIT License. It is provided "as is", without warranty of any kind, express or implied. This means you use these tools at your own risk, and the authors are not liable for any damages or issues arising from their use.
+  **Disclaimer:** ABAP AI tools Cloud is released under the MIT License. It is provided "as is", without warranty of any kind, express or implied. This means you use these tools at your own risk, and the authors are not liable for any damages or issues arising from their use.
 
 ## Prerequisites
  - **SAP ABAP Cloud**: You need an SAP BTP ABAP environment or SAP S/4HANA Cloud ABAP environment (a.k.a. Embedded Steampunk) .
