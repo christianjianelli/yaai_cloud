@@ -188,11 +188,15 @@ CLASS ycl_aaic_func_call_anthropic IMPLEMENTATION.
 
     IF lt_parameters[] IS NOT INITIAL.
 
-      RAISE EVENT on_tool_call
+      FREE lt_components.
+
+      lo_aaic_util->get_method_importing_params(
         EXPORTING
-          class_name       = ls_method-class_name
-          method_name      = ls_method-method_name
-          parameters_table = lt_parameters.
+          i_class_name   = ls_method-class_name
+          i_method_name  = 'CONSTRUCTOR'
+        IMPORTING
+          e_t_components = lt_components
+      ).
 
       TRY.
 
@@ -210,6 +214,12 @@ CLASS ycl_aaic_func_call_anthropic IMPLEMENTATION.
             CREATE OBJECT lo_class TYPE (ls_method-class_name).
 
           ENDIF.
+
+          RAISE EVENT on_tool_call
+            EXPORTING
+              class_name       = ls_method-class_name
+              method_name      = ls_method-method_name
+              parameters_table = lt_parameters.
 
           CALL METHOD lo_class->(ls_method-method_name)
             PARAMETER-TABLE lt_parameters.

@@ -207,12 +207,6 @@ CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
           e_t_components = lt_components
       ).
 
-      RAISE EVENT on_tool_call
-        EXPORTING
-          class_name = ls_method-class_name
-          method_name = ls_method-method_name
-          parameters_table = lt_parameters.
-
       TRY.
 
           READ TABLE lt_components TRANSPORTING NO FIELDS
@@ -229,6 +223,12 @@ CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
             CREATE OBJECT lo_class TYPE (ls_method-class_name).
 
           ENDIF.
+
+          RAISE EVENT on_tool_call
+            EXPORTING
+              class_name = ls_method-class_name
+              method_name = ls_method-method_name
+              parameters_table = lt_parameters.
 
           CALL METHOD lo_class->(ls_method-method_name)
             PARAMETER-TABLE lt_parameters.

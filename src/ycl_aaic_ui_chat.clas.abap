@@ -419,24 +419,58 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
           ls_msg-content = ls_msg-text.
         ENDIF.
 
-        IF i_api = yif_aaic_const=>c_anthropic.
+        CASE i_api.
 
-          IF ls_msg-role = 'user'.
+          WHEN yif_aaic_const=>c_anthropic.
 
-            FREE lt_anthropic_chat_response.
+            IF ls_msg-role = 'user'.
 
-            /ui2/cl_json=>deserialize(
-              EXPORTING
-                json = ls_msg-content
-              CHANGING
-                data = lt_anthropic_chat_response
-            ).
+              FREE lt_anthropic_chat_response.
 
-            IF lt_anthropic_chat_response IS NOT INITIAL.
+              /ui2/cl_json=>deserialize(
+                EXPORTING
+                  json = ls_msg-content
+                CHANGING
+                  data = lt_anthropic_chat_response
+              ).
 
-              CLEAR ls_msg-content.
+              IF lt_anthropic_chat_response IS NOT INITIAL.
 
-              LOOP AT lt_anthropic_chat_response ASSIGNING FIELD-SYMBOL(<ls_anthropic_chat_response>).
+                CLEAR ls_msg-content.
+
+                LOOP AT lt_anthropic_chat_response ASSIGNING FIELD-SYMBOL(<ls_anthropic_chat_response>).
+
+                  IF <ls_anthropic_chat_response>-type <> 'text'.
+                    CONTINUE.
+                  ENDIF.
+
+                  ls_msg-content = <ls_anthropic_chat_response>-text.
+
+                ENDLOOP.
+
+              ELSE.
+
+                /ui2/cl_json=>deserialize(
+                 EXPORTING
+                   json = ls_msg-content
+                 CHANGING
+                   data = ls_msg-content
+               ).
+
+              ENDIF.
+
+            ELSE.
+
+              FREE lt_anthropic_chat_response.
+
+              /ui2/cl_json=>deserialize(
+                EXPORTING
+                  json = ls_msg-content
+                CHANGING
+                  data = lt_anthropic_chat_response
+              ).
+
+              LOOP AT lt_anthropic_chat_response ASSIGNING <ls_anthropic_chat_response>.
 
                 IF <ls_anthropic_chat_response>-type <> 'text'.
                   CONTINUE.
@@ -446,51 +480,17 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
 
               ENDLOOP.
 
-            ELSE.
-
-              /ui2/cl_json=>deserialize(
-               EXPORTING
-                 json = ls_msg-content
-               CHANGING
-                 data = ls_msg-content
-             ).
-
             ENDIF.
 
-          ELSE.
+          WHEN yif_aaic_const=>c_google.
 
-            FREE lt_anthropic_chat_response.
+            LOOP AT ls_msg-parts ASSIGNING FIELD-SYMBOL(<ls_parts>).
 
-            /ui2/cl_json=>deserialize(
-              EXPORTING
-                json = ls_msg-content
-              CHANGING
-                data = lt_anthropic_chat_response
-            ).
-
-            LOOP AT lt_anthropic_chat_response ASSIGNING <ls_anthropic_chat_response>.
-
-              IF <ls_anthropic_chat_response>-type <> 'text'.
-                CONTINUE.
-              ENDIF.
-
-              ls_msg-content = <ls_anthropic_chat_response>-text.
+              ls_msg-content = ls_msg-content && <ls_parts>-text.
 
             ENDLOOP.
 
-          ENDIF.
-
-        ENDIF.
-
-        IF i_api = yif_aaic_const=>c_google.
-
-          LOOP AT ls_msg-parts ASSIGNING FIELD-SYMBOL(<ls_parts>).
-
-            ls_msg-content = ls_msg-content && <ls_parts>-text.
-
-          ENDLOOP.
-
-        ENDIF.
+        ENDCASE.
 
         IF ls_msg-content IS NOT INITIAL.
 
