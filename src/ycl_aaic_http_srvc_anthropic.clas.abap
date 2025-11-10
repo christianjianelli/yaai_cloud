@@ -82,35 +82,18 @@ CLASS ycl_aaic_http_srvc_anthropic IMPLEMENTATION.
                                                               i_o_connection = lo_aaic_conn
                                                               i_o_persistence = lo_aaic_db ).
 
-
             IF l_agent_id IS NOT INITIAL.
 
-              DATA(lo_agent) = NEW ycl_aaic_agent( ).
+              DATA(lo_agent) = NEW ycl_aaic_agent(
+                i_agent_id = CONV #( l_agent_id )
+                i_chat_id  = lo_aaic_db->m_id
+              ).
 
               DATA(l_system_instructions) = lo_agent->get_system_instructions( CONV #( l_agent_id ) ).
-
-              DATA(lt_agent_tools) = lo_agent->get_tools( CONV #( l_agent_id ) ).
 
               lo_aaic_anthropic->set_system_instructions(
                 i_system_instructions = l_system_instructions
               ).
-
-              IF lt_agent_tools[] IS NOT INITIAL.
-
-                DATA(lo_function_calling) = NEW ycl_aaic_func_call_anthropic( ).
-
-                LOOP AT lt_agent_tools ASSIGNING FIELD-SYMBOL(<ls_agent_tool>).
-
-                  lo_function_calling->add_methods( VALUE #( ( class_name = <ls_agent_tool>-class_name
-                                                               method_name = <ls_agent_tool>-method_name
-                                                               proxy_class = <ls_agent_tool>-proxy_class
-                                                               description = <ls_agent_tool>-description ) ) ).
-
-                ENDLOOP.
-
-                lo_aaic_anthropic->bind_tools( lo_function_calling ).
-
-              ENDIF.
 
             ENDIF.
 
@@ -119,6 +102,7 @@ CLASS ycl_aaic_http_srvc_anthropic IMPLEMENTATION.
               lo_aaic_anthropic->chat(
                 EXPORTING
                   i_message  = ls_request-prompt
+                  i_o_agent  = lo_agent
                 IMPORTING
                   e_response = ls_response-message
               ).
@@ -147,6 +131,7 @@ CLASS ycl_aaic_http_srvc_anthropic IMPLEMENTATION.
               lo_aaic_anthropic->yif_aaic_chat~chat(
                 EXPORTING
                   i_o_prompt = lo_aaic_prompt
+                  i_o_agent  = lo_agent
                 IMPORTING
                   e_response = ls_response-message
               ).

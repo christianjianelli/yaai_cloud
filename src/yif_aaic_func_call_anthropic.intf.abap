@@ -43,7 +43,11 @@ INTERFACE yif_aaic_func_call_anthropic
 
   METHODS add_methods IMPORTING i_t_methods TYPE ty_methods_t.
 
-  METHODS get_tools EXPORTING e_tools TYPE string.
+  METHODS get_tools
+            IMPORTING
+              i_o_agent TYPE REF TO yif_aaic_agent OPTIONAL
+            EXPORTING
+              e_tools TYPE string.
 
   METHODS reset_methods.
 

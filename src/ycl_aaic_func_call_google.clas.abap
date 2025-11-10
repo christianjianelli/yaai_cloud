@@ -18,9 +18,15 @@ CLASS ycl_aaic_func_call_google DEFINITION
     ALIASES remove_method FOR yif_aaic_func_call_google~remove_method.
     ALIASES call_tool FOR yif_aaic_func_call_google~call_tool.
 
+    METHODS constructor
+      IMPORTING
+        i_o_agent TYPE REF TO yif_aaic_agent OPTIONAL.
+
   PROTECTED SECTION.
 
   PRIVATE SECTION.
+
+    DATA _o_agent TYPE REF TO yif_aaic_agent.
 
 ENDCLASS.
 
@@ -28,6 +34,15 @@ ENDCLASS.
 
 CLASS ycl_aaic_func_call_google IMPLEMENTATION.
 
+  METHOD constructor.
+
+    IF i_o_agent IS SUPPLIED.
+
+      me->_o_agent = i_o_agent.
+
+    ENDIF.
+
+  ENDMETHOD.
 
   METHOD yif_aaic_func_call_google~add_methods.
 
@@ -75,7 +90,7 @@ CLASS ycl_aaic_func_call_google IMPLEMENTATION.
 
     IF ls_method IS INITIAL.
 
-      r_response = 'The function/tool called is not available.'.
+      r_response = |The function/tool called { i_tool_name } is not available.|.
 
       RAISE EVENT on_tool_call_error EXPORTING error_text = r_response.
 
@@ -94,7 +109,7 @@ CLASS ycl_aaic_func_call_google IMPLEMENTATION.
 
     IF sy-subrc <> 0.
 
-      r_response = 'The function/tool called is not available.'.
+      r_response = |The function/tool called { i_tool_name } is not available.|.
 
       RAISE EVENT on_tool_call_error EXPORTING error_text = r_response.
 
@@ -103,17 +118,17 @@ CLASS ycl_aaic_func_call_google IMPLEMENTATION.
     ENDIF.
 
     IF ls_method-proxy_class IS NOT INITIAL.
-      ls_method-class_name = ls_method-proxy_class.
+      ls_method-class_name = to_upper( ls_method-proxy_class ).
     ENDIF.
 
     DATA(lo_aaic_util) = NEW ycl_aaic_util( ).
 
     lo_aaic_util->get_method_importing_params(
       EXPORTING
-        i_class_name         = ls_method-class_name
-        i_method_name        = ls_method-method_name
+        i_class_name   = ls_method-class_name
+        i_method_name  = ls_method-method_name
       IMPORTING
-        e_t_components       = DATA(lt_components)
+        e_t_components = DATA(lt_components)
     ).
 
     IF lt_components[] IS NOT INITIAL.
@@ -129,14 +144,20 @@ CLASS ycl_aaic_func_call_google IMPLEMENTATION.
 
         CATCH cx_sy_create_data_error INTO DATA(lo_ex).
 
-          r_response = |An error occurred while calling the function/tool. Error description: { lo_ex->get_text( ) }|.
+          r_response = |An error occurred while calling the function/tool { i_tool_name }. Error description: { lo_ex->get_text( ) }|.
 
           RAISE EVENT on_tool_call_error EXPORTING error_text = r_response.
 
       ENDTRY.
 
       IF <ls_data> IS NOT ASSIGNED.
+
+        r_response = |An error occurred while calling the function/tool { i_tool_name }. Error description: missing importing parameter(s)|.
+
+        RAISE EVENT on_tool_call_error EXPORTING error_text = r_response.
+
         RETURN.
+
       ENDIF.
 
       " Deserialize the JSON passing its data to the corresponding importing parameters of the method that is going to be called
@@ -183,7 +204,20 @@ CLASS ycl_aaic_func_call_google IMPLEMENTATION.
 
       TRY.
 
-          CREATE OBJECT lo_class TYPE (ls_method-class_name).
+          READ TABLE lt_components TRANSPORTING NO FIELDS
+            WITH KEY name = 'I_O_AGENT'.
+
+          IF sy-subrc = 0.
+
+            CREATE OBJECT lo_class TYPE (ls_method-class_name)
+              EXPORTING
+                i_o_agent = me->_o_agent.
+
+          ELSE.
+
+            CREATE OBJECT lo_class TYPE (ls_method-class_name).
+
+          ENDIF.
 
           CALL METHOD lo_class->(ls_method-method_name)
             PARAMETER-TABLE lt_parameters.
@@ -200,7 +234,7 @@ CLASS ycl_aaic_func_call_google IMPLEMENTATION.
               cx_sy_dyn_call_param_not_found
               cx_sy_ref_is_initial INTO lo_ex_root.
 
-          r_response = |An error occurred while calling the function/tool. Error description: { lo_ex_root->get_text( ) }|.
+          r_response = |An error occurred while calling the function/tool { i_tool_name }. Error description: { lo_ex_root->get_text( ) }|.
 
           RAISE EVENT on_tool_call_error EXPORTING error_text = r_response.
 
@@ -216,6 +250,31 @@ CLASS ycl_aaic_func_call_google IMPLEMENTATION.
     DATA lt_tools TYPE STANDARD TABLE OF yif_aaic_func_call_google~ty_tool_s.
 
     DATA(lo_aaic_util) = NEW ycl_aaic_util( ).
+
+    IF i_o_agent IS SUPPLIED AND i_o_agent IS BOUND.
+
+      me->_o_agent = i_o_agent.
+
+    ENDIF.
+
+    IF me->_o_agent IS BOUND.
+
+      DATA(lt_agent_tools) = me->_o_agent->get_tools( ).
+
+      LOOP AT lt_agent_tools ASSIGNING FIELD-SYMBOL(<ls_agent_tool>).
+
+        APPEND VALUE #( class_name = <ls_agent_tool>-class_name
+                        method_name = <ls_agent_tool>-method_name
+                        proxy_class = <ls_agent_tool>-proxy_class
+                        description = <ls_agent_tool>-description ) TO me->mt_methods.
+
+      ENDLOOP.
+
+      SORT me->mt_methods BY class_name method_name.
+
+      DELETE ADJACENT DUPLICATES FROM me->mt_methods COMPARING class_name method_name.
+
+    ENDIF.
 
     LOOP AT me->mt_methods ASSIGNING FIELD-SYMBOL(<ls_method>).
 

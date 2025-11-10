@@ -122,6 +122,7 @@ CLASS ycl_aaic_google IMPLEMENTATION.
         i_new        = i_new
         i_greeting   = i_greeting
         i_o_prompt   = i_o_prompt
+        i_o_agent    = i_o_agent
       IMPORTING
         e_response   = e_response
         e_t_response = e_t_response
@@ -239,6 +240,12 @@ CLASS ycl_aaic_google IMPLEMENTATION.
     " In memory we keep the augmented prompt instead of the user message
     IF l_prompt IS NOT INITIAL.
       <ls_msg> = VALUE #( role = 'user' parts = VALUE #( ( l_prompt ) ) ).
+    ENDIF.
+
+    IF i_o_agent IS BOUND AND me->mo_function_calling IS NOT BOUND.
+
+      me->mo_function_calling = NEW ycl_aaic_func_call_google( i_o_agent ).
+
     ENDIF.
 
     DO me->_max_tools_calls TIMES.

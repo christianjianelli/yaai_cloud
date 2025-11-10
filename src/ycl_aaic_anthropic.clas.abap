@@ -205,15 +205,6 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
       <ls_msg>-content = l_prompt.
     ENDIF.
 
-    IF me->mo_function_calling IS BOUND.
-
-      me->mo_function_calling->get_tools(
-        IMPORTING
-          e_tools = l_tools
-      ).
-
-    ENDIF.
-
     IF me->_o_connection IS NOT BOUND.
 
       me->_o_connection = NEW ycl_aaic_conn( i_api = yif_aaic_const=>c_anthropic ).
@@ -236,11 +227,26 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
       me->m_endpoint = yif_aaic_const=>c_anthropic_messages_endpoint.
     ENDIF.
 
+    IF i_o_agent IS BOUND AND me->mo_function_calling IS NOT BOUND.
+
+      me->mo_function_calling = NEW ycl_aaic_func_call_anthropic( i_o_agent ).
+
+    ENDIF.
+
     DO me->_max_tools_calls TIMES.
 
       IF me->_o_connection->create( i_endpoint = me->m_endpoint ).
 
         FREE ls_anthropic_chat_response.
+
+        IF me->mo_function_calling IS BOUND.
+
+          me->mo_function_calling->get_tools(
+            IMPORTING
+              e_tools = l_tools
+          ).
+
+        ENDIF.
 
         DATA(l_json) = lo_aaic_util->serialize( i_data = VALUE yif_aaic_anthropic~ty_anthropic_chat_request_s( model = me->_model
                                                                                                                temperature = me->_temperature
@@ -468,6 +474,7 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
         i_new        = i_new
         i_greeting   = i_greeting
         i_o_prompt   = i_o_prompt
+        i_o_agent    = i_o_agent
       IMPORTING
         e_response   = e_response
         e_failed     = e_failed
