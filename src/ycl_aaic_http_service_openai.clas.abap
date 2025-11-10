@@ -18,7 +18,17 @@ CLASS ycl_aaic_http_service_openai IMPLEMENTATION.
 
   METHOD if_http_service_extension~handle_request.
 
-    TYPES: BEGIN OF ty_request,
+    TYPES: BEGIN OF ty_message_s,
+             id       TYPE string,
+             seqno    TYPE yaaic_msg-seqno,
+             msg      TYPE /ui2/cl_json=>json,
+             msg_date TYPE yaaic_msg-msg_date,
+             msg_time TYPE yaaic_msg-msg_time,
+           END OF ty_message_s,
+
+           ty_message_t TYPE STANDARD TABLE OF ty_message_s WITH EMPTY KEY,
+
+           BEGIN OF ty_request,
              chatid  TYPE string,
              apikey  TYPE string,
              prompt  TYPE string,
@@ -27,19 +37,10 @@ CLASS ycl_aaic_http_service_openai IMPLEMENTATION.
            END OF ty_request,
 
            BEGIN OF ty_response,
-             message TYPE string,
-             chatid  TYPE string,
-           END OF ty_response,
-
-           BEGIN OF ty_message_s,
-             id       TYPE yaaic_msg-id,
-             seqno    TYPE yaaic_msg-seqno,
-             msg      TYPE /ui2/cl_json=>json,
-             msg_date TYPE yaaic_msg-msg_date,
-             msg_time TYPE yaaic_msg-msg_time,
-           END OF ty_message_s,
-
-           ty_message_t TYPE STANDARD TABLE OF ty_message_s WITH DEFAULT KEY.
+             chatid   TYPE string,
+             message  TYPE string,
+             messages TYPE ty_message_t,
+           END OF ty_response.
 
     DATA: ls_request  TYPE ty_request,
           ls_response TYPE ty_response.
@@ -141,6 +142,15 @@ CLASS ycl_aaic_http_service_openai IMPLEMENTATION.
 
             ls_response-chatid = lo_aaic_db->m_id.
 
+            lo_aaic_db->get_chat(
+              EXPORTING
+                i_ui = abap_true
+              IMPORTING
+                e_t_messages = DATA(lt_messages)
+            ).
+
+            ls_response-messages = CORRESPONDING #( lt_messages ).
+
             l_json = /ui2/cl_json=>serialize(
               EXPORTING
                 data = ls_response
@@ -179,7 +189,7 @@ CLASS ycl_aaic_http_service_openai IMPLEMENTATION.
               EXPORTING
                 i_ui = abap_true
               IMPORTING
-                e_t_messages = DATA(lt_messages)
+                e_t_messages = lt_messages
             ).
 
             l_format = to_lower( l_format ).

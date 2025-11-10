@@ -18,31 +18,32 @@ CLASS ycl_aaic_http_srvc_anthropic IMPLEMENTATION.
 
   METHOD if_http_service_extension~handle_request.
 
-    TYPES: BEGIN OF ty_request,
-             chatid  TYPE string,
-             apikey  TYPE string,
-             prompt  TYPE string,
-             context TYPE string,
-             model   TYPE string,
-           END OF ty_request,
-
-           BEGIN OF ty_response,
-             message TYPE string,
-             chatid  TYPE string,
-           END OF ty_response,
-
-           BEGIN OF ty_message_s,
-             id       TYPE yaaic_msg-id,
+    TYPES: BEGIN OF ty_message_s,
+             id       TYPE string,
              seqno    TYPE yaaic_msg-seqno,
              msg      TYPE /ui2/cl_json=>json,
              msg_date TYPE yaaic_msg-msg_date,
              msg_time TYPE yaaic_msg-msg_time,
            END OF ty_message_s,
 
-           ty_message_t TYPE STANDARD TABLE OF ty_message_s WITH DEFAULT KEY.
+           ty_message_t TYPE STANDARD TABLE OF ty_message_s WITH EMPTY KEY,
 
-    DATA: ls_request  TYPE ty_request,
-          ls_response TYPE ty_response.
+           BEGIN OF ty_request_s,
+             chatid  TYPE string,
+             apikey  TYPE string,
+             prompt  TYPE string,
+             context TYPE string,
+             model   TYPE string,
+           END OF ty_request_s,
+
+           BEGIN OF ty_response_s,
+             chatid   TYPE string,
+             message  TYPE string,
+             messages TYPE ty_message_t,
+           END OF ty_response_s.
+
+    DATA: ls_request  TYPE ty_request_s,
+          ls_response TYPE ty_response_s.
 
     DATA l_response_text TYPE string.
 
@@ -101,10 +102,10 @@ CLASS ycl_aaic_http_srvc_anthropic IMPLEMENTATION.
 
               lo_aaic_anthropic->chat(
                 EXPORTING
-                  i_message  = ls_request-prompt
-                  i_o_agent  = lo_agent
+                  i_message    = ls_request-prompt
+                  i_o_agent    = lo_agent
                 IMPORTING
-                  e_response = ls_response-message
+                  e_response   = ls_response-message
               ).
 
             ELSE.
@@ -130,21 +131,32 @@ CLASS ycl_aaic_http_srvc_anthropic IMPLEMENTATION.
 
               lo_aaic_anthropic->yif_aaic_chat~chat(
                 EXPORTING
-                  i_o_prompt = lo_aaic_prompt
-                  i_o_agent  = lo_agent
+                  i_o_prompt   = lo_aaic_prompt
+                  i_o_agent    = lo_agent
                 IMPORTING
-                  e_response = ls_response-message
+                  e_response   = ls_response-message
               ).
 
             ENDIF.
 
             ls_response-chatid = lo_aaic_db->m_id.
 
+            lo_aaic_db->get_chat(
+              EXPORTING
+                i_ui = abap_true
+              IMPORTING
+                e_t_messages = DATA(lt_messages)
+            ).
+
+            ls_response-messages = CORRESPONDING #( lt_messages ).
+
             l_json = /ui2/cl_json=>serialize(
               EXPORTING
                 data = ls_response
                 pretty_name = /ui2/cl_json=>pretty_mode-low_case
             ).
+
+            response->set_content_type( content_type = 'application/json' ).
 
             response->set_text(
               EXPORTING
@@ -178,7 +190,7 @@ CLASS ycl_aaic_http_srvc_anthropic IMPLEMENTATION.
               EXPORTING
                 i_ui = abap_true
               IMPORTING
-                e_t_messages = DATA(lt_messages)
+                e_t_messages = lt_messages
             ).
 
             l_format = to_lower( l_format ).

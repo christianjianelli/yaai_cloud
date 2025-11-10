@@ -93,6 +93,10 @@ CLASS ycl_aaic_db IMPLEMENTATION.
 
     DATA l_id TYPE uuid.
 
+    FREE: e_t_messages,
+          e_t_msg_data,
+          e_t_tools.
+
     IF i_id IS SUPPLIED.
       l_id = i_id.
     ENDIF.

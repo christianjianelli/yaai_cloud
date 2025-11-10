@@ -322,6 +322,10 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
 
           LOOP AT lt_response_content ASSIGNING FIELD-SYMBOL(<ls_content>).
 
+            IF <ls_content>-type = 'text'.
+              e_response = |{ e_response }{ cl_abap_char_utilities=>newline }{ <ls_content>-text }|.
+            ENDIF.
+
             IF <ls_content>-type <> 'tool_use'.
               CONTINUE.
             ENDIF.
@@ -361,7 +365,7 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
 
             WHEN 'text'.
 
-              e_response = |{ e_response } { <ls_content>-text }|.
+              e_response = |{ e_response }{ cl_abap_char_utilities=>newline }{ <ls_content>-text }|.
 
           ENDCASE.
 
