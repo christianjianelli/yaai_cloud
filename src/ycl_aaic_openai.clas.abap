@@ -41,13 +41,15 @@ CLASS ycl_aaic_openai DEFINITION
 
     METHODS constructor
       IMPORTING
-        i_api             TYPE csequence OPTIONAL
-        i_model           TYPE csequence OPTIONAL
-        i_use_completions TYPE abap_bool DEFAULT abap_false
-        i_t_history       TYPE yif_aaic_openai~ty_generate_messages_t OPTIONAL
-        i_o_prompt        TYPE REF TO yif_aaic_prompt OPTIONAL
-        i_o_connection    TYPE REF TO yif_aaic_conn OPTIONAL
-        i_o_persistence   TYPE REF TO yif_aaic_db OPTIONAL.
+        i_api                 TYPE csequence OPTIONAL
+        i_model               TYPE csequence OPTIONAL
+        i_use_completions     TYPE abap_bool DEFAULT abap_false
+        i_parallel_tool_calls TYPE abap_bool DEFAULT abap_false
+        i_safety_identifier   TYPE csequence OPTIONAL
+        i_t_history           TYPE yif_aaic_openai~ty_generate_messages_t OPTIONAL
+        i_o_prompt            TYPE REF TO yif_aaic_prompt OPTIONAL
+        i_o_connection        TYPE REF TO yif_aaic_conn OPTIONAL
+        i_o_persistence       TYPE REF TO yif_aaic_db OPTIONAL.
 
   PROTECTED SECTION.
 
@@ -59,6 +61,8 @@ CLASS ycl_aaic_openai DEFINITION
     DATA: _model                     TYPE string,
           _use_completions           TYPE abap_bool VALUE abap_false,
           _temperature               TYPE p LENGTH 2 DECIMALS 1,
+          _parallel_tool_calls       TYPE abap_bool VALUE abap_false,
+          _safety_identifier         TYPE string,
           _verbosity                 TYPE string,
           _reasoning_effort          TYPE string,
           _system_instructions       TYPE string,
@@ -86,19 +90,22 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       ENDIF.
       SELECT SINGLE model FROM yaaic_model WHERE id = @l_id INTO @me->_model.
       IF sy-subrc <> 0.
-        me->_model = 'gpt-5-nano'.
+        me->_model = 'gpt-5-nano'. " default model
       ENDIF.
     ENDIF.
 
-    "me->_system_instructions_role = 'developer'.
-
     me->_messages = i_t_history.
 
-    me->_temperature = 1.
+    me->_temperature = 1. "non gpt5 models
 
     me->_verbosity = yif_aaic_openai~mc_verbosity_medium.
 
     me->_reasoning_effort = yif_aaic_openai~mc_reasoning_effort_medium.
+
+    me->_parallel_tool_calls = i_parallel_tool_calls.
+
+    me->_safety_identifier = COND #( WHEN i_safety_identifier IS SUPPLIED THEN i_safety_identifier
+                                     ELSE cl_abap_context_info=>get_user_technical_name( ) ).
 
     me->_max_tools_calls = 10.
 
@@ -697,15 +704,19 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
           DATA(l_json) = lo_aaic_util->serialize( i_data = VALUE yif_aaic_openai~ty_openai_generate_request_s( model = me->_model
                                                                                                                stream = abap_false
-                                                                                                               input = me->get_conversation( )
                                                                                                                text-verbosity = me->_verbosity
                                                                                                                reasoning-effort = me->_reasoning_effort
+                                                                                                               parallel_tool_calls = me->_parallel_tool_calls
+                                                                                                               safety_identifier = me->_safety_identifier
+                                                                                                               input = me->get_conversation( )
                                                                                                                tools = l_tools ) ).
         ELSE.
 
           l_json = lo_aaic_util->serialize( i_data = VALUE yif_aaic_openai~ty_openai_generate_req_wt_s( model = me->_model
                                                                                                         stream = abap_false
                                                                                                         temperature = me->_temperature
+                                                                                                        parallel_tool_calls = me->_parallel_tool_calls
+                                                                                                        safety_identifier = me->_safety_identifier
                                                                                                         input = me->get_conversation( )
                                                                                                         tools = l_tools ) ).
         ENDIF.

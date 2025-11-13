@@ -83,20 +83,25 @@ INTERFACE yif_aaic_openai
          END OF ty_type_message_chat_comp_s.
 
   TYPES: BEGIN OF ty_openai_generate_request_s,
-           model     TYPE string,
-           stream    TYPE abap_bool,
-           input     TYPE /ui2/cl_json=>json,
-           text      TYPE ty_type_text_s,
-           reasoning TYPE ty_type_reasoning_s,
-           tools     TYPE /ui2/cl_json=>json,
+           model               TYPE string,
+           stream              TYPE abap_bool,
+           text                TYPE ty_type_text_s,
+           reasoning           TYPE ty_type_reasoning_s,
+           parallel_tool_calls TYPE abap_bool,
+           safety_identifier   TYPE string,
+           input               TYPE /ui2/cl_json=>json,
+           tools               TYPE /ui2/cl_json=>json,
          END OF ty_openai_generate_request_s.
 
+  " Generate request with temperature parameter (non gpt5 models only)
   TYPES: BEGIN OF ty_openai_generate_req_wt_s,
-           model       TYPE string,
-           stream      TYPE abap_bool,
-           temperature TYPE p LENGTH 2 DECIMALS 1,
-           input       TYPE /ui2/cl_json=>json,
-           tools       TYPE /ui2/cl_json=>json,
+           model               TYPE string,
+           stream              TYPE abap_bool,
+           temperature         TYPE p LENGTH 2 DECIMALS 1,
+           parallel_tool_calls TYPE abap_bool,
+           safety_identifier   TYPE string,
+           input               TYPE /ui2/cl_json=>json,
+           tools               TYPE /ui2/cl_json=>json,
          END OF ty_openai_generate_req_wt_s.
 
   TYPES: BEGIN OF ty_openai_completions_req_s,
