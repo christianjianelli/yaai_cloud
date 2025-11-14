@@ -115,9 +115,24 @@ CLASS ycl_aaic_async IMPLEMENTATION.
 
   METHOD yif_aaic_async~update_status.
 
+    DATA: l_enddate TYPE d,
+          l_endtime TYPE t.
+
     r_updated = abap_false.
 
-    UPDATE yaaic_async SET status = @i_status WHERE id = @i_task_id.
+    IF i_status = yif_aaic_async=>mc_task_finished OR
+       i_status = yif_aaic_async=>mc_task_cancelled.
+
+     l_enddate = xco_cp=>sy->date( )->as( xco_cp_time=>format->abap )->value.
+     l_endtime = xco_cp=>sy->time( )->as( xco_cp_time=>format->abap )->value.
+
+    ENDIF.
+
+    UPDATE yaaic_async
+      SET status = @i_status,
+          enddate = @l_enddate,
+          endtime = @l_endtime
+      WHERE id = @i_task_id.
 
     IF sy-subrc = 0.
 

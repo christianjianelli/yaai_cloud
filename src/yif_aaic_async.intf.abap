@@ -4,6 +4,7 @@ INTERFACE yif_aaic_async
   TYPES: BEGIN OF ty_task_s,
            id        TYPE yaaic_async-id,
            chat_id   TYPE yaaic_async-chat_id,
+           name      TYPE yaaic_async-name,
            status    TYPE yaaic_async-status,
            username  TYPE yaaic_async-username,
            startdate TYPE yaaic_async-startdate,
@@ -21,6 +22,7 @@ INTERFACE yif_aaic_async
   METHODS create
     IMPORTING
               i_chat_id        TYPE ty_task_s-chat_id
+              i_task_name      TYPE ty_task_s-name
     RETURNING VALUE(r_task_id) TYPE ty_task_s-id.
 
   METHODS read
