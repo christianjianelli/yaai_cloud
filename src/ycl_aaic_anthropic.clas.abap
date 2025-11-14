@@ -65,7 +65,12 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
     IF i_model IS NOT INITIAL.
       me->_model = i_model.
     ELSE.
-      SELECT SINGLE model FROM yaaic_model WHERE id = @yif_aaic_const=>c_anthropic INTO @me->_model.
+      SELECT model FROM yaaic_model
+        WHERE id = @yif_aaic_const=>c_anthropic
+          AND default_model = @abap_true
+        INTO @me->_model
+        UP TO 1 ROWS.                                   "#EC CI_NOORDER
+      ENDSELECT.
       IF sy-subrc <> 0.
         me->_model = 'claude-3-7-sonnet-latest'.
       ENDIF.

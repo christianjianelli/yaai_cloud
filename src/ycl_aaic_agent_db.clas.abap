@@ -75,7 +75,7 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
       WHERE id = @i_agent_id
          OR name = @i_agent_name
       INTO CORRESPONDING FIELDS OF @e_s_agent
-      UP TO 1 ROWS.
+      UP TO 1 ROWS.                                     "#EC CI_NOORDER
     ENDSELECT.
 
     IF sy-subrc <> 0.

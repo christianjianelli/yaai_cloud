@@ -105,7 +105,7 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
       WHERE id = @i_id
          OR filename = @i_filename
       INTO @DATA(ls_rag)
-      UP TO 1 ROWS.
+      UP TO 1 ROWS.                                     "#EC CI_NOORDER
     ENDSELECT.
 
     IF sy-subrc <> 0.
@@ -182,7 +182,7 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
       WHERE id = @i_id
          OR filename = @i_filename
       INTO @DATA(ls_rag)
-      UP TO 1 ROWS.
+      UP TO 1 ROWS.                                     "#EC CI_NOORDER
     ENDSELECT.
 
     IF sy-subrc = 0.

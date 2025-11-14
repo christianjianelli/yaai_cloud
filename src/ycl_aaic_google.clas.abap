@@ -67,7 +67,12 @@ CLASS ycl_aaic_google IMPLEMENTATION.
     IF i_model IS NOT INITIAL.
       me->_model = i_model.
     ELSE.
-      SELECT SINGLE model FROM yaaic_model WHERE id = @yif_aaic_const=>c_google INTO @me->_model.
+      SELECT model FROM yaaic_model
+        WHERE id = @yif_aaic_const=>c_google
+          AND default_model = @abap_true
+         INTO @me->_model
+         UP TO 1 ROWS.                                  "#EC CI_NOORDER
+      ENDSELECT.
       IF sy-subrc <> 0.
         me->_model = 'gemini-2.5-flash'.
       ENDIF.

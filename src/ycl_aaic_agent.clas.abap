@@ -60,7 +60,7 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
         FROM yaaic_agent
         WHERE name = @i_agent_name
         INTO CORRESPONDING FIELDS OF @ls_agent
-        UP TO 1 ROWS.
+        UP TO 1 ROWS.                                   "#EC CI_NOORDER
       ENDSELECT.
 
     ENDIF.
@@ -108,10 +108,10 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
         ON a~id = b~id
         WHERE a~name = @i_agent_name
         AND load_on_demand = @i_load_on_demand_tools
-        INTO TABLE @lt_tools.
+        INTO TABLE @lt_tools.                           "#EC CI_NOORDER
 
       IF sy-subrc = 0.
-        me->m_agent_id = lt_tools[ 1 ]-id.
+        me->m_agent_id = lt_tools[ 1 ]-id.              "#EC CI_NOORDER
       ENDIF.
 
     ENDIF.
@@ -158,7 +158,7 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
         FROM yaaic_agent
         WHERE name = @i_agent_name
         INTO CORRESPONDING FIELDS OF @ls_agent
-        UP TO 1 ROWS.
+        UP TO 1 ROWS.                                   "#EC CI_NOORDER
       ENDSELECT.
 
     ENDIF.

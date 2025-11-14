@@ -88,7 +88,12 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       IF i_api IS NOT INITIAL.
         l_id = i_api.
       ENDIF.
-      SELECT SINGLE model FROM yaaic_model WHERE id = @l_id INTO @me->_model.
+      SELECT model FROM yaaic_model
+        WHERE id = @l_id
+          AND default_model = @abap_true
+         INTO @me->_model
+         UP TO 1 ROWS.                                  "#EC CI_NOORDER
+      ENDSELECT.
       IF sy-subrc <> 0.
         me->_model = 'gpt-5-nano'. " default model
       ENDIF.
