@@ -14,6 +14,8 @@ CLASS ycl_aaic_async DEFINITION
     ALIASES run FOR yif_aaic_async~run.
     ALIASES update_status FOR yif_aaic_async~update_status.
     ALIASES get_status FOR yif_aaic_async~get_status.
+    ALIASES get_response FOR yif_aaic_async~get_response.
+    ALIASES update_response FOR yif_aaic_async~update_response.
 
   PROTECTED SECTION.
 
@@ -123,8 +125,8 @@ CLASS ycl_aaic_async IMPLEMENTATION.
     IF i_status = yif_aaic_async=>mc_task_finished OR
        i_status = yif_aaic_async=>mc_task_cancelled.
 
-     l_enddate = xco_cp=>sy->date( )->as( xco_cp_time=>format->abap )->value.
-     l_endtime = xco_cp=>sy->time( )->as( xco_cp_time=>format->abap )->value.
+      l_enddate = xco_cp=>sy->date( )->as( xco_cp_time=>format->abap )->value.
+      l_endtime = xco_cp=>sy->time( )->as( xco_cp_time=>format->abap )->value.
 
     ENDIF.
 
@@ -159,6 +161,33 @@ CLASS ycl_aaic_async IMPLEMENTATION.
       FROM yaaic_async
       WHERE chat_id = @i_chat_id
       INTO CORRESPONDING FIELDS OF TABLE @r_t_tasks.
+
+  ENDMETHOD.
+
+  METHOD yif_aaic_async~get_response.
+
+    CLEAR r_response.
+
+    SELECT SINGLE response
+      FROM yaaic_async
+      WHERE id = @i_task_id
+      INTO @r_response.
+
+  ENDMETHOD.
+
+  METHOD yif_aaic_async~update_response.
+
+    r_updated = abap_false.
+
+    UPDATE yaaic_async
+      SET response = @i_response
+      WHERE id = @i_task_id.
+
+    IF sy-subrc = 0.
+
+      r_updated = abap_true.
+
+    ENDIF.
 
   ENDMETHOD.
 

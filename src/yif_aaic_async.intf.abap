@@ -63,4 +63,15 @@ INTERFACE yif_aaic_async
               i_chat_id        TYPE ty_task_s-chat_id
     RETURNING VALUE(r_t_tasks) TYPE ty_task_t.
 
+  METHODS get_response
+    IMPORTING
+              i_task_id         TYPE ty_task_s-id
+    RETURNING VALUE(r_response) TYPE yde_aaic_response.
+
+  METHODS update_response
+    IMPORTING
+              i_task_id        TYPE ty_task_s-id
+              i_response       TYPE csequence
+    RETURNING VALUE(r_updated) TYPE abap_bool.
+
 ENDINTERFACE.
