@@ -14,7 +14,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_http_srvc_anthropic IMPLEMENTATION.
+CLASS YCL_AAIC_HTTP_SRVC_ANTHROPIC IMPLEMENTATION.
+
 
   METHOD if_http_service_extension~handle_request.
 
@@ -270,5 +271,4 @@ CLASS ycl_aaic_http_srvc_anthropic IMPLEMENTATION.
     ENDTRY.
 
   ENDMETHOD.
-
 ENDCLASS.

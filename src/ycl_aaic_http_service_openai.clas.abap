@@ -14,7 +14,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_http_service_openai IMPLEMENTATION.
+CLASS YCL_AAIC_HTTP_SERVICE_OPENAI IMPLEMENTATION.
+
 
   METHOD if_http_service_extension~handle_request.
 
@@ -269,5 +270,4 @@ CLASS ycl_aaic_http_service_openai IMPLEMENTATION.
     ENDTRY.
 
   ENDMETHOD.
-
 ENDCLASS.

@@ -19,7 +19,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_agent_db IMPLEMENTATION.
+CLASS YCL_AAIC_AGENT_DB IMPLEMENTATION.
+
 
   METHOD yif_aaic_agent_db~create.
 
@@ -65,6 +66,7 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_agent_db~read.
 
     FREE: e_error,
@@ -93,6 +95,7 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
       INTO CORRESPONDING FIELDS OF TABLE @e_t_agent_tools.
 
   ENDMETHOD.
+
 
   METHOD yif_aaic_agent_db~update.
 
@@ -131,6 +134,7 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_agent_db~delete.
 
     e_deleted = abap_false.
@@ -146,6 +150,7 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
     e_deleted = abap_true.
 
   ENDMETHOD.
+
 
   METHOD if_oo_adt_classrun~main.
 
@@ -175,5 +180,4 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
 *    out->write( l_error ).
 
   ENDMETHOD.
-
 ENDCLASS.

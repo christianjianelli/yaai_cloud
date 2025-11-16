@@ -29,109 +29,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_diagram_anthropic IMPLEMENTATION.
+CLASS YCL_AAIC_DIAGRAM_ANTHROPIC IMPLEMENTATION.
 
-  METHOD constructor.
-
-    me->m_maxlen = 70.
-
-    me->m_diagram = |sequenceDiagram| && cl_abap_char_utilities=>newline.
-
-    me->mt_replacements = VALUE #(
-      ( from_char = |#|  to_string = '#35;' )
-      ( from_char = cl_abap_char_utilities=>newline to_string = ' ' )
-    ).
-
-  ENDMETHOD.
-
-  METHOD yif_aaic_diagram_anthropic~get_chat_messages.
-
-    NEW ycl_aaic_db( i_api = yif_aaic_const=>c_anthropic
-                     i_id = CONV #( i_chat_id ) )->get_chat(
-                                           EXPORTING
-                                             i_ui = abap_false
-                                           IMPORTING
-                                             e_t_messages = DATA(lt_msg)
-                                         ).
-
-    LOOP AT lt_msg ASSIGNING FIELD-SYMBOL(<ls_msg>).
-
-      APPEND INITIAL LINE TO r_t_messages ASSIGNING FIELD-SYMBOL(<ls_message>).
-
-      me->parse_json(
-        EXPORTING
-          i_json  = <ls_msg>-msg
-        IMPORTING
-          e_s_msg = <ls_message>
-      ).
-
-    ENDLOOP.
-
-  ENDMETHOD.
-
-  METHOD yif_aaic_diagram_anthropic~parse_json.
-
-    NEW ycl_aaic_util( )->deserialize(
-      EXPORTING
-        i_json = i_json
-      IMPORTING
-        e_data = e_s_msg
-    ).
-
-  ENDMETHOD.
-
-  METHOD yif_aaic_diagram_anthropic~escape_text.
-
-    " Start with the original text
-    r_escaped_text = i_text.
-
-    " Replace each special character
-    LOOP AT mt_replacements ASSIGNING FIELD-SYMBOL(<ls_rep>).
-
-      REPLACE ALL OCCURRENCES OF <ls_rep>-from_char
-        IN r_escaped_text
-        WITH <ls_rep>-to_string.
-
-    ENDLOOP.
-
-  ENDMETHOD.
-
-  METHOD yif_aaic_diagram_anthropic~add_participant.
-
-    READ TABLE me->mt_participants TRANSPORTING NO FIELDS
-      WITH KEY participant = to_lower( i_participant ).
-
-    IF sy-subrc <> 0.
-      APPEND VALUE #( participant = to_lower( i_participant ) ) TO me->mt_participants.
-    ENDIF.
-
-  ENDMETHOD.
-
-  METHOD yif_aaic_diagram_anthropic~add_step.
-
-    DATA: l_line    TYPE string,
-          l_content TYPE string,
-          l_len     TYPE i,
-          l_suffix  TYPE string.
-
-    me->add_participant( i_sender ).
-    me->add_participant( i_target ).
-
-    l_content = me->escape_text( i_content ).
-
-    l_len = COND #( WHEN strlen( l_content ) < me->m_maxlen THEN strlen( l_content ) ELSE me->m_maxlen ).
-
-    IF strlen( i_content ) > l_len.
-      l_suffix = '...'.
-    ENDIF.
-
-    " Build mermaid line
-    l_line = |{ i_sender } ->> { i_target }: { substring( val = l_content off = 0 len = l_len ) }{ l_suffix }|.
-
-    " Append to diagram
-    APPEND VALUE #( step = l_line && cl_abap_char_utilities=>newline ) TO mt_steps.
-
-  ENDMETHOD.
 
   METHOD yif_aaic_diagram_anthropic~add_message.
 
@@ -255,6 +154,7 @@ CLASS ycl_aaic_diagram_anthropic IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_diagram_anthropic~get_diagram.
 
     r_diagram = me->m_diagram.
@@ -285,10 +185,118 @@ CLASS ycl_aaic_diagram_anthropic IMPLEMENTATION.
 
   ENDMETHOD.
 
+
+  METHOD constructor.
+
+    me->m_maxlen = 70.
+
+    me->m_diagram = |sequenceDiagram| && cl_abap_char_utilities=>newline.
+
+    me->mt_replacements = VALUE #(
+      ( from_char = |#|  to_string = '#35;' )
+      ( from_char = cl_abap_char_utilities=>newline to_string = ' ' )
+    ).
+
+  ENDMETHOD.
+
+
   METHOD if_oo_adt_classrun~main.
 
     out->write( me->get_diagram( '7EA3422BA1AC1FE0AE910DC49DEBCC68' ) ).
 
   ENDMETHOD.
 
+
+  METHOD yif_aaic_diagram_anthropic~add_participant.
+
+    READ TABLE me->mt_participants TRANSPORTING NO FIELDS
+      WITH KEY participant = to_lower( i_participant ).
+
+    IF sy-subrc <> 0.
+      APPEND VALUE #( participant = to_lower( i_participant ) ) TO me->mt_participants.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD yif_aaic_diagram_anthropic~add_step.
+
+    DATA: l_line    TYPE string,
+          l_content TYPE string,
+          l_len     TYPE i,
+          l_suffix  TYPE string.
+
+    me->add_participant( i_sender ).
+    me->add_participant( i_target ).
+
+    l_content = me->escape_text( i_content ).
+
+    l_len = COND #( WHEN strlen( l_content ) < me->m_maxlen THEN strlen( l_content ) ELSE me->m_maxlen ).
+
+    IF strlen( i_content ) > l_len.
+      l_suffix = '...'.
+    ENDIF.
+
+    " Build mermaid line
+    l_line = |{ i_sender } ->> { i_target }: { substring( val = l_content off = 0 len = l_len ) }{ l_suffix }|.
+
+    " Append to diagram
+    APPEND VALUE #( step = l_line && cl_abap_char_utilities=>newline ) TO mt_steps.
+
+  ENDMETHOD.
+
+
+  METHOD yif_aaic_diagram_anthropic~escape_text.
+
+    " Start with the original text
+    r_escaped_text = i_text.
+
+    " Replace each special character
+    LOOP AT mt_replacements ASSIGNING FIELD-SYMBOL(<ls_rep>).
+
+      REPLACE ALL OCCURRENCES OF <ls_rep>-from_char
+        IN r_escaped_text
+        WITH <ls_rep>-to_string.
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+  METHOD yif_aaic_diagram_anthropic~get_chat_messages.
+
+    NEW ycl_aaic_db( i_api = yif_aaic_const=>c_anthropic
+                     i_id = CONV #( i_chat_id ) )->get_chat(
+                                           EXPORTING
+                                             i_ui = abap_false
+                                           IMPORTING
+                                             e_t_messages = DATA(lt_msg)
+                                         ).
+
+    LOOP AT lt_msg ASSIGNING FIELD-SYMBOL(<ls_msg>).
+
+      APPEND INITIAL LINE TO r_t_messages ASSIGNING FIELD-SYMBOL(<ls_message>).
+
+      me->parse_json(
+        EXPORTING
+          i_json  = <ls_msg>-msg
+        IMPORTING
+          e_s_msg = <ls_message>
+      ).
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+  METHOD yif_aaic_diagram_anthropic~parse_json.
+
+    NEW ycl_aaic_util( )->deserialize(
+      EXPORTING
+        i_json = i_json
+      IMPORTING
+        e_data = e_s_msg
+    ).
+
+  ENDMETHOD.
 ENDCLASS.

@@ -20,7 +20,13 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_rag_tools IMPLEMENTATION.
+CLASS YCL_AAIC_RAG_TOOLS IMPLEMENTATION.
+
+
+  METHOD yif_aaic_rag_tools~create_documentation.
+
+  ENDMETHOD.
+
 
   METHOD yif_aaic_rag_tools~get_documentation.
 
@@ -33,16 +39,13 @@ CLASS ycl_aaic_rag_tools IMPLEMENTATION.
 
   ENDMETHOD.
 
-  METHOD yif_aaic_rag_tools~create_documentation.
-
-  ENDMETHOD.
-
-  METHOD yif_aaic_rag_tools~update_documentation.
-
-  ENDMETHOD.
 
   METHOD yif_aaic_rag_tools~get_list_of_documents.
 
   ENDMETHOD.
 
+
+  METHOD yif_aaic_rag_tools~update_documentation.
+
+  ENDMETHOD.
 ENDCLASS.

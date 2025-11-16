@@ -18,7 +18,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_rag_db IMPLEMENTATION.
+CLASS YCL_AAIC_RAG_DB IMPLEMENTATION.
+
 
   METHOD yif_aaic_rag_db~create.
 
@@ -91,6 +92,7 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
+
 
   METHOD yif_aaic_rag_db~read.
 
@@ -170,6 +172,7 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_rag_db~update.
 
     e_updated = abap_false.
@@ -214,6 +217,7 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_rag_db~delete.
 
     e_deleted = abap_false.
@@ -233,5 +237,4 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
-
 ENDCLASS.

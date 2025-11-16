@@ -56,7 +56,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_conn IMPLEMENTATION.
+CLASS YCL_AAIC_CONN IMPLEMENTATION.
+
 
   METHOD constructor.
 
@@ -383,5 +384,4 @@ CLASS ycl_aaic_conn IMPLEMENTATION.
     lo_request->set_text( i_json ).
 
   ENDMETHOD.
-
 ENDCLASS.

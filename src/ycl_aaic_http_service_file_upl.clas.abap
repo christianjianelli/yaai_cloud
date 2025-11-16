@@ -17,7 +17,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_http_service_file_upl IMPLEMENTATION.
+CLASS YCL_AAIC_HTTP_SERVICE_FILE_UPL IMPLEMENTATION.
+
 
   METHOD if_http_service_extension~handle_request.
 
@@ -56,6 +57,7 @@ CLASS ycl_aaic_http_service_file_upl IMPLEMENTATION.
     ENDCASE.
 
   ENDMETHOD.
+
 
   METHOD get_html.
 
@@ -130,7 +132,4 @@ CLASS ycl_aaic_http_service_file_upl IMPLEMENTATION.
      | \n| &&
      |</html> |.
   ENDMETHOD.
-
 ENDCLASS.
-
-

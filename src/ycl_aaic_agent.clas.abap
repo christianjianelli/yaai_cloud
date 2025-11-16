@@ -28,7 +28,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_agent IMPLEMENTATION.
+CLASS YCL_AAIC_AGENT IMPLEMENTATION.
+
 
   METHOD constructor.
 
@@ -36,6 +37,7 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
     me->m_chat_id = i_chat_id.
 
   ENDMETHOD.
+
 
   METHOD yif_aaic_agent~get_system_instructions.
 
@@ -77,6 +79,7 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
     ).
 
   ENDMETHOD.
+
 
   METHOD yif_aaic_agent~get_tools.
 
@@ -135,6 +138,7 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_agent~get_prompt_template.
 
     DATA ls_agent TYPE yaaic_agent.
@@ -166,6 +170,7 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
     r_prompt_template = ls_agent-prompt_template.
 
   ENDMETHOD.
+
 
   METHOD if_oo_adt_classrun~main.
 
@@ -209,5 +214,4 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
 
 
   ENDMETHOD.
-
 ENDCLASS.

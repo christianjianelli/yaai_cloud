@@ -29,7 +29,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_log IMPLEMENTATION.
+CLASS YCL_AAIC_LOG IMPLEMENTATION.
+
 
   METHOD constructor.
 
@@ -38,6 +39,7 @@ CLASS ycl_aaic_log IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
+
 
   METHOD yif_aaic_log~add_message.
 
@@ -65,6 +67,7 @@ CLASS ycl_aaic_log IMPLEMENTATION.
     ENDLOOP.
 
   ENDMETHOD.
+
 
   METHOD yif_aaic_log~save_log.
 
@@ -122,6 +125,7 @@ CLASS ycl_aaic_log IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_log~load_log.
 
     IF i_chat_id IS NOT SUPPLIED AND me->m_chat_id IS INITIAL.
@@ -144,11 +148,13 @@ CLASS ycl_aaic_log IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_log~get_log.
 
     rt_log = me->mt_log.
 
   ENDMETHOD.
+
 
   METHOD yif_aaic_log~get_messages.
 
@@ -174,10 +180,10 @@ CLASS ycl_aaic_log IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_log~delete_expired_logs.
 
     DELETE FROM yaaic_log WHERE expiry_date < @( cl_abap_context_info=>get_system_date( ) ).
 
   ENDMETHOD.
-
 ENDCLASS.

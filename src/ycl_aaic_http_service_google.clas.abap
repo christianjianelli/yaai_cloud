@@ -14,7 +14,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_http_service_google IMPLEMENTATION.
+CLASS YCL_AAIC_HTTP_SERVICE_GOOGLE IMPLEMENTATION.
+
 
   METHOD if_http_service_extension~handle_request.
 
@@ -262,5 +263,4 @@ CLASS ycl_aaic_http_service_google IMPLEMENTATION.
     ENDTRY.
 
   ENDMETHOD.
-
 ENDCLASS.

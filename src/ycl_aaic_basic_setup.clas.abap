@@ -13,7 +13,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_basic_setup IMPLEMENTATION.
+CLASS YCL_AAIC_BASIC_SETUP IMPLEMENTATION.
+
 
   METHOD if_oo_adt_classrun~main.
 
@@ -28,5 +29,4 @@ CLASS ycl_aaic_basic_setup IMPLEMENTATION.
                                               ( id = 'MISTRAL' model = 'mistral-large-latest' ) ) ) ACCEPTING DUPLICATE KEYS.
 
   ENDMETHOD.
-
 ENDCLASS.

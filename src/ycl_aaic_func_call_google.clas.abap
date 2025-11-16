@@ -32,7 +32,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_func_call_google IMPLEMENTATION.
+CLASS YCL_AAIC_FUNC_CALL_GOOGLE IMPLEMENTATION.
+
 
   METHOD constructor.
 
@@ -43,6 +44,7 @@ CLASS ycl_aaic_func_call_google IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
+
 
   METHOD yif_aaic_func_call_google~add_methods.
 
@@ -344,5 +346,4 @@ CLASS ycl_aaic_func_call_google IMPLEMENTATION.
     FREE me->mt_methods.
 
   ENDMETHOD.
-
 ENDCLASS.

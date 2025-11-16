@@ -13,7 +13,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_default_llm_models IMPLEMENTATION.
+CLASS YCL_AAIC_DEFAULT_LLM_MODELS IMPLEMENTATION.
+
 
   METHOD if_oo_adt_classrun~main.
 
@@ -40,5 +41,4 @@ CLASS ycl_aaic_default_llm_models IMPLEMENTATION.
     out->write( 'ABAP AI tool Cloud: Default LLM models set.' ).
 
   ENDMETHOD.
-
 ENDCLASS.

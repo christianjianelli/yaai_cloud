@@ -27,7 +27,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_prompt IMPLEMENTATION.
+CLASS YCL_AAIC_PROMPT IMPLEMENTATION.
+
 
   METHOD constructor.
 
@@ -57,6 +58,7 @@ CLASS ycl_aaic_prompt IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_prompt~get_prompt.
 
     r_prompt = space.
@@ -76,6 +78,7 @@ CLASS ycl_aaic_prompt IMPLEMENTATION.
     ).
 
   ENDMETHOD.
+
 
   METHOD yif_aaic_prompt~generate_prompt_from_template.
 
@@ -126,6 +129,7 @@ CLASS ycl_aaic_prompt IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_prompt~get_user_message.
 
     r_user_message = space.
@@ -150,6 +154,7 @@ CLASS ycl_aaic_prompt IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_prompt~get_context.
 
     r_context = space.
@@ -173,5 +178,4 @@ CLASS ycl_aaic_prompt IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
-
 ENDCLASS.

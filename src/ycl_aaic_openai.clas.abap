@@ -77,7 +77,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_openai IMPLEMENTATION.
+CLASS YCL_AAIC_OPENAI IMPLEMENTATION.
+
 
   METHOD constructor.
 
@@ -1067,10 +1068,10 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_openai~set_endpoint.
 
     me->m_endpoint = i_endpoint.
 
   ENDMETHOD.
-
 ENDCLASS.

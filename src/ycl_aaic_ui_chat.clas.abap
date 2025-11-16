@@ -17,7 +17,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_ui_chat IMPLEMENTATION.
+CLASS YCL_AAIC_UI_CHAT IMPLEMENTATION.
+
 
   METHOD yif_aaic_ui_chat~get_css.
 
@@ -707,5 +708,4 @@ CLASS ycl_aaic_ui_chat IMPLEMENTATION.
     r_html = r_html && '</html>' && cl_abap_char_utilities=>newline.
 
   ENDMETHOD.
-
 ENDCLASS.

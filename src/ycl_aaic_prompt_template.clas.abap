@@ -19,7 +19,8 @@ CLASS ycl_aaic_prompt_template DEFINITION
 ENDCLASS.
 
 
-CLASS ycl_aaic_prompt_template IMPLEMENTATION.
+
+CLASS YCL_AAIC_PROMPT_TEMPLATE IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -43,5 +44,4 @@ CLASS ycl_aaic_prompt_template IMPLEMENTATION.
     me->m_template_text = i_template_text.
 
   ENDMETHOD.
-
 ENDCLASS.

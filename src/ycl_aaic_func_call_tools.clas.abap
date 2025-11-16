@@ -26,17 +26,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_func_call_tools IMPLEMENTATION.
+CLASS YCL_AAIC_FUNC_CALL_TOOLS IMPLEMENTATION.
 
-  METHOD constructor.
-
-    IF i_o_agent IS SUPPLIED.
-
-      me->_o_agent = i_o_agent.
-
-    ENDIF.
-
-  ENDMETHOD.
 
   METHOD yif_aaic_func_call_tools~get_available_tools.
 
@@ -68,6 +59,7 @@ CLASS ycl_aaic_func_call_tools IMPLEMENTATION.
     ).
 
   ENDMETHOD.
+
 
   METHOD yif_aaic_func_call_tools~request_tools.
 
@@ -144,6 +136,7 @@ CLASS ycl_aaic_func_call_tools IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD if_oo_adt_classrun~main.
 
 *    me->_o_agent = NEW ycl_aaic_agent(
@@ -165,4 +158,14 @@ CLASS ycl_aaic_func_call_tools IMPLEMENTATION.
 
   ENDMETHOD.
 
+
+  METHOD constructor.
+
+    IF i_o_agent IS SUPPLIED.
+
+      me->_o_agent = i_o_agent.
+
+    ENDIF.
+
+  ENDMETHOD.
 ENDCLASS.

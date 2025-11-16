@@ -33,7 +33,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
+CLASS YCL_AAIC_FUNC_CALL_OPENAI IMPLEMENTATION.
+
 
   METHOD constructor.
 
@@ -44,6 +45,7 @@ CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
+
 
   METHOD yif_aaic_func_call_openai~add_methods.
 
@@ -420,5 +422,4 @@ CLASS ycl_aaic_func_call_openai IMPLEMENTATION.
     FREE me->mt_methods.
 
   ENDMETHOD.
-
 ENDCLASS.

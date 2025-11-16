@@ -68,7 +68,9 @@ CLASS ycl_aaic_util DEFINITION
 ENDCLASS.
 
 
-CLASS ycl_aaic_util IMPLEMENTATION.
+
+CLASS YCL_AAIC_UTIL IMPLEMENTATION.
+
 
   METHOD serialize.
 
@@ -97,6 +99,7 @@ CLASS ycl_aaic_util IMPLEMENTATION.
     ).
 
   ENDMETHOD.
+
 
   METHOD deserialize.
 
@@ -631,5 +634,4 @@ CLASS ycl_aaic_util IMPLEMENTATION.
     ENDTRY.
 
   ENDMETHOD.
-
 ENDCLASS.

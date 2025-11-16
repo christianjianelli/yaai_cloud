@@ -56,7 +56,9 @@ CLASS ycl_aaic_anthropic DEFINITION
 ENDCLASS.
 
 
-CLASS ycl_aaic_anthropic IMPLEMENTATION.
+
+CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
+
 
   METHOD constructor.
 
@@ -492,10 +494,10 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_anthropic~set_endpoint.
 
     m_endpoint = i_endpoint.
 
   ENDMETHOD.
-
 ENDCLASS.

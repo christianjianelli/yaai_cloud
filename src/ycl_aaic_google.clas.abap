@@ -60,7 +60,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_google IMPLEMENTATION.
+CLASS YCL_AAIC_GOOGLE IMPLEMENTATION.
+
 
   METHOD constructor.
 
@@ -556,10 +557,10 @@ CLASS ycl_aaic_google IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_google~set_endpoint.
 
     me->m_endpoint = i_endpoint.
 
   ENDMETHOD.
-
 ENDCLASS.

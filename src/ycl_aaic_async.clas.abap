@@ -25,7 +25,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_async IMPLEMENTATION.
+CLASS YCL_AAIC_ASYNC IMPLEMENTATION.
+
 
   METHOD yif_aaic_async~create.
 
@@ -47,6 +48,7 @@ CLASS ycl_aaic_async IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_async~read.
 
     SELECT SINGLE id, chat_id, status, username, startdate, starttime
@@ -55,6 +57,7 @@ CLASS ycl_aaic_async IMPLEMENTATION.
       INTO CORRESPONDING FIELDS OF @e_s_task.
 
   ENDMETHOD.
+
 
   METHOD yif_aaic_async~update.
 
@@ -72,6 +75,7 @@ CLASS ycl_aaic_async IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_async~delete.
 
     r_deleted = abap_false.
@@ -85,6 +89,7 @@ CLASS ycl_aaic_async IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
+
 
   METHOD yif_aaic_async~run.
 
@@ -115,6 +120,7 @@ CLASS ycl_aaic_async IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_async~update_status.
 
     DATA: l_enddate TYPE d,
@@ -144,6 +150,7 @@ CLASS ycl_aaic_async IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_async~get_status.
 
     CLEAR r_status.
@@ -155,6 +162,7 @@ CLASS ycl_aaic_async IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD yif_aaic_async~get_tasks_by_chat_id.
 
     SELECT id, chat_id, status, username, startdate, starttime
@@ -163,6 +171,7 @@ CLASS ycl_aaic_async IMPLEMENTATION.
       INTO CORRESPONDING FIELDS OF TABLE @r_t_tasks.
 
   ENDMETHOD.
+
 
   METHOD yif_aaic_async~get_response.
 
@@ -174,6 +183,7 @@ CLASS ycl_aaic_async IMPLEMENTATION.
       INTO @r_response.
 
   ENDMETHOD.
+
 
   METHOD yif_aaic_async~update_response.
 
@@ -190,5 +200,4 @@ CLASS ycl_aaic_async IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
-
 ENDCLASS.

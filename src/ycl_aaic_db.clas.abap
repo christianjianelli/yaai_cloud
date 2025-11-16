@@ -35,7 +35,8 @@ ENDCLASS.
 
 
 
-CLASS ycl_aaic_db IMPLEMENTATION.
+CLASS YCL_AAIC_DB IMPLEMENTATION.
+
 
   METHOD constructor.
 
@@ -381,5 +382,4 @@ CLASS ycl_aaic_db IMPLEMENTATION.
     e_persisted = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
 
   ENDMETHOD.
-
 ENDCLASS.

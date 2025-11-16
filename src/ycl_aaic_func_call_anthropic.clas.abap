@@ -30,7 +30,10 @@ CLASS ycl_aaic_func_call_anthropic DEFINITION
 
 ENDCLASS.
 
-CLASS ycl_aaic_func_call_anthropic IMPLEMENTATION.
+
+
+CLASS YCL_AAIC_FUNC_CALL_ANTHROPIC IMPLEMENTATION.
+
 
   METHOD constructor.
 
@@ -41,6 +44,7 @@ CLASS ycl_aaic_func_call_anthropic IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
+
 
   METHOD yif_aaic_func_call_anthropic~add_methods.
 
@@ -334,5 +338,4 @@ CLASS ycl_aaic_func_call_anthropic IMPLEMENTATION.
     FREE me->mt_methods.
 
   ENDMETHOD.
-
 ENDCLASS.
