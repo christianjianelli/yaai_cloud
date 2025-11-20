@@ -23,10 +23,10 @@ CLASS YCL_AAIC_BASIC_SETUP IMPLEMENTATION.
                                             ( id = 'GOOGLE' base_url = 'https://generativelanguage.googleapis.com' )
                                             ( id = 'MISTRAL' base_url = 'https://api.mistral.ai' ) ) ) ACCEPTING DUPLICATE KEYS.
 
-    INSERT yaaic_model FROM TABLE @( VALUE #( ( id = 'OPENAI' model = 'gpt-5' )
-                                              ( id = 'ANTHROPIC' model = 'claude-sonnet-4-20250514' )
-                                              ( id = 'GOOGLE' model = 'gemini-2.5-flash' )
-                                              ( id = 'MISTRAL' model = 'mistral-large-latest' ) ) ) ACCEPTING DUPLICATE KEYS.
+    INSERT yaaic_model FROM TABLE @( VALUE #( ( id = 'OPENAI' model = 'gpt-5' default_model = abap_true )
+                                              ( id = 'ANTHROPIC' model = 'claude-sonnet-4-20250514' default_model = abap_true )
+                                              ( id = 'GOOGLE' model = 'gemini-2.5-flash' default_model = abap_true )
+                                              ( id = 'MISTRAL' model = 'mistral-large-latest' default_model = abap_true ) ) ) ACCEPTING DUPLICATE KEYS.
 
   ENDMETHOD.
 ENDCLASS.

@@ -165,10 +165,7 @@ CLASS YCL_AAIC_CONN IMPLEMENTATION.
 
         me->log( i_s_msg = VALUE #( id = lo_http_dest_provider_error->if_t100_message~t100key-msgid
                                     number = lo_http_dest_provider_error->if_t100_message~t100key-msgno
-                                    message_v1 = CONV #( lo_http_dest_provider_error->if_t100_message~t100key-attr1 )
-                                    message_v2 = CONV #( lo_http_dest_provider_error->if_t100_message~t100key-attr2 )
-                                    message_v3 = CONV #( lo_http_dest_provider_error->if_t100_message~t100key-attr3 )
-                                    message_v4 = CONV #( lo_http_dest_provider_error->if_t100_message~t100key-attr4 ) ) ).
+                                    message = lo_http_dest_provider_error->get_text( ) ) ).
 
         RAISE EVENT on_connection_error.
 
@@ -186,10 +183,7 @@ CLASS YCL_AAIC_CONN IMPLEMENTATION.
 
         me->log( i_s_msg = VALUE #( id = lo_web_http_client_error->if_t100_message~t100key-msgid
                                     number = lo_web_http_client_error->if_t100_message~t100key-msgno
-                                    message_v1 = CONV #( lo_web_http_client_error->if_t100_message~t100key-attr1 )
-                                    message_v2 = CONV #( lo_web_http_client_error->if_t100_message~t100key-attr2 )
-                                    message_v3 = CONV #( lo_web_http_client_error->if_t100_message~t100key-attr3 )
-                                    message_v4 = CONV #( lo_web_http_client_error->if_t100_message~t100key-attr4 ) ) ).
+                                    message = lo_web_http_client_error->get_text( ) ) ).
 
         RAISE EVENT on_connection_error.
 
@@ -278,10 +272,7 @@ CLASS YCL_AAIC_CONN IMPLEMENTATION.
 
         me->log( i_s_msg = VALUE #( id = lo_web_http_client_error->if_t100_message~t100key-msgid
                                     number = lo_web_http_client_error->if_t100_message~t100key-msgno
-                                    message_v1 = CONV #( lo_web_http_client_error->if_t100_message~t100key-attr1 )
-                                    message_v2 = CONV #( lo_web_http_client_error->if_t100_message~t100key-attr2 )
-                                    message_v3 = CONV #( lo_web_http_client_error->if_t100_message~t100key-attr3 )
-                                    message_v4 = CONV #( lo_web_http_client_error->if_t100_message~t100key-attr4 ) ) ).
+                                    message = lo_web_http_client_error->get_text( ) ) ).
 
         e_failed = abap_true.
 
@@ -295,10 +286,7 @@ CLASS YCL_AAIC_CONN IMPLEMENTATION.
 
         me->log( i_s_msg = VALUE #( id = lo_web_message_error->if_t100_message~t100key-msgid
                                     number = lo_web_message_error->if_t100_message~t100key-msgno
-                                    message_v1 = CONV #( lo_web_message_error->if_t100_message~t100key-attr1 )
-                                    message_v2 = CONV #( lo_web_message_error->if_t100_message~t100key-attr2 )
-                                    message_v3 = CONV #( lo_web_message_error->if_t100_message~t100key-attr3 )
-                                    message_v4 = CONV #( lo_web_message_error->if_t100_message~t100key-attr4 ) ) ).
+                                    message = lo_web_message_error->get_text( ) ) ).
 
         e_failed = abap_true.
 

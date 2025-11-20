@@ -147,7 +147,7 @@ CLASS YCL_AAIC_DB IMPLEMENTATION.
 
     ENDIF.
 
-    SELECT id, class_name, method_name, proxy_class, description, full_schema
+    SELECT id, class_name, method_name, proxy_class, description
       FROM yaaic_tools
       WHERE id = @i_id
       INTO CORRESPONDING FIELDS OF TABLE @e_t_tools.
