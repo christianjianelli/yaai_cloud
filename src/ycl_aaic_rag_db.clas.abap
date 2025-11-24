@@ -46,6 +46,8 @@ CLASS YCL_AAIC_RAG_DB IMPLEMENTATION.
 
     ls_aaic_rag-id = xco_cp=>uuid( )->value.
     ls_aaic_rag-filename = i_filename.
+    ls_aaic_rag-description = i_description.
+    ls_aaic_rag-keywords = i_keywords.
 
     DATA(l_content_bin) = xco_cp=>string( i_content )->as_xstring( xco_cp_character=>code_page->utf_8 )->value.
 

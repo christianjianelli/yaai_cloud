@@ -40,12 +40,18 @@ CLASS YCL_AAIC_HTTP_SERVICE_FILE_UPL IMPLEMENTATION.
 
             DATA(l_filename) = lo_request->get_header_field( '~content_filename' ).
 
+            DATA(l_description) = request->get_form_field( i_name = 'description' ).
+
+            DATA(l_keywords) = request->get_form_field( i_name = 'keywords' ).
+
             NEW ycl_aaic_rag_db( )->create(
               EXPORTING
                 i_filename = l_filename
-                i_content  = l_file_content
+                i_description = l_description
+                i_keywords = l_keywords
+                i_content = l_file_content
               IMPORTING
-                e_id       = DATA(l_id)
+                e_id = DATA(l_id)
             ).
 
             response->set_text( |File { l_filename } uploaded successfully. Id: { l_id } | ).
