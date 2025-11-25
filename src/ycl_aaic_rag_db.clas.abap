@@ -11,6 +11,7 @@ CLASS ycl_aaic_rag_db DEFINITION
     ALIASES read   FOR yif_aaic_rag_db~read.
     ALIASES update FOR yif_aaic_rag_db~update.
     ALIASES delete FOR yif_aaic_rag_db~delete.
+    ALIASES query  FOR yif_aaic_rag_db~query.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -18,7 +19,7 @@ ENDCLASS.
 
 
 
-CLASS YCL_AAIC_RAG_DB IMPLEMENTATION.
+CLASS ycl_aaic_rag_db IMPLEMENTATION.
 
 
   METHOD yif_aaic_rag_db~create.
@@ -224,19 +225,67 @@ CLASS YCL_AAIC_RAG_DB IMPLEMENTATION.
 
     e_deleted = abap_false.
 
-    DELETE FROM yaaic_rag
+    SELECT FROM yaaic_rag FIELDS id
       WHERE id = @i_id
-         OR filename = @i_filename.
+         OR filename = @i_filename
+      INTO @DATA(l_id)
+      UP TO 1 ROWS.                                     "#EC CI_NOORDER
+    ENDSELECT.
 
     IF sy-subrc = 0.
-      e_deleted = abap_true.
+
+      DELETE FROM yaaic_rag_data
+        WHERE id = @l_id.
+
+      DELETE FROM yaaic_rag
+        WHERE id = @l_id.
+
+      IF sy-subrc = 0.
+        e_deleted = abap_true.
+      ELSE.
+
+        e_error = |Document { i_id } { i_filename } not found in the database|.
+
+        RETURN.
+
+      ENDIF.
+
     ELSE.
 
-      e_error = |File { i_filename } not found in the database|.
-
-      RETURN.
+      e_error = |Document { i_id } { i_filename } not found in the database|.
 
     ENDIF.
+
+  ENDMETHOD.
+
+  METHOD yif_aaic_rag_db~query.
+
+    DATA: lt_rng_filename    TYPE RANGE OF yaaic_rag-filename,
+          lt_rng_description TYPE RANGE OF yaaic_rag-description,
+          lt_rng_keywords    TYPE RANGE OF yaaic_rag-keywords.
+
+    FREE e_t_documents.
+
+    IF i_filename IS NOT INITIAL.
+      lt_rng_filename = VALUE #( ( sign = 'I' option = 'CP' low = |*{ i_filename }*| ) ).
+    ENDIF.
+
+    IF i_description IS NOT INITIAL.
+      lt_rng_description = VALUE #( ( sign = 'I' option = 'CP' low = |*{ i_description }*| ) ).
+    ENDIF.
+
+    IF i_keywords IS NOT INITIAL.
+      lt_rng_keywords = VALUE #( ( sign = 'I' option = 'CP' low = |*{ i_keywords }*| ) ).
+    ENDIF.
+
+    SELECT id, filename, description, keywords
+      FROM yaaic_rag
+      WHERE filename IN @lt_rng_filename
+        AND description IN @lt_rng_description
+        AND keywords IN @lt_rng_keywords
+        INTO TABLE @DATA(lt_documents).
+
+    e_t_documents = CORRESPONDING #( lt_documents ).
 
   ENDMETHOD.
 ENDCLASS.

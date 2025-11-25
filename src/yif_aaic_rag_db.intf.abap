@@ -1,6 +1,16 @@
 INTERFACE yif_aaic_rag_db
   PUBLIC.
 
+  TYPES: BEGIN OF ty_document_s,
+           id          TYPE string,
+           filename    TYPE string,
+           description TYPE string,
+           keywords    TYPE string,
+           content     TYPE string,
+         END OF ty_document_s,
+
+         ty_documents_t TYPE STANDARD TABLE OF ty_document_s WITH EMPTY KEY.
+
   METHODS create
     IMPORTING
       i_filename    TYPE csequence
@@ -39,5 +49,13 @@ INTERFACE yif_aaic_rag_db
     EXPORTING
       e_deleted  TYPE abap_bool
       e_error    TYPE string.
+
+  METHODS query
+    IMPORTING
+      i_filename    TYPE csequence OPTIONAL
+      i_description TYPE csequence OPTIONAL
+      i_keywords    TYPE csequence OPTIONAL
+    EXPORTING
+      e_t_documents TYPE ty_documents_t.
 
 ENDINTERFACE.
