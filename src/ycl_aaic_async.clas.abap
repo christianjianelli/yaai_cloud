@@ -34,6 +34,7 @@ CLASS YCL_AAIC_ASYNC IMPLEMENTATION.
 
     DATA(ls_task) = VALUE yaaic_async( id = xco_cp=>uuid( )->value
                                        chat_id = i_chat_id
+                                       name = i_task_name
                                        status = yif_aaic_async~mc_task_created
                                        username = xco_cp=>sy->user( )->name
                                        startdate = xco_cp=>sy->date( )->as( xco_cp_time=>format->abap )->value
@@ -51,7 +52,7 @@ CLASS YCL_AAIC_ASYNC IMPLEMENTATION.
 
   METHOD yif_aaic_async~read.
 
-    SELECT SINGLE id, chat_id, status, username, startdate, starttime
+    SELECT SINGLE id, chat_id, name, status, username, startdate, starttime
       FROM yaaic_async
       WHERE id = @i_task_id
       INTO CORRESPONDING FIELDS OF @e_s_task.
@@ -99,9 +100,9 @@ CLASS YCL_AAIC_ASYNC IMPLEMENTATION.
 
     TRY.
 
-        lo_background_process = cl_bgmc_process_factory=>get_default(  )->create(  ).
+        lo_background_process = cl_bgmc_process_factory=>get_default( )->create( ).
         lo_background_process->set_operation_tx_uncontrolled( i_o_task ).
-        lo_background_process->save_for_execution(  ).
+        lo_background_process->save_for_execution( ).
 
       CATCH cx_bgmc INTO DATA(exception) ##NO_HANDLER.
         RETURN.

@@ -14,7 +14,19 @@ CLASS ycl_aaic_rag_db DEFINITION
     ALIASES query  FOR yif_aaic_rag_db~query.
 
   PROTECTED SECTION.
+
   PRIVATE SECTION.
+
+    TYPES ty_aaic_rag_data_t TYPE STANDARD TABLE OF yaaic_rag_data WITH DEFAULT KEY.
+
+    METHODS convert_file_content
+      IMPORTING
+        i_id         TYPE uuid
+        i_filename   TYPE string
+        i_content    TYPE string
+      EXPORTING
+        e_t_rag_data TYPE ty_aaic_rag_data_t.
+
 ENDCLASS.
 
 
@@ -24,8 +36,7 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
 
   METHOD yif_aaic_rag_db~create.
 
-    DATA: lt_aaic_rag_data TYPE STANDARD TABLE OF yaaic_rag_data,
-          ls_aaic_rag      TYPE yaaic_rag.
+    DATA: ls_aaic_rag TYPE yaaic_rag.
 
     DATA: l_offset    TYPE i,
           l_line_no   TYPE i,
@@ -50,40 +61,14 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
     ls_aaic_rag-description = i_description.
     ls_aaic_rag-keywords = i_keywords.
 
-    DATA(l_content_bin) = xco_cp=>string( i_content )->as_xstring( xco_cp_character=>code_page->utf_8 )->value.
-
-    DATA(lo_zip) = NEW cl_abap_zip( ).
-
-    lo_zip->add( name = i_filename
-                 content = l_content_bin ).
-
-    DATA(l_zip) = lo_zip->save( ).
-
-    DATA(l_len) = xstrlen( l_zip ).
-
-    DATA(l_max_len) = dbmaxlen( l_zip ).
-
-    WHILE l_offset < l_len.
-
-      APPEND INITIAL LINE TO lt_aaic_rag_data ASSIGNING FIELD-SYMBOL(<ls_rag_data>).
-
-      <ls_rag_data> = CORRESPONDING #( ls_aaic_rag ).
-
-      l_line_no = l_line_no + 1.
-
-      l_remaining = l_len - l_offset.
-
-      <ls_rag_data>-line_no = l_line_no.
-
-      IF l_remaining > l_max_len.
-        <ls_rag_data>-bin_data = l_zip+l_offset(l_max_len).
-      ELSE.
-        <ls_rag_data>-bin_data = l_zip+l_offset(l_remaining).
-      ENDIF.
-
-      l_offset = l_offset + l_max_len.
-
-    ENDWHILE.
+    me->convert_file_content(
+      EXPORTING
+        i_id         = ls_aaic_rag-id
+        i_filename   = i_filename
+        i_content    = i_content
+      IMPORTING
+        e_t_rag_data = DATA(lt_aaic_rag_data)
+    ).
 
     IF lt_aaic_rag_data[] IS NOT INITIAL.
 
@@ -184,7 +169,7 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    SELECT FROM yaaic_rag FIELDS id, description, keywords
+    SELECT FROM yaaic_rag FIELDS id, filename, description, keywords
       WHERE id = @i_id
          OR filename = @i_filename
       INTO @DATA(ls_rag)
@@ -212,10 +197,42 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
     UPDATE yaaic_rag
       SET description = @ls_rag-description,
           keywords = @ls_rag-keywords
-      WHERE id = @i_id.
+      WHERE id = @ls_rag-id.
 
     IF sy-subrc = 0.
       e_updated = abap_true.
+    ELSE.
+      e_updated = abap_false.
+      e_error = 'Error while updating the document'.
+    ENDIF.
+
+    IF i_content IS SUPPLIED.
+
+      me->convert_file_content(
+        EXPORTING
+          i_id         = ls_rag-id
+          i_filename   = CONV #( ls_rag-filename )
+          i_content    = i_content
+        IMPORTING
+          e_t_rag_data = DATA(lt_aaic_rag_data)
+      ).
+
+      IF lt_aaic_rag_data IS NOT INITIAL.
+
+        DELETE FROM yaaic_rag_data
+          WHERE id = @ls_rag-id.
+
+        INSERT yaaic_rag_data FROM TABLE @lt_aaic_rag_data.
+
+        IF sy-subrc = 0.
+          e_updated = abap_true.
+        ELSE.
+          e_updated = abap_false.
+          e_error = 'Error while updating the file content'.
+        ENDIF.
+
+      ENDIF.
+
     ENDIF.
 
   ENDMETHOD.
@@ -288,4 +305,48 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
     e_t_documents = CORRESPONDING #( lt_documents ).
 
   ENDMETHOD.
+
+  METHOD convert_file_content.
+
+    DATA: l_offset    TYPE i,
+          l_line_no   TYPE i,
+          l_remaining TYPE i.
+
+    DATA(l_content_bin) = xco_cp=>string( i_content )->as_xstring( xco_cp_character=>code_page->utf_8 )->value.
+
+    DATA(lo_zip) = NEW cl_abap_zip( ).
+
+    lo_zip->add( name = i_filename
+                 content = l_content_bin ).
+
+    DATA(l_zip) = lo_zip->save( ).
+
+    DATA(l_len) = xstrlen( l_zip ).
+
+    DATA(l_max_len) = dbmaxlen( l_zip ).
+
+    WHILE l_offset < l_len.
+
+      APPEND INITIAL LINE TO e_t_rag_data ASSIGNING FIELD-SYMBOL(<ls_rag_data>).
+
+      <ls_rag_data>-id = i_id.
+
+      l_line_no = l_line_no + 1.
+
+      l_remaining = l_len - l_offset.
+
+      <ls_rag_data>-line_no = l_line_no.
+
+      IF l_remaining > l_max_len.
+        <ls_rag_data>-bin_data = l_zip+l_offset(l_max_len).
+      ELSE.
+        <ls_rag_data>-bin_data = l_zip+l_offset(l_remaining).
+      ENDIF.
+
+      l_offset = l_offset + l_max_len.
+
+    ENDWHILE.
+
+  ENDMETHOD.
+
 ENDCLASS.
