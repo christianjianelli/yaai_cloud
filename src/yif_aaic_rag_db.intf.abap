@@ -26,6 +26,7 @@ INTERFACE yif_aaic_rag_db
       i_id          TYPE uuid OPTIONAL
       i_filename    TYPE csequence OPTIONAL
     EXPORTING
+      e_id          TYPE uuid
       e_filename    TYPE csequence
       e_description TYPE csequence
       e_keywords    TYPE csequence

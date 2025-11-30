@@ -152,6 +152,7 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
       RETURN.
     ENDIF.
 
+    e_id = ls_rag-id.
     e_filename = ls_rag-filename.
     e_description = ls_rag-description.
     e_keywords = ls_rag-keywords.

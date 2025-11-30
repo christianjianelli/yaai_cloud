@@ -125,7 +125,13 @@ CLASS YCL_AAIC_AGENT_DB IMPLEMENTATION.
 
     DELETE FROM yaaic_agent_tool WHERE id = @i_s_agent-id.
 
-    INSERT yaaic_agent_tool FROM TABLE @i_t_agent_tools.
+    DATA(lt_tools) = i_t_agent_tools.
+
+    LOOP AT lt_tools ASSIGNING FIELD-SYMBOL(<ls_tool>).
+      <ls_tool>-id = i_s_agent-id.
+    ENDLOOP.
+
+    INSERT yaaic_agent_tool FROM TABLE @lt_tools.
 
     IF sy-subrc <> 0.
       e_error = |Error while saving tools for Agent { i_s_agent-name }|.
