@@ -42,12 +42,6 @@ INTERFACE yif_aaic_db
     EXPORTING
       e_persisted TYPE abap_bool.
 
-  METHODS delete_chat
-    IMPORTING
-      i_id      TYPE uuid
-    EXPORTING
-      e_deleted TYPE abap_bool.
-
   METHODS get_chat
     IMPORTING
       i_id         TYPE uuid OPTIONAL
@@ -58,15 +52,15 @@ INTERFACE yif_aaic_db
       e_t_msg_data TYPE STANDARD TABLE.
 
   METHODS block_chat
-    IMPORTING
-      i_id      TYPE uuid
     EXPORTING
       e_blocked TYPE abap_bool.
 
   METHODS release_chat
-    IMPORTING
-      i_id       TYPE uuid
     EXPORTING
       e_released TYPE abap_bool.
+
+  METHODS delete_chat
+    EXPORTING
+      e_deleted TYPE abap_bool.
 
 ENDINTERFACE.

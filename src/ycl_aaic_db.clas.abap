@@ -85,7 +85,7 @@ CLASS ycl_aaic_db IMPLEMENTATION.
 
   METHOD yif_aaic_db~delete_chat.
 
-    DELETE FROM yaaic_chat WHERE id = @i_id.
+    DELETE FROM yaaic_chat WHERE id = @me->m_id.
 
     e_deleted = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
 
@@ -389,7 +389,7 @@ CLASS ycl_aaic_db IMPLEMENTATION.
 
     UPDATE yaaic_chat
       SET blocked = @abap_true
-      WHERE id = @i_id.
+      WHERE id = @me->m_id.
 
     e_blocked = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
 
@@ -399,7 +399,7 @@ CLASS ycl_aaic_db IMPLEMENTATION.
 
     UPDATE yaaic_chat
       SET blocked = @abap_false
-      WHERE id = @i_id.
+      WHERE id = @me->m_id.
 
     e_released = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
 
