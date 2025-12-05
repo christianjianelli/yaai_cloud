@@ -84,10 +84,11 @@ CLASS ycl_aaic_async_chat_openai IMPLEMENTATION.
 
       lo_aaic_openai->chat(
         EXPORTING
-          i_message  = me->_message
-          i_o_agent  = lo_agent
+          i_message       = me->_message
+          i_async_task_id = me->_task_id
+          i_o_agent       = lo_agent
         IMPORTING
-          e_response = me->_response
+          e_response      = me->_response
       ).
 
     ELSE.
@@ -122,12 +123,6 @@ CLASS ycl_aaic_async_chat_openai IMPLEMENTATION.
     ENDIF.
 
     DATA(lo_async) = NEW ycl_aaic_async( ).
-
-    lo_async->update_response(
-      EXPORTING
-        i_task_id  = CONV #( me->_task_id )
-        i_response = me->_response
-    ).
 
     lo_async->update_status(
       EXPORTING

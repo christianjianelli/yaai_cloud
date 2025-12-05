@@ -18,6 +18,8 @@ CLASS ycl_aaic_async DEFINITION
     ALIASES update_response FOR yif_aaic_async~update_response.
     ALIASES set_monitor FOR yif_aaic_async~set_monitor.
     ALIASES get_monitor FOR yif_aaic_async~get_monitor.
+    ALIASES get_process_monitor FOR yif_aaic_async~get_process_monitor.
+    ALIASES get_process_state FOR yif_aaic_async~get_process_state.
 
   PROTECTED SECTION.
 
@@ -130,15 +132,12 @@ CLASS ycl_aaic_async IMPLEMENTATION.
 
         TRY.
 
-            DATA(l_state) = lo_process_monitor->get_state( ).
+            DATA(l_process_state) = lo_process_monitor->get_state( ).
 
             me->update_status(
               EXPORTING
-                i_task_id = i_task_id
-                i_status  = COND #( WHEN l_state = if_bgmc_process_monitor=>gcs_state-erroneous THEN yif_aaic_async~mc_task_failed
-                                    WHEN l_state = if_bgmc_process_monitor=>gcs_state-unknown THEN yif_aaic_async~mc_task_failed
-                                    WHEN l_state = if_bgmc_process_monitor=>gcs_state-running THEN yif_aaic_async~mc_task_running
-                                    WHEN l_state = if_bgmc_process_monitor=>gcs_state-successful THEN yif_aaic_async~mc_task_finished ) ).
+                i_task_id       = i_task_id
+                i_process_state = l_process_state ).
 
           CATCH cx_bgmc ##NO_HANDLER.
             RETURN.
@@ -156,12 +155,23 @@ CLASS ycl_aaic_async IMPLEMENTATION.
   METHOD yif_aaic_async~update_status.
 
     DATA: l_enddate TYPE d,
-          l_endtime TYPE t.
+          l_endtime TYPE t,
+          l_status  TYPE yaaic_async-status.
 
     r_updated = abap_false.
 
-    IF i_status = yif_aaic_async=>mc_task_finished OR
-       i_status = yif_aaic_async=>mc_task_cancelled.
+    IF i_status IS NOT INITIAL.
+      l_status = i_status.
+    ELSE.
+
+      l_status  = COND #( WHEN i_process_state = if_bgmc_process_monitor=>gcs_state-erroneous THEN yif_aaic_async~mc_task_failed
+                          WHEN i_process_state = if_bgmc_process_monitor=>gcs_state-unknown THEN yif_aaic_async~mc_task_failed
+                          WHEN i_process_state = if_bgmc_process_monitor=>gcs_state-running THEN yif_aaic_async~mc_task_running
+                          WHEN i_process_state = if_bgmc_process_monitor=>gcs_state-successful THEN yif_aaic_async~mc_task_finished ).
+    ENDIF.
+
+    IF l_status = yif_aaic_async=>mc_task_finished OR
+       l_status = yif_aaic_async=>mc_task_cancelled.
 
       l_enddate = xco_cp=>sy->date( )->as( xco_cp_time=>format->abap )->value.
       l_endtime = xco_cp=>sy->time( )->as( xco_cp_time=>format->abap )->value.
@@ -169,7 +179,7 @@ CLASS ycl_aaic_async IMPLEMENTATION.
     ENDIF.
 
     UPDATE yaaic_async
-      SET status = @i_status,
+      SET status = @l_status,
           enddate = @l_enddate,
           endtime = @l_endtime
       WHERE id = @i_task_id.
@@ -259,4 +269,51 @@ CLASS ycl_aaic_async IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
+
+  METHOD yif_aaic_async~get_process_monitor.
+
+    CLEAR ro_process_monitor.
+
+    DATA(l_monitor) = me->get_monitor(
+      EXPORTING
+        i_task_id = i_task_id
+    ).
+
+    IF l_monitor IS NOT INITIAL.
+
+      TRY.
+
+          ro_process_monitor = cl_bgmc_process_factory=>create_monitor_from_string( l_monitor ).
+
+        CATCH cx_bgmc ##NO_HANDLER.
+
+      ENDTRY.
+
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD yif_aaic_async~get_process_state.
+
+    CLEAR r_state.
+
+    TRY.
+
+        DATA(lo_process_monitor) = me->get_process_monitor(
+          EXPORTING
+            i_task_id = i_task_id
+        ).
+
+        IF lo_process_monitor IS BOUND.
+
+          r_state = lo_process_monitor->get_state( ).
+
+        ENDIF.
+
+      CATCH cx_bgmc ##NO_HANDLER.
+
+    ENDTRY.
+
+  ENDMETHOD.
+
 ENDCLASS.

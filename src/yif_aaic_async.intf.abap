@@ -64,10 +64,21 @@ INTERFACE yif_aaic_async
               i_task_id        TYPE ty_task_s-id
     RETURNING VALUE(r_monitor) TYPE string.
 
+  METHODS get_process_monitor
+    IMPORTING
+              i_task_id                 TYPE ty_task_s-id
+    RETURNING VALUE(ro_process_monitor) TYPE REF TO if_bgmc_process_monitor.
+
+  METHODS get_process_state
+    IMPORTING
+              i_task_id                 TYPE ty_task_s-id
+    RETURNING VALUE(r_state) TYPE if_bgmc_process_monitor=>ty_state.
+
   METHODS update_status
     IMPORTING
               i_task_id        TYPE ty_task_s-id
-              i_status         TYPE ty_task_s-status
+              i_status         TYPE ty_task_s-status OPTIONAL
+              i_process_state  TYPE if_bgmc_process_monitor=>ty_state OPTIONAL
     RETURNING VALUE(r_updated) TYPE abap_bool.
 
   METHODS get_tasks_by_chat_id
