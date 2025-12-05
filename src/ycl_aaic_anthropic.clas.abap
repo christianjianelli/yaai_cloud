@@ -204,7 +204,8 @@ CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
     IF me->_o_persistence IS BOUND.
       " persist the user message and the augmented prompt
       me->_o_persistence->persist_message( i_data = <ls_msg>
-                                           i_prompt = ls_prompt ).
+                                           i_prompt = ls_prompt
+                                           i_async_task_id = i_async_task_id ).
     ENDIF.
 
     " In memory we keep the augmented prompt instead of the user message
@@ -481,15 +482,16 @@ CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
 
     me->chat(
       EXPORTING
-        i_message    = i_message
-        i_new        = i_new
-        i_greeting   = i_greeting
-        i_o_prompt   = i_o_prompt
-        i_o_agent    = i_o_agent
+        i_message       = i_message
+        i_new           = i_new
+        i_greeting      = i_greeting
+        i_async_task_id = i_async_task_id
+        i_o_prompt      = i_o_prompt
+        i_o_agent       = i_o_agent
       IMPORTING
-        e_response   = e_response
-        e_failed     = e_failed
-        e_t_response = e_t_response
+        e_response      = e_response
+        e_failed        = e_failed
+        e_t_response    = e_t_response
     ).
 
   ENDMETHOD.

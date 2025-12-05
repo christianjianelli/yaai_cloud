@@ -60,7 +60,7 @@ ENDCLASS.
 
 
 
-CLASS YCL_AAIC_GOOGLE IMPLEMENTATION.
+CLASS ycl_aaic_google IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -124,11 +124,12 @@ CLASS YCL_AAIC_GOOGLE IMPLEMENTATION.
 
     me->generate(
       EXPORTING
-        i_message    = i_message
-        i_new        = i_new
-        i_greeting   = i_greeting
-        i_o_prompt   = i_o_prompt
-        i_o_agent    = i_o_agent
+        i_message       = i_message
+        i_new           = i_new
+        i_greeting      = i_greeting
+        i_async_task_id = i_async_task_id
+        i_o_prompt      = i_o_prompt
+        i_o_agent       = i_o_agent
       IMPORTING
         e_response   = e_response
         e_t_response = e_t_response
@@ -240,7 +241,8 @@ CLASS YCL_AAIC_GOOGLE IMPLEMENTATION.
 
     IF me->_o_persistence IS BOUND.
       me->_o_persistence->persist_message( i_data = <ls_msg>
-                                           i_prompt = ls_prompt ).
+                                           i_prompt = ls_prompt
+                                           i_async_task_id = i_async_task_id ).
     ENDIF.
 
     " In memory we keep the augmented prompt instead of the user message

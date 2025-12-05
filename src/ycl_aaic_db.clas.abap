@@ -282,6 +282,7 @@ CLASS ycl_aaic_db IMPLEMENTATION.
 
       ls_msg-msg_date = cl_abap_context_info=>get_system_date( ).
       ls_msg-msg_time = cl_abap_context_info=>get_system_time( ).
+      ls_msg-async_task_id = i_async_task_id.
 
       INSERT yaaic_msg FROM @ls_msg.
 

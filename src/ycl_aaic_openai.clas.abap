@@ -77,7 +77,7 @@ ENDCLASS.
 
 
 
-CLASS YCL_AAIC_OPENAI IMPLEMENTATION.
+CLASS ycl_aaic_openai IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -154,30 +154,32 @@ CLASS YCL_AAIC_OPENAI IMPLEMENTATION.
 
       me->generate(
         EXPORTING
-          i_message    = i_message
-          i_new        = i_new
-          i_greeting   = i_greeting
-          i_o_prompt   = i_o_prompt
-          i_o_agent    = i_o_agent
+          i_message       = i_message
+          i_new           = i_new
+          i_greeting      = i_greeting
+          i_async_task_id = i_async_task_id
+          i_o_prompt      = i_o_prompt
+          i_o_agent       = i_o_agent
         IMPORTING
-          e_response   = e_response
-          e_failed     = e_failed
-          e_t_response = e_t_response
+          e_response      = e_response
+          e_failed        = e_failed
+          e_t_response    = e_t_response
       ).
 
     ELSE.
 
       me->chat_completions(
         EXPORTING
-          i_message    = i_message
-          i_new        = i_new
-          i_greeting   = i_greeting
-          i_o_prompt   = i_o_prompt
-          i_o_agent    = i_o_agent
+          i_message       = i_message
+          i_new           = i_new
+          i_greeting      = i_greeting
+          i_async_task_id = i_async_task_id
+          i_o_prompt      = i_o_prompt
+          i_o_agent       = i_o_agent
         IMPORTING
-          e_response   = e_response
-          e_failed     = e_failed
-          e_t_response = e_t_response
+          e_response      = e_response
+          e_failed        = e_failed
+          e_t_response    = e_t_response
       ).
 
     ENDIF.
@@ -306,7 +308,8 @@ CLASS YCL_AAIC_OPENAI IMPLEMENTATION.
     IF me->_o_persistence IS BOUND.
       " persist the user message and the augmented prompt
       me->_o_persistence->persist_message( i_data = <ls_msg>
-                                           i_prompt = ls_prompt ).
+                                           i_prompt = ls_prompt
+                                           i_async_task_id = i_async_task_id ).
     ENDIF.
 
     " In memory we keep the augmented prompt instead of the user message
@@ -667,7 +670,8 @@ CLASS YCL_AAIC_OPENAI IMPLEMENTATION.
     IF me->_o_persistence IS BOUND.
       " persist the user message and the augmented prompt
       me->_o_persistence->persist_message( i_data = <ls_msg>
-                                           i_prompt = ls_prompt ).
+                                           i_prompt = ls_prompt
+                                           i_async_task_id = i_async_task_id ).
     ENDIF.
 
     " In memory we keep the augmented prompt instead of the user message

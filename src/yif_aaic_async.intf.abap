@@ -53,6 +53,17 @@ INTERFACE yif_aaic_async
               i_task_id       TYPE ty_task_s-id
     RETURNING VALUE(r_status) TYPE ty_task_s-status.
 
+  METHODS set_monitor
+    IMPORTING
+              i_task_id    TYPE ty_task_s-id
+              i_monitor    TYPE string
+    RETURNING VALUE(r_set) TYPE abap_bool.
+
+  METHODS get_monitor
+    IMPORTING
+              i_task_id        TYPE ty_task_s-id
+    RETURNING VALUE(r_monitor) TYPE string.
+
   METHODS update_status
     IMPORTING
               i_task_id        TYPE ty_task_s-id

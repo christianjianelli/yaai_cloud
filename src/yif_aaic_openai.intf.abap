@@ -260,29 +260,31 @@ INTERFACE yif_aaic_openai
 
   METHODS generate
     IMPORTING
-      i_message    TYPE csequence OPTIONAL
-      i_new        TYPE abap_bool DEFAULT abap_false
-      i_greeting   TYPE csequence OPTIONAL
-      i_o_prompt   TYPE REF TO yif_aaic_prompt OPTIONAL
-      i_o_agent    TYPE REF TO yif_aaic_agent OPTIONAL
+      i_message       TYPE csequence OPTIONAL
+      i_new           TYPE abap_bool DEFAULT abap_false
+      i_greeting      TYPE csequence OPTIONAL
+      i_async_task_id TYPE csequence OPTIONAL
+      i_o_prompt      TYPE REF TO yif_aaic_prompt OPTIONAL
+      i_o_agent       TYPE REF TO yif_aaic_agent OPTIONAL
         PREFERRED PARAMETER i_message
     EXPORTING
-      e_response   TYPE string
-      e_failed     TYPE abap_bool
-      e_t_response TYPE ty_response_t.
+      e_response      TYPE string
+      e_failed        TYPE abap_bool
+      e_t_response    TYPE ty_response_t.
 
   METHODS chat_completions
     IMPORTING
-      i_message    TYPE csequence OPTIONAL
-      i_new        TYPE abap_bool DEFAULT abap_false
-      i_greeting   TYPE csequence OPTIONAL
-      i_o_prompt   TYPE REF TO yif_aaic_prompt OPTIONAL
-      i_o_agent    TYPE REF TO yif_aaic_agent OPTIONAL
+      i_message       TYPE csequence OPTIONAL
+      i_new           TYPE abap_bool DEFAULT abap_false
+      i_greeting      TYPE csequence OPTIONAL
+      i_async_task_id TYPE csequence OPTIONAL
+      i_o_prompt      TYPE REF TO yif_aaic_prompt OPTIONAL
+      i_o_agent       TYPE REF TO yif_aaic_agent OPTIONAL
         PREFERRED PARAMETER i_message
     EXPORTING
-      e_response   TYPE string
-      e_failed     TYPE abap_bool
-      e_t_response TYPE ty_response_t.
+      e_response      TYPE string
+      e_failed        TYPE abap_bool
+      e_t_response    TYPE ty_response_t.
 
   METHODS embed
     IMPORTING

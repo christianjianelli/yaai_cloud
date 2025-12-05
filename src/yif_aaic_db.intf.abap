@@ -28,13 +28,14 @@ INTERFACE yif_aaic_db
 
   METHODS persist_message
     IMPORTING
-      i_id        TYPE uuid OPTIONAL
-      i_message   TYPE csequence OPTIONAL
-      i_data      TYPE data OPTIONAL
-      i_prompt    TYPE data OPTIONAL
+      i_id            TYPE uuid OPTIONAL
+      i_message       TYPE csequence OPTIONAL
+      i_data          TYPE data OPTIONAL
+      i_prompt        TYPE data OPTIONAL
+      i_async_task_id TYPE csequence OPTIONAL
     EXPORTING
-      e_id        TYPE uuid
-      e_persisted TYPE abap_bool.
+      e_id            TYPE uuid
+      e_persisted     TYPE abap_bool.
 
   METHODS persist_tools
     IMPORTING
