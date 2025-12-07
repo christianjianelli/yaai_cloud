@@ -7,10 +7,9 @@ CLASS ycl_aaic_agent DEFINITION
 
     INTERFACES yif_aaic_agent.
 
-    INTERFACES if_oo_adt_classrun.
-
     ALIASES get_system_instructions FOR yif_aaic_agent~get_system_instructions.
     ALIASES get_tools FOR yif_aaic_agent~get_tools.
+    ALIASES get_model FOR yif_aaic_agent~get_model.
     ALIASES get_prompt_template FOR yif_aaic_agent~get_prompt_template.
     ALIASES m_agent_id FOR yif_aaic_agent~m_agent_id.
     ALIASES m_chat_id FOR yif_aaic_agent~m_chat_id.
@@ -28,7 +27,7 @@ ENDCLASS.
 
 
 
-CLASS YCL_AAIC_AGENT IMPLEMENTATION.
+CLASS ycl_aaic_agent IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -171,47 +170,30 @@ CLASS YCL_AAIC_AGENT IMPLEMENTATION.
 
   ENDMETHOD.
 
+  METHOD yif_aaic_agent~get_model.
 
-  METHOD if_oo_adt_classrun~main.
+    CLEAR r_s_model.
 
-*    me->m_agent_id = '7EA3422BA1AC1FE0AE835528E8F90C68'.
-*
-*    DATA(l_system_instructions) = me->get_system_instructions( ).
-*
-*    DATA(lt_tools) = me->get_tools( ).
-*
-*    DATA(l_prompt_template) = me->get_prompt_template( ).
-*
-*    out->write( l_system_instructions ).
-*
-*    out->write( lt_tools ).
-*
-*    out->write( l_prompt_template ).
+    IF i_agent_id IS SUPPLIED.
+      me->m_agent_id = i_agent_id.
+    ENDIF.
 
-    """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    IF me->m_agent_id IS NOT INITIAL.
 
-*    DATA(l_agent_name) = 'travel-fiori-ai-assistant'.
-*
-*    DATA(l_system_instructions) = me->get_system_instructions( i_agent_name = CONV #( l_agent_name ) ).
-*
-*    DATA(lt_tools) = me->get_tools( i_agent_name = CONV #( l_agent_name ) ).
-*
-*    DATA(l_prompt_template) = me->get_prompt_template( i_agent_name = CONV #( l_agent_name ) ).
-*
-*    out->write( l_system_instructions ).
-*
-*    out->write( lt_tools ).
-*
-*    out->write( l_prompt_template ).
+      SELECT a~id, b~api, b~model, b~temperature, b~verbosity, b~reasoning, b~max_tool_calls
+        FROM yaaic_agent AS a
+        INNER JOIN yaaic_agent_mdl AS b
+        ON a~id = b~id
+        WHERE a~id = @me->m_agent_id OR
+              a~name = @i_agent_name
+        INTO TABLE @DATA(lt_model).
 
-    """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+      IF sy-subrc = 0.
+        r_s_model = CORRESPONDING #( lt_model[ 1 ] ).                      "#EC CI_NOORDER
+      ENDIF.
 
-    me->m_agent_id = '7EA3422BA1AC1FE0AF9BF54114B1CC74'.
-    me->m_chat_id = '2A9448FCE52F1FD0AFB19E6C3E30184D'.
-
-    out->write( me->get_tools( ) ).
-
-
+    ENDIF.
 
   ENDMETHOD.
+
 ENDCLASS.

@@ -39,13 +39,16 @@ CLASS YCL_AAIC_AGENT_DB IMPLEMENTATION.
 
     DATA(ls_agent) = i_s_agent.
     DATA(lt_agent_tools) = i_t_agent_tools.
+    DATA(lt_agent_models) = i_t_agent_models.
 
     ls_agent-id = xco_cp=>uuid( )->value.
 
     LOOP AT lt_agent_tools ASSIGNING FIELD-SYMBOL(<ls_agent_tool>).
-
       <ls_agent_tool>-id = ls_agent-id.
+    ENDLOOP.
 
+    LOOP AT lt_agent_models ASSIGNING FIELD-SYMBOL(<ls_agent_model>).
+      <ls_agent_model>-id = ls_agent-id.
     ENDLOOP.
 
     INSERT yaaic_agent FROM @ls_agent.
@@ -62,6 +65,12 @@ CLASS YCL_AAIC_AGENT_DB IMPLEMENTATION.
     IF sy-subrc <> 0.
       e_error = |Error while saving tools for Agent { i_s_agent-name }|.
       RETURN.
+    ENDIF.
+
+    INSERT yaaic_agent_mdl FROM TABLE @lt_agent_models.
+
+    IF sy-subrc <> 0.
+      e_error = |Error while saving models for Agent { i_s_agent-name }|.
     ENDIF.
 
   ENDMETHOD.
@@ -124,18 +133,30 @@ CLASS YCL_AAIC_AGENT_DB IMPLEMENTATION.
     e_updated = abap_true.
 
     DELETE FROM yaaic_agent_tool WHERE id = @i_s_agent-id.
+    DELETE FROM yaaic_agent_mdl WHERE id = @i_s_agent-id.
 
-    DATA(lt_tools) = i_t_agent_tools.
+    DATA(lt_agent_tools) = i_t_agent_tools.
+    DATA(lt_agent_models) = i_t_agent_models.
 
-    LOOP AT lt_tools ASSIGNING FIELD-SYMBOL(<ls_tool>).
-      <ls_tool>-id = i_s_agent-id.
+    LOOP AT lt_agent_tools ASSIGNING FIELD-SYMBOL(<ls_agent_tool>).
+      <ls_agent_tool>-id = i_s_agent-id.
     ENDLOOP.
 
-    INSERT yaaic_agent_tool FROM TABLE @lt_tools.
+    LOOP AT lt_agent_models ASSIGNING FIELD-SYMBOL(<ls_agent_model>).
+      <ls_agent_model>-id = i_s_agent-id.
+    ENDLOOP.
+
+    INSERT yaaic_agent_tool FROM TABLE @lt_agent_tools.
 
     IF sy-subrc <> 0.
       e_error = |Error while saving tools for Agent { i_s_agent-name }|.
       RETURN.
+    ENDIF.
+
+    INSERT yaaic_agent_mdl FROM TABLE @lt_agent_models.
+
+    IF sy-subrc <> 0.
+      e_error = |Error while saving models for Agent { i_s_agent-name }|.
     ENDIF.
 
   ENDMETHOD.

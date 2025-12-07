@@ -36,4 +36,11 @@ INTERFACE yif_aaic_agent
                 PREFERRED PARAMETER i_agent_id
     RETURNING VALUE(r_prompt_template) TYPE string.
 
+  METHODS get_model
+    IMPORTING
+              i_agent_id       TYPE yaaic_agent-id OPTIONAL
+              i_agent_name     TYPE yaaic_agent-name OPTIONAL
+              i_api            TYPE yaaic_agent_mdl-api
+    RETURNING VALUE(r_s_model) TYPE yaaic_agent_mdl.
+
 ENDINTERFACE.
