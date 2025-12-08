@@ -60,6 +60,10 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
 
       IF lt_agent_tools IS NOT INITIAL.
 
+        SORT lt_agent_tools BY class_name method_name.
+
+        DELETE ADJACENT DUPLICATES FROM lt_agent_tools COMPARING class_name method_name.
+
         INSERT yaaic_agent_tool FROM TABLE @lt_agent_tools.
 
         IF sy-subrc <> 0.
@@ -80,6 +84,10 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
       ENDLOOP.
 
       IF lt_agent_models IS NOT INITIAL.
+
+        SORT lt_agent_models BY api.
+
+        DELETE ADJACENT DUPLICATES FROM lt_agent_models COMPARING api.
 
         INSERT yaaic_agent_mdl FROM TABLE @lt_agent_models.
 
@@ -160,11 +168,19 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
         <ls_agent_tool>-id = i_s_agent-id.
       ENDLOOP.
 
-      INSERT yaaic_agent_tool FROM TABLE @lt_agent_tools.
+      IF lt_agent_tools IS NOT INITIAL.
 
-      IF sy-subrc <> 0.
-        e_error = |Error while saving tools for Agent { i_s_agent-name }|.
-        RETURN.
+        SORT lt_agent_tools BY class_name method_name.
+
+        DELETE ADJACENT DUPLICATES FROM lt_agent_tools COMPARING class_name method_name.
+
+        INSERT yaaic_agent_tool FROM TABLE @lt_agent_tools.
+
+        IF sy-subrc <> 0.
+          e_error = |Error while saving tools for Agent { i_s_agent-name }|.
+          RETURN.
+        ENDIF.
+
       ENDIF.
 
     ENDIF.
@@ -179,10 +195,18 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
         <ls_agent_model>-id = i_s_agent-id.
       ENDLOOP.
 
-      INSERT yaaic_agent_mdl FROM TABLE @lt_agent_models.
+      IF lt_agent_models IS NOT INITIAL.
 
-      IF sy-subrc <> 0.
-        e_error = |Error while saving models for Agent { i_s_agent-name }|.
+        SORT lt_agent_models BY api.
+
+        DELETE ADJACENT DUPLICATES FROM lt_agent_models COMPARING api.
+
+        INSERT yaaic_agent_mdl FROM TABLE @lt_agent_models.
+
+        IF sy-subrc <> 0.
+          e_error = |Error while saving models for Agent { i_s_agent-name }|.
+        ENDIF.
+
       ENDIF.
 
     ENDIF.
