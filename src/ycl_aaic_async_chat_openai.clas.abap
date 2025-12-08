@@ -53,6 +53,8 @@ CLASS ycl_aaic_async_chat_openai IMPLEMENTATION.
 
   METHOD if_bgmc_op_single_tx_uncontr~execute.
 
+    DATA lo_agent TYPE REF TO yif_aaic_agent.
+
     DATA(lo_aaic_conn) = NEW ycl_aaic_conn( i_api = yif_aaic_const=>c_openai ).
 
     lo_aaic_conn->set_api_key( i_api_key = me->_api_key ).
@@ -61,24 +63,19 @@ CLASS ycl_aaic_async_chat_openai IMPLEMENTATION.
                                         i_id = CONV #( me->_chat_id ) ).
 
 
-    DATA(lo_aaic_openai) = NEW ycl_aaic_openai( i_model = me->_model
-                                                i_o_connection = lo_aaic_conn
-                                                i_o_persistence = lo_aaic_db ).
-
     IF me->_agent_id IS NOT INITIAL.
 
-      DATA(lo_agent) = NEW ycl_aaic_agent(
+      lo_agent = NEW ycl_aaic_agent(
         i_agent_id = CONV #( me->_agent_id )
         i_chat_id  = lo_aaic_db->m_id
       ).
 
-      DATA(l_system_instructions) = lo_agent->get_system_instructions( ).
-
-      lo_aaic_openai->set_system_instructions(
-        i_system_instructions = l_system_instructions
-      ).
-
     ENDIF.
+
+    DATA(lo_aaic_openai) = NEW ycl_aaic_openai( i_model = me->_model
+                                                i_o_connection = lo_aaic_conn
+                                                i_o_persistence = lo_aaic_db
+                                                i_o_agent = lo_agent ).
 
     IF me->_context IS INITIAL.
 

@@ -14,7 +14,7 @@ ENDCLASS.
 
 
 
-CLASS YCL_AAIC_HTTP_SERVICE_GOOGLE IMPLEMENTATION.
+CLASS ycl_aaic_http_service_google IMPLEMENTATION.
 
 
   METHOD if_http_service_extension~handle_request.
@@ -42,6 +42,8 @@ CLASS YCL_AAIC_HTTP_SERVICE_GOOGLE IMPLEMENTATION.
              message  TYPE string,
              messages TYPE ty_message_t,
            END OF ty_response.
+
+    DATA lo_agent TYPE REF TO yif_aaic_agent.
 
     DATA: ls_request  TYPE ty_request,
           ls_response TYPE ty_response.
@@ -81,24 +83,19 @@ CLASS YCL_AAIC_HTTP_SERVICE_GOOGLE IMPLEMENTATION.
             DATA(lo_aaic_db) = NEW ycl_aaic_db( i_api = yif_aaic_const=>c_google
                                                 i_id = CONV #( ls_request-chatid ) ).
 
-            DATA(lo_aaic_google) = NEW ycl_aaic_google( i_model = ls_request-model
-                                                        i_o_connection = lo_aaic_conn
-                                                        i_o_persistence = lo_aaic_db ).
-
             IF l_agent_id IS NOT INITIAL.
 
-              DATA(lo_agent) = NEW ycl_aaic_agent(
+              lo_agent = NEW ycl_aaic_agent(
                 i_agent_id = CONV #( l_agent_id )
                 i_chat_id  = lo_aaic_db->m_id
               ).
 
-              DATA(l_system_instructions) = lo_agent->get_system_instructions( CONV #( l_agent_id ) ).
-
-              lo_aaic_google->set_system_instructions(
-                i_system_instructions = l_system_instructions
-              ).
-
             ENDIF.
+
+            DATA(lo_aaic_google) = NEW ycl_aaic_google( i_model = ls_request-model
+                                                        i_o_connection = lo_aaic_conn
+                                                        i_o_persistence = lo_aaic_db
+                                                        i_o_agent = lo_agent ).
 
             IF ls_request-context IS INITIAL.
 

@@ -63,7 +63,8 @@ INTERFACE yif_aaic_anthropic
            error       TYPE ty_error_s,
          END OF ty_anthropic_chat_response_s.
 
-  DATA: mo_function_calling TYPE REF TO yif_aaic_func_call_anthropic READ-ONLY.
+  DATA: mo_function_calling TYPE REF TO yif_aaic_func_call_anthropic READ-ONLY,
+        mo_agent            TYPE REF TO yif_aaic_agent READ-ONLY.
 
   DATA: m_anthropic_version TYPE string READ-ONLY,
         m_endpoint          TYPE string READ-ONLY.

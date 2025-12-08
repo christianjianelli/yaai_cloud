@@ -21,6 +21,8 @@ CLASS ycl_aaic_anthropic DEFINITION
     ALIASES get_conversation FOR yif_aaic_anthropic~get_conversation.
 
     ALIASES mo_function_calling FOR yif_aaic_anthropic~mo_function_calling.
+    ALIASES mo_agent FOR yif_aaic_anthropic~mo_agent.
+
     ALIASES m_anthropic_version FOR yif_aaic_anthropic~m_anthropic_version.
     ALIASES m_endpoint FOR yif_aaic_anthropic~m_endpoint.
 
@@ -36,7 +38,8 @@ CLASS ycl_aaic_anthropic DEFINITION
         i_model         TYPE csequence OPTIONAL
         i_max_tokens    TYPE i OPTIONAL
         i_o_connection  TYPE REF TO yif_aaic_conn OPTIONAL
-        i_o_persistence TYPE REF TO yif_aaic_db OPTIONAL.
+        i_o_persistence TYPE REF TO yif_aaic_db OPTIONAL
+        i_o_agent       TYPE REF TO yif_aaic_agent OPTIONAL.
 
 
   PROTECTED SECTION.
@@ -51,7 +54,7 @@ CLASS ycl_aaic_anthropic DEFINITION
           _max_tokens          TYPE i VALUE 2048,
           _system_instructions TYPE string,
           _chat_messages       TYPE yif_aaic_anthropic~ty_chat_messages_t,
-          _max_tools_calls     TYPE i.
+          _max_tool_calls      TYPE i.
 
 ENDCLASS.
 
@@ -84,7 +87,7 @@ CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
 
     me->_temperature = 1.
 
-    me->_max_tools_calls = 5.
+    me->_max_tool_calls = 5.
 
     IF i_o_connection IS SUPPLIED.
       me->_o_connection = i_o_connection.
@@ -98,6 +101,40 @@ CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
         IMPORTING
           e_t_msg_data = me->_chat_messages
       ).
+
+    ENDIF.
+
+    "If an Agent is passed then its settings overwrite any other previous setting
+    IF i_o_agent IS BOUND.
+
+      me->mo_agent = i_o_agent.
+
+      DATA(ls_model) = me->mo_agent->get_model(
+        EXPORTING
+          i_api = CONV #( yif_aaic_const=>c_anthropic )
+      ).
+
+      IF ls_model-model IS NOT INITIAL.
+        me->_model = ls_model-model.
+      ENDIF.
+
+      IF ls_model-temperature IS NOT INITIAL.
+        me->_temperature = ls_model-temperature.
+      ENDIF.
+
+      IF ls_model-max_tool_calls IS NOT INITIAL.
+        me->_max_tool_calls = ls_model-max_tool_calls.
+      ENDIF.
+
+      DATA(l_system_instructions) = me->mo_agent->get_system_instructions( ).
+
+      IF l_system_instructions IS NOT INITIAL.
+
+        me->set_system_instructions(
+          i_system_instructions = l_system_instructions
+        ).
+
+      ENDIF.
 
     ENDIF.
 
@@ -124,7 +161,7 @@ CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
     me->mo_function_calling = i_o_function_calling.
 
     IF i_max_tools_calls IS SUPPLIED.
-      me->_max_tools_calls = i_max_tools_calls.
+      me->_max_tool_calls = i_max_tools_calls.
     ENDIF.
 
   ENDMETHOD.
@@ -241,7 +278,7 @@ CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
 
     ENDIF.
 
-    DO me->_max_tools_calls TIMES.
+    DO me->_max_tool_calls TIMES.
 
       IF me->_o_connection->create( i_endpoint = me->m_endpoint ).
 

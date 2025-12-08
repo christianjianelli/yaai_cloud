@@ -165,7 +165,11 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       DATA(l_system_instructions) = me->mo_agent->get_system_instructions( ).
 
       IF l_system_instructions IS NOT INITIAL.
-        me->_system_instructions = l_system_instructions.
+
+        me->set_system_instructions(
+          i_system_instructions = l_system_instructions
+        ).
+
       ENDIF.
 
     ENDIF.

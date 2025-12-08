@@ -196,9 +196,8 @@ INTERFACE yif_aaic_openai
              mc_reasoning_effort_medium  TYPE string VALUE 'medium',
              mc_reasoning_effort_high    TYPE string VALUE 'high'.
 
-  DATA: mo_function_calling TYPE REF TO yif_aaic_func_call_openai READ-ONLY.
-
-  DATA: mo_agent TYPE REF TO yif_aaic_agent READ-ONLY.
+  DATA: mo_function_calling TYPE REF TO yif_aaic_func_call_openai READ-ONLY,
+        mo_agent            TYPE REF TO yif_aaic_agent READ-ONLY.
 
   DATA: m_endpoint TYPE string READ-ONLY.
 

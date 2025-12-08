@@ -85,7 +85,8 @@ INTERFACE yif_aaic_google
            candidates TYPE ty_candidates_t,
          END OF ty_google_generate_response_s.
 
-  DATA: mo_function_calling TYPE REF TO yif_aaic_func_call_google READ-ONLY.
+  DATA: mo_function_calling TYPE REF TO yif_aaic_func_call_google READ-ONLY,
+        mo_agent            TYPE REF TO yif_aaic_agent READ-ONLY.
 
   DATA: m_endpoint TYPE string READ-ONLY.
 
