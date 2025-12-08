@@ -198,6 +198,8 @@ INTERFACE yif_aaic_openai
 
   DATA: mo_function_calling TYPE REF TO yif_aaic_func_call_openai READ-ONLY.
 
+  DATA: mo_agent TYPE REF TO yif_aaic_agent READ-ONLY.
+
   DATA: m_endpoint TYPE string READ-ONLY.
 
   METHODS use_completions

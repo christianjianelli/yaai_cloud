@@ -7,8 +7,8 @@ INTERFACE yif_aaic_agent_db
   METHODS create
     IMPORTING
       i_s_agent        TYPE yaaic_agent
-      i_t_agent_tools  TYPE ty_agent_tools_t
-      i_t_agent_models TYPE ty_agent_models_t
+      i_t_agent_tools  TYPE ty_agent_tools_t  OPTIONAL
+      i_t_agent_models TYPE ty_agent_models_t OPTIONAL
     EXPORTING
       e_id             TYPE uuid
       e_error          TYPE string.
@@ -27,8 +27,8 @@ INTERFACE yif_aaic_agent_db
   METHODS update
     IMPORTING
       i_s_agent        TYPE yaaic_agent
-      i_t_agent_tools  TYPE ty_agent_tools_t
-      i_t_agent_models TYPE ty_agent_models_t
+      i_t_agent_tools  TYPE ty_agent_tools_t OPTIONAL
+      i_t_agent_models TYPE ty_agent_models_t OPTIONAL
     EXPORTING
       e_updated        TYPE abap_bool
       e_error          TYPE string.

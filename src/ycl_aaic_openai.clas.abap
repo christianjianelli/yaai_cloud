@@ -30,6 +30,7 @@ CLASS ycl_aaic_openai DEFINITION
     ALIASES get_conversation_chat_comp FOR yif_aaic_openai~get_conversation_chat_comp.
 
     ALIASES mo_function_calling FOR yif_aaic_openai~mo_function_calling.
+    ALIASES mo_agent FOR yif_aaic_openai~mo_agent.
     ALIASES m_endpoint FOR yif_aaic_openai~m_endpoint.
 
     CLASS-DATA m_ref TYPE REF TO ycl_aaic_openai READ-ONLY.
@@ -49,7 +50,8 @@ CLASS ycl_aaic_openai DEFINITION
         i_t_history           TYPE yif_aaic_openai~ty_generate_messages_t OPTIONAL
         i_o_prompt            TYPE REF TO yif_aaic_prompt OPTIONAL
         i_o_connection        TYPE REF TO yif_aaic_conn OPTIONAL
-        i_o_persistence       TYPE REF TO yif_aaic_db OPTIONAL.
+        i_o_persistence       TYPE REF TO yif_aaic_db OPTIONAL
+        i_o_agent             TYPE REF TO yif_aaic_agent OPTIONAL.
 
   PROTECTED SECTION.
 
@@ -71,7 +73,7 @@ CLASS ycl_aaic_openai DEFINITION
           _openai_generate_response  TYPE yif_aaic_openai~ty_openai_generate_response_s,
           _openai_chat_comp_response TYPE yif_aaic_openai~ty_openai_chat_comp_resp_s,
           _messages                  TYPE yif_aaic_openai~ty_generate_messages_t,
-          _max_tools_calls           TYPE i.
+          _max_tool_calls            TYPE i.
 
 ENDCLASS.
 
@@ -113,7 +115,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
     me->_safety_identifier = COND #( WHEN i_safety_identifier IS SUPPLIED THEN i_safety_identifier
                                      ELSE cl_abap_context_info=>get_user_technical_name( ) ).
 
-    me->_max_tools_calls = 10.
+    me->_max_tool_calls = 10.
 
     IF i_o_connection IS SUPPLIED.
       me->_o_connection = i_o_connection.
@@ -127,6 +129,44 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
         IMPORTING
           e_t_msg_data = me->_messages
       ).
+
+    ENDIF.
+
+    "If an Agent is passed then its settings overwrite any other previous setting
+    IF i_o_agent IS BOUND.
+
+      me->mo_agent = i_o_agent.
+
+      DATA(ls_model) = me->mo_agent->get_model(
+        EXPORTING
+          i_api = CONV #( yif_aaic_const=>c_openai )
+      ).
+
+      IF ls_model-model IS NOT INITIAL.
+        me->_model = ls_model-model.
+      ENDIF.
+
+      IF ls_model-temperature IS NOT INITIAL.
+        me->_temperature = ls_model-temperature.
+      ENDIF.
+
+      IF ls_model-verbosity IS NOT INITIAL.
+        me->_verbosity = ls_model-verbosity.
+      ENDIF.
+
+      IF ls_model-reasoning IS NOT INITIAL.
+        me->_reasoning_effort = ls_model-reasoning.
+      ENDIF.
+
+      IF ls_model-max_tool_calls IS NOT INITIAL.
+        me->_max_tool_calls = ls_model-max_tool_calls.
+      ENDIF.
+
+      DATA(l_system_instructions) = me->mo_agent->get_system_instructions( ).
+
+      IF l_system_instructions IS NOT INITIAL.
+        me->_system_instructions = l_system_instructions.
+      ENDIF.
 
     ENDIF.
 
@@ -192,7 +232,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
     me->mo_function_calling = i_o_function_calling.
 
     IF i_max_tools_calls IS SUPPLIED.
-      me->_max_tools_calls = i_max_tools_calls.
+      me->_max_tool_calls = i_max_tools_calls.
     ENDIF.
 
   ENDMETHOD.
@@ -220,6 +260,10 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
     IF i_new = abap_true.
       FREE me->_messages.
+    ENDIF.
+
+    IF i_o_agent IS BOUND AND me->mo_agent IS NOT BOUND.
+      me->mo_agent = i_o_agent.
     ENDIF.
 
     IF me->_messages IS INITIAL.
@@ -327,13 +371,13 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       me->m_endpoint = yif_aaic_const=>c_openai_completions_endpoint.
     ENDIF.
 
-    IF i_o_agent IS BOUND AND me->mo_function_calling IS NOT BOUND.
+    IF me->mo_agent IS BOUND AND me->mo_function_calling IS NOT BOUND.
 
-      me->mo_function_calling = NEW ycl_aaic_func_call_openai( i_o_agent ).
+      me->mo_function_calling = NEW ycl_aaic_func_call_openai( me->mo_agent ).
 
     ENDIF.
 
-    DO me->_max_tools_calls TIMES.
+    DO me->_max_tool_calls TIMES.
 
       IF me->_o_connection->create( i_endpoint = me->m_endpoint ).
 
@@ -586,6 +630,10 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       FREE me->_messages.
     ENDIF.
 
+    IF i_o_agent IS BOUND AND me->mo_agent IS NOT BOUND.
+      me->mo_agent = i_o_agent.
+    ENDIF.
+
     IF me->_messages IS INITIAL.
 
       IF me->_system_instructions IS NOT INITIAL.
@@ -689,13 +737,13 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       me->m_endpoint = yif_aaic_const=>c_openai_generate_endpoint.
     ENDIF.
 
-    IF i_o_agent IS BOUND AND me->mo_function_calling IS NOT BOUND.
+    IF me->mo_agent IS BOUND AND me->mo_function_calling IS NOT BOUND.
 
-      me->mo_function_calling = NEW ycl_aaic_func_call_openai( i_o_agent ).
+      me->mo_function_calling = NEW ycl_aaic_func_call_openai( me->mo_agent ).
 
     ENDIF.
 
-    DO me->_max_tools_calls TIMES.
+    DO me->_max_tool_calls TIMES.
 
       IF me->_o_connection->create( i_endpoint = me->m_endpoint ).
 

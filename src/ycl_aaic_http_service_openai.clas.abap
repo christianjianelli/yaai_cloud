@@ -43,6 +43,8 @@ CLASS YCL_AAIC_HTTP_SERVICE_OPENAI IMPLEMENTATION.
              messages TYPE ty_message_t,
            END OF ty_response.
 
+    DATA lo_agent TYPE REF TO yif_aaic_agent.
+
     DATA: ls_request  TYPE ty_request,
           ls_response TYPE ty_response.
 
@@ -80,25 +82,19 @@ CLASS YCL_AAIC_HTTP_SERVICE_OPENAI IMPLEMENTATION.
             DATA(lo_aaic_db) = NEW ycl_aaic_db( i_api = yif_aaic_const=>c_openai
                                                 i_id = CONV #( ls_request-chatid ) ).
 
-
-            DATA(lo_aaic_openai) = NEW ycl_aaic_openai( i_model = ls_request-model
-                                                        i_o_connection = lo_aaic_conn
-                                                        i_o_persistence = lo_aaic_db ).
-
             IF l_agent_id IS NOT INITIAL.
 
-              DATA(lo_agent) = NEW ycl_aaic_agent(
+              lo_agent = NEW ycl_aaic_agent(
                 i_agent_id = CONV #( l_agent_id )
                 i_chat_id  = lo_aaic_db->m_id
               ).
 
-              DATA(l_system_instructions) = lo_agent->get_system_instructions( ).
-
-              lo_aaic_openai->set_system_instructions(
-                i_system_instructions = l_system_instructions
-              ).
-
             ENDIF.
+
+            DATA(lo_aaic_openai) = NEW ycl_aaic_openai( i_model = ls_request-model
+                                                        i_o_connection = lo_aaic_conn
+                                                        i_o_persistence = lo_aaic_db
+                                                        i_o_agent = lo_agent ).
 
             IF ls_request-context IS INITIAL.
 
