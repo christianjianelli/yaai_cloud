@@ -100,6 +100,21 @@ CLASS ycl_aaic_async_chat_anthropic IMPLEMENTATION.
 
     ENDIF.
 
+    " Connection events handlers
+    SET HANDLER me->on_http_request_send FOR ALL INSTANCES.
+    SET HANDLER me->on_http_response_received FOR ALL INSTANCES.
+    SET HANDLER me->on_connection_error FOR ALL INSTANCES.
+
+    " Chat events handlers
+    SET HANDLER me->on_message_send FOR ALL INSTANCES.
+    SET HANDLER me->on_response_received FOR ALL INSTANCES.
+    SET HANDLER me->on_message_failed FOR ALL INSTANCES.
+
+    " Function Calling events handlers
+    SET HANDLER me->on_tool_call FOR ALL INSTANCES.
+    SET HANDLER me->on_tool_call_response FOR ALL INSTANCES.
+    SET HANDLER me->on_tool_call_error FOR ALL INSTANCES.
+
     DATA(lo_aaic_anthropic) = NEW ycl_aaic_anthropic( i_model = me->_model
                                                       i_o_connection = lo_aaic_conn
                                                       i_o_persistence = lo_aaic_db
