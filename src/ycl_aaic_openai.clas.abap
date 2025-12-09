@@ -787,6 +787,8 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
         FREE l_json.
 
+        RAISE EVENT on_message_send.
+
         me->_o_connection->execute(
           IMPORTING
             e_response = l_json
@@ -805,9 +807,15 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
             <l_response> = e_response.
           ENDIF.
 
+          RAISE EVENT on_message_failed
+            EXPORTING
+              error_text = e_response.
+
           EXIT.
 
         ENDIF.
+
+        RAISE EVENT on_response_received.
 
         lo_aaic_util->deserialize(
           EXPORTING

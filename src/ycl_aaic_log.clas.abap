@@ -29,7 +29,7 @@ ENDCLASS.
 
 
 
-CLASS YCL_AAIC_LOG IMPLEMENTATION.
+CLASS ycl_aaic_log IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -55,6 +55,10 @@ CLASS YCL_AAIC_LOG IMPLEMENTATION.
 
     APPEND ls_msg TO me->mt_msg.
 
+    IF i_save = abap_true.
+      me->save_log( ).
+    ENDIF.
+
   ENDMETHOD.
 
 
@@ -65,6 +69,10 @@ CLASS YCL_AAIC_LOG IMPLEMENTATION.
       me->add( i_s_msg = <ls_msg> ).
 
     ENDLOOP.
+
+    IF i_save = abap_true.
+      me->save_log( ).
+    ENDIF.
 
   ENDMETHOD.
 
@@ -93,7 +101,7 @@ CLASS YCL_AAIC_LOG IMPLEMENTATION.
       l_expiry_date = i_expiry_date.
     ENDIF.
 
-    LOOP AT me->mt_msg ASSIGNING FIELD-SYMBOL(<ls_msg>).
+    LOOP AT me->mt_msg ASSIGNING FIELD-SYMBOL(<ls_msg>) WHERE row IS INITIAL.
 
       MESSAGE ID <ls_msg>-id
         TYPE <ls_msg>-type
@@ -105,6 +113,8 @@ CLASS YCL_AAIC_LOG IMPLEMENTATION.
         INTO DATA(l_message).
 
       l_seqno += 1.
+
+      <ls_msg>-row = l_seqno.
 
       INSERT yaaic_log FROM @( VALUE yaaic_log( id = me->m_chat_id
                                                 seqno = l_seqno

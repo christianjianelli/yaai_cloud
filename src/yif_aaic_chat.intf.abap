@@ -5,7 +5,9 @@ INTERFACE yif_aaic_chat
 
   EVENTS on_message_send.
   EVENTS on_response_received.
-  EVENTS on_message_failed.
+  EVENTS on_message_failed
+    EXPORTING
+      VALUE(error_text) TYPE string.
 
   METHODS chat
     IMPORTING

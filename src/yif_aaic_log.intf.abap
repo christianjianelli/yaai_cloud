@@ -11,10 +11,12 @@ INTERFACE yif_aaic_log
 
   METHODS add_message
     IMPORTING
+      i_save  TYPE abap_boolean DEFAULT abap_true
       i_s_msg TYPE bapiret2.
 
   METHODS add_messages
     IMPORTING
+      i_save  TYPE abap_boolean DEFAULT abap_true
       i_t_msg TYPE ty_messages_t.
 
   METHODS save_log
