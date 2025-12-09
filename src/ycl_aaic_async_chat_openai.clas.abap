@@ -17,7 +17,8 @@ CLASS ycl_aaic_async_chat_openai DEFINITION
         i_message  TYPE csequence
         i_context  TYPE csequence OPTIONAL
         i_agent_id TYPE csequence OPTIONAL
-        i_model    TYPE csequence OPTIONAL.
+        i_model    TYPE csequence OPTIONAL
+        i_log      TYPE abap_bool DEFAULT abap_true.
 
     METHODS on_http_request_send FOR EVENT on_request_send OF ycl_aaic_conn.
 
@@ -57,7 +58,8 @@ CLASS ycl_aaic_async_chat_openai DEFINITION
           _api_key  TYPE string,
           _message  TYPE string,
           _context  TYPE string,
-          _response TYPE string.
+          _response TYPE string,
+          _log      TYPE abap_bool.
 
 ENDCLASS.
 
@@ -74,6 +76,7 @@ CLASS ycl_aaic_async_chat_openai IMPLEMENTATION.
     me->_context  = i_context.
     me->_agent_id = i_agent_id.
     me->_model    = i_model.
+    me->_log      = i_log.
 
   ENDMETHOD.
 
@@ -99,10 +102,17 @@ CLASS ycl_aaic_async_chat_openai IMPLEMENTATION.
 
     ENDIF.
 
+    " Connection events handlers
+    SET HANDLER me->on_http_request_send FOR ALL INSTANCES.
+    SET HANDLER me->on_http_response_received FOR ALL INSTANCES.
+    SET HANDLER me->on_connection_error FOR ALL INSTANCES.
+
+    " Chat events handlers
     SET HANDLER me->on_message_send FOR ALL INSTANCES.
     SET HANDLER me->on_response_received FOR ALL INSTANCES.
     SET HANDLER me->on_message_failed FOR ALL INSTANCES.
 
+    " Function Calling events handlers
     SET HANDLER me->on_tool_call FOR ALL INSTANCES.
     SET HANDLER me->on_response_received FOR ALL INSTANCES.
     SET HANDLER me->on_message_failed FOR ALL INSTANCES.
@@ -174,60 +184,88 @@ CLASS ycl_aaic_async_chat_openai IMPLEMENTATION.
 
   METHOD on_message_send.
 
-    DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+    IF me->_log = abap_true.
 
-    lo_log->add( VALUE #( number = '005' type = 'S' ) ).
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '005' type = 'S' ) ).
+
+    ENDIF.
 
   ENDMETHOD.
 
   METHOD on_response_received.
 
-    DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+    IF me->_log = abap_true.
 
-    lo_log->add( VALUE #( number = '006' type = 'S' ) ).
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '006' type = 'S' ) ).
+
+    ENDIF.
 
   ENDMETHOD.
 
   METHOD on_message_failed.
 
-    DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+    IF me->_log = abap_true.
 
-    lo_log->add( VALUE #( number = '007' type = 'E' ) ).
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '007' type = 'E' ) ).
+
+    ENDIF.
 
   ENDMETHOD.
 
   METHOD on_tool_call.
 
-    DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+    IF me->_log = abap_true.
 
-    lo_log->add( VALUE #( number = '008'
-                              type = 'S'
-                              message_v1 = class_name
-                              message_v2 = method_name ) ).
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '008'
+                                type = 'S'
+                                message_v1 = class_name
+                                message_v2 = method_name ) ).
+
+    ENDIF.
 
   ENDMETHOD.
 
   METHOD on_tool_call_response.
 
-    DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+    IF me->_log = abap_true.
 
-    lo_log->add( VALUE #( number = '009' type = 'S' message_v1 = tool_response ) ).
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '009' type = 'S' message_v1 = tool_response ) ).
+
+    ENDIF.
 
   ENDMETHOD.
 
   METHOD on_tool_call_error.
 
-    DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+    IF me->_log = abap_true.
 
-    lo_log->add( VALUE #( number = '010' type = 'E' message_v1 = error_text ) ).
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '010' type = 'E' message_v1 = error_text ) ).
+
+    ENDIF.
 
   ENDMETHOD.
 
   METHOD on_connection_error.
 
-    DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+    IF me->_log = abap_true.
 
-    lo_log->add( VALUE #( number = '001' type = 'E' ) ).
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '001' type = 'E' ) ).
+
+    ENDIF.
 
   ENDMETHOD.
 
@@ -241,9 +279,13 @@ CLASS ycl_aaic_async_chat_openai IMPLEMENTATION.
 
   METHOD on_http_response_received.
 
-    DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+    IF me->_log = abap_true.
 
-    lo_log->add( VALUE #( number = '012' type = 'S' ) ).
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '012' type = 'S' ) ).
+
+    ENDIF.
 
   ENDMETHOD.
 

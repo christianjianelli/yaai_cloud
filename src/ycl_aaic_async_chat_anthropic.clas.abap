@@ -17,8 +17,35 @@ CLASS ycl_aaic_async_chat_anthropic DEFINITION
         i_message  TYPE csequence
         i_context  TYPE csequence OPTIONAL
         i_agent_id TYPE csequence OPTIONAL
-        i_model    TYPE csequence OPTIONAL.
+        i_model    TYPE csequence OPTIONAL
+        i_log      TYPE abap_bool DEFAULT abap_true.
 
+    METHODS on_http_request_send FOR EVENT on_request_send OF ycl_aaic_conn.
+
+    METHODS on_http_response_received FOR EVENT on_response_received OF ycl_aaic_conn.
+
+    METHODS on_connection_error FOR EVENT on_connection_error OF ycl_aaic_conn.
+
+    METHODS on_message_send FOR EVENT on_message_send OF ycl_aaic_openai.
+
+    METHODS on_response_received FOR EVENT on_response_received OF ycl_aaic_openai.
+
+    METHODS on_message_failed FOR EVENT on_message_failed OF ycl_aaic_openai
+      IMPORTING
+        error_text.
+
+    METHODS on_tool_call FOR EVENT on_tool_call OF yif_aaic_func_call_openai
+      IMPORTING
+        class_name
+        method_name.
+
+    METHODS on_tool_call_response FOR EVENT on_tool_call_response OF yif_aaic_func_call_openai
+      IMPORTING
+        tool_response.
+
+    METHODS on_tool_call_error FOR EVENT on_tool_call_error OF yif_aaic_func_call_openai
+      IMPORTING
+        error_text.
 
   PROTECTED SECTION.
 
@@ -30,7 +57,8 @@ CLASS ycl_aaic_async_chat_anthropic DEFINITION
           _model    TYPE string,
           _api_key  TYPE string,
           _message  TYPE string,
-          _context  TYPE string.
+          _context  TYPE string,
+          _log      TYPE abap_bool.
 
 ENDCLASS.
 
@@ -47,6 +75,7 @@ CLASS ycl_aaic_async_chat_anthropic IMPLEMENTATION.
     me->_context  = i_context.
     me->_agent_id = i_agent_id.
     me->_model    = i_model.
+    me->_log      = i_log.
 
   ENDMETHOD.
 
@@ -122,6 +151,113 @@ CLASS ycl_aaic_async_chat_anthropic IMPLEMENTATION.
         i_task_id = CONV #( me->_task_id )
         i_status  = yif_aaic_async=>mc_task_finished
     ).
+
+  ENDMETHOD.
+
+  METHOD on_message_send.
+
+    IF me->_log = abap_true.
+
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '005' type = 'S' ) ).
+
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD on_response_received.
+
+    IF me->_log = abap_true.
+
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '006' type = 'S' ) ).
+
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD on_message_failed.
+
+    IF me->_log = abap_true.
+
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '007' type = 'E' ) ).
+
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD on_tool_call.
+
+    IF me->_log = abap_true.
+
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '008'
+                                type = 'S'
+                                message_v1 = class_name
+                                message_v2 = method_name ) ).
+
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD on_tool_call_response.
+
+    IF me->_log = abap_true.
+
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '009' type = 'S' message_v1 = tool_response ) ).
+
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD on_tool_call_error.
+
+    IF me->_log = abap_true.
+
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '010' type = 'E' message_v1 = error_text ) ).
+
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD on_connection_error.
+
+    IF me->_log = abap_true.
+
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '001' type = 'E' ) ).
+
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD on_http_request_send.
+
+    DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+    lo_log->add( VALUE #( number = '011' type = 'S' ) ).
+
+  ENDMETHOD.
+
+  METHOD on_http_response_received.
+
+    IF me->_log = abap_true.
+
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '012' type = 'S' ) ).
+
+    ENDIF.
 
   ENDMETHOD.
 

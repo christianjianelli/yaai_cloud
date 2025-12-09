@@ -361,7 +361,9 @@ CLASS ycl_aaic_google IMPLEMENTATION.
             <l_response> = e_response.
           ENDIF.
 
-          RAISE EVENT on_message_failed.
+          RAISE EVENT on_message_failed
+            EXPORTING
+              error_text = e_response.
 
           EXIT.
 
@@ -374,12 +376,12 @@ CLASS ycl_aaic_google IMPLEMENTATION.
             e_data = ls_response
         ).
 
+        RAISE EVENT on_response_received.
+
         LOOP AT ls_response-candidates ASSIGNING FIELD-SYMBOL(<ls_candidates>).
 
           "Add LLM response to the chat history
           me->_append_to_history( <ls_candidates>-content ).
-
-          RAISE EVENT on_response_received.
 
           DATA(l_function_call) = abap_false.
 

@@ -303,6 +303,8 @@ CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
 
         me->_o_connection->set_body( l_json ).
 
+        RAISE EVENT on_message_send.
+
         FREE l_json.
 
         me->_o_connection->execute(
@@ -322,6 +324,10 @@ CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
             APPEND INITIAL LINE TO e_t_response ASSIGNING FIELD-SYMBOL(<l_response>).
             <l_response> = e_response.
           ENDIF.
+
+          RAISE EVENT on_message_failed
+            EXPORTING
+              error_text = e_response.
 
           EXIT.
 
@@ -343,6 +349,10 @@ CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
             <l_response> = e_response.
           ENDIF.
 
+          RAISE EVENT on_message_failed
+            EXPORTING
+              error_text = e_response.
+
           EXIT.
 
         ENDIF.
@@ -362,6 +372,8 @@ CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
           IMPORTING
             e_data = lt_response_content
         ).
+
+        RAISE EVENT on_response_received.
 
         IF ls_anthropic_chat_response-stop_reason = 'tool_use' AND me->mo_function_calling IS BOUND.
 

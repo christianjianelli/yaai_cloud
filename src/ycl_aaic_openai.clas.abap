@@ -415,6 +415,8 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
         FREE l_json.
 
+        RAISE EVENT on_message_send.
+
         me->_o_connection->execute(
           IMPORTING
             e_response = l_json
@@ -433,6 +435,10 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
             <l_response> = e_response.
           ENDIF.
 
+          RAISE EVENT on_message_failed
+            EXPORTING
+              error_text = e_response.
+
           EXIT.
 
         ENDIF.
@@ -445,9 +451,17 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
         ).
 
         IF me->_openai_chat_comp_response-object = 'error'.
+
           e_response = |**Error!** { me->_openai_chat_comp_response-code } { me->_openai_chat_comp_response-message }|.
+
+          RAISE EVENT on_message_failed
+            EXPORTING
+              error_text = e_response.
+
           EXIT.
         ENDIF.
+
+        RAISE EVENT on_response_received.
 
         DATA(l_function_call) = abap_false.
 
@@ -815,14 +829,14 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
         ENDIF.
 
-        RAISE EVENT on_response_received.
-
         lo_aaic_util->deserialize(
           EXPORTING
             i_json = l_json
           IMPORTING
             e_data = me->_openai_generate_response
         ).
+
+        RAISE EVENT on_response_received.
 
         DATA(l_function_call) = abap_false.
 
