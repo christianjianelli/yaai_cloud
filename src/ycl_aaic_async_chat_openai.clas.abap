@@ -212,7 +212,7 @@ CLASS ycl_aaic_async_chat_openai IMPLEMENTATION.
 
       DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
 
-      lo_log->add( VALUE #( number = '007' type = 'E' ) ).
+      lo_log->add( VALUE #( number = '007' type = 'E' message_v1 = error_text ) ).
 
     ENDIF.
 

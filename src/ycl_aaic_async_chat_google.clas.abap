@@ -26,24 +26,24 @@ CLASS ycl_aaic_async_chat_google DEFINITION
 
     METHODS on_connection_error FOR EVENT on_connection_error OF ycl_aaic_conn.
 
-    METHODS on_message_send FOR EVENT on_message_send OF ycl_aaic_openai.
+    METHODS on_message_send FOR EVENT on_message_send OF ycl_aaic_google.
 
-    METHODS on_response_received FOR EVENT on_response_received OF ycl_aaic_openai.
+    METHODS on_response_received FOR EVENT on_response_received OF ycl_aaic_google.
 
-    METHODS on_message_failed FOR EVENT on_message_failed OF ycl_aaic_openai
+    METHODS on_message_failed FOR EVENT on_message_failed OF ycl_aaic_google
       IMPORTING
         error_text.
 
-    METHODS on_tool_call FOR EVENT on_tool_call OF yif_aaic_func_call_openai
+    METHODS on_tool_call FOR EVENT on_tool_call OF yif_aaic_func_call_google
       IMPORTING
         class_name
         method_name.
 
-    METHODS on_tool_call_response FOR EVENT on_tool_call_response OF yif_aaic_func_call_openai
+    METHODS on_tool_call_response FOR EVENT on_tool_call_response OF yif_aaic_func_call_google
       IMPORTING
         tool_response.
 
-    METHODS on_tool_call_error FOR EVENT on_tool_call_error OF yif_aaic_func_call_openai
+    METHODS on_tool_call_error FOR EVENT on_tool_call_error OF yif_aaic_func_call_google
       IMPORTING
         error_text.
 
@@ -202,7 +202,7 @@ CLASS ycl_aaic_async_chat_google IMPLEMENTATION.
 
       DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
 
-      lo_log->add( VALUE #( number = '007' type = 'E' ) ).
+      lo_log->add( VALUE #( number = '007' type = 'E' message_v1 = error_text ) ).
 
     ENDIF.
 

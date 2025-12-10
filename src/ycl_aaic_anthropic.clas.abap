@@ -87,7 +87,7 @@ CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
 
     me->_temperature = 1.
 
-    me->_max_tool_calls = 5.
+    me->_max_tool_calls = 10.
 
     IF i_o_connection IS SUPPLIED.
       me->_o_connection = i_o_connection.
@@ -342,7 +342,7 @@ CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
 
         IF ls_anthropic_chat_response-type = 'error'.
 
-          e_response = ls_anthropic_chat_response-error-message.
+          e_response = |{ ls_anthropic_chat_response-error-type } { ls_anthropic_chat_response-error-message }|.
 
           IF e_t_response IS REQUESTED.
             APPEND INITIAL LINE TO e_t_response ASSIGNING <l_response>.

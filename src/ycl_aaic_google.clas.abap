@@ -84,7 +84,7 @@ CLASS ycl_aaic_google IMPLEMENTATION.
 
     me->_temperature = 1.
 
-    me->_max_tool_calls = 5.
+    me->_max_tool_calls = 10.
 
     IF i_o_connection IS SUPPLIED.
       me->_o_connection = i_o_connection.

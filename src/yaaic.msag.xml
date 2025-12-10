@@ -54,7 +54,7 @@
      <SPRSL>E</SPRSL>
      <ARBGB>YAAIC</ARBGB>
      <MSGNR>007</MSGNR>
-     <TEXT>Message failed</TEXT>
+     <TEXT>Message failed! Error: &amp;1</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>

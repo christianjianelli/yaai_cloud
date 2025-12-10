@@ -184,13 +184,12 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
         FROM yaaic_agent AS a
         INNER JOIN yaaic_agent_mdl AS b
         ON a~id = b~id
-        WHERE a~id = @me->m_agent_id OR
-              a~name = @i_agent_name
-        INTO TABLE @DATA(lt_model).
-
-      IF sy-subrc = 0.
-        r_s_model = CORRESPONDING #( lt_model[ 1 ] ).                      "#EC CI_NOORDER
-      ENDIF.
+        WHERE ( a~id = @me->m_agent_id OR
+                a~name = @i_agent_name )
+          AND b~api = @i_api
+        INTO CORRESPONDING FIELDS OF @r_s_model
+        UP TO 1 ROWS.
+      ENDSELECT.
 
     ENDIF.
 

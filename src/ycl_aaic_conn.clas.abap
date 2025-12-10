@@ -262,9 +262,13 @@ CLASS YCL_AAIC_CONN IMPLEMENTATION.
 
         ENDIF.
 
+        RAISE EVENT on_request_send.
+
         me->_o_http_response = me->_o_http_client->execute( i_method = if_web_http_client=>post ).
 
         e_response = me->_o_http_response->get_text( ).
+
+        RAISE EVENT on_response_received.
 
       CATCH cx_web_http_client_error INTO DATA(lo_web_http_client_error).
 
