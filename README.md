@@ -1,3 +1,5 @@
+[![License](https://img.shields.io/github/license/christianjianelli/yaaic?label=License&color=success)](https://github.com/christianjianelli/yaaic/blob/main/LICENSE)
+
 # yaai_cloud - ABAP AI tools Cloud
 This repository provides a set of tools designed to facilitate Artificial Intelligence capabilities within **ABAP Cloud** environments.
 
