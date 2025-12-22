@@ -20,7 +20,7 @@ ENDCLASS.
 
 
 
-CLASS YCL_AAIC_RAG_TOOLS IMPLEMENTATION.
+CLASS ycl_aaic_rag_tools IMPLEMENTATION.
 
 
   METHOD yif_aaic_rag_tools~create_documentation.
