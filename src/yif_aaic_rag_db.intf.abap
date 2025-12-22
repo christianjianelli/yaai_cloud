@@ -9,7 +9,14 @@ INTERFACE yif_aaic_rag_db
            content     TYPE string,
          END OF ty_document_s,
 
-         ty_documents_t TYPE STANDARD TABLE OF ty_document_s WITH EMPTY KEY.
+         BEGIN OF ty_document_list_s,
+           id          TYPE string,
+           filename    TYPE string,
+           description TYPE string,
+           keywords    TYPE string,
+         END OF ty_document_list_s,
+
+         ty_documents_t TYPE STANDARD TABLE OF ty_document_list_s WITH EMPTY KEY.
 
   METHODS create
     IMPORTING
