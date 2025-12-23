@@ -327,7 +327,9 @@ CLASS ycl_aaic_google IMPLEMENTATION.
 
           ASSIGN ls_generate_request_sys TO <ls_generate_request>.
 
-          DATA(ls_msg) = VALUE yif_aaic_google~ty_contents_s( role = 'system' parts = VALUE #( ( me->_system_instructions ) ) ).
+          DATA(l_system_instructions) = '{"text": ' && lo_aaic_util->serialize( me->_system_instructions ) && '}'.
+
+          DATA(ls_msg) = VALUE yif_aaic_google~ty_contents_s( role = 'system' parts = VALUE #( ( l_system_instructions ) ) ).
 
           IF me->_o_persistence IS BOUND.
             me->_o_persistence->persist_system_instructions( i_data = ls_msg ).
