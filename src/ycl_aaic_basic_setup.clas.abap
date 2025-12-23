@@ -52,7 +52,25 @@ CLASS ycl_aaic_basic_setup IMPLEMENTATION.
 
                                              ( class_name = 'ycl_aaic_rag_tools'
                                                method_name = 'update_documentation'
-                                               description = 'Use this tool to create a documentation.' ) ) ) ACCEPTING DUPLICATE KEYS.
+                                               description = 'Use this tool to create a documentation.' )
+
+                                             ( class_name = 'ycl_aaic_planning_tools'
+                                               method_name = 'create_plan'
+                                               description = 'Use this tool to create a plan in markdown format.' )
+
+                                             ( class_name = 'ycl_aaic_planning_tools'
+                                               method_name = 'update_plan'
+                                               description = 'Use this tool to update a plan in markdown format.' )
+
+                                             ( class_name = 'ycl_aaic_planning_tools'
+                                               method_name = 'get_plan'
+                                               description = 'Use this tool to retrieve the content of a plan.' )
+
+                                             ( class_name = 'ycl_aaic_planning_tools'
+                                               method_name = 'delete_plan'
+                                               description = 'Use this tool to delete a plan.' )
+
+                                                    ) ) ACCEPTING DUPLICATE KEYS.
 
   ENDMETHOD.
 ENDCLASS.
