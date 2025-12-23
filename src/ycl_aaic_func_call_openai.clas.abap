@@ -145,6 +145,12 @@ CLASS YCL_AAIC_FUNC_CALL_OPENAI IMPLEMENTATION.
 
           ASSIGN lr_data->* TO <ls_data>.
 
+        CATCH cx_sy_struct_comp_type INTO DATA(lo_ex_struct_comp_type).
+
+          r_response = |An error occurred while calling the function/tool { i_tool_name }. Error description: { lo_ex_struct_comp_type->get_text( ) }|.
+
+          RAISE EVENT on_tool_call_error EXPORTING error_text = r_response.
+
         CATCH cx_sy_struct_attributes INTO DATA(lo_ex_struct_attributes).
 
           r_response = |An error occurred while calling the function/tool { i_tool_name }. Error description: { lo_ex_struct_attributes->get_text( ) }|.
