@@ -75,6 +75,8 @@ CLASS ycl_aaic_openai DEFINITION
           _messages                  TYPE yif_aaic_openai~ty_generate_messages_t,
           _max_tool_calls            TYPE i.
 
+    METHODS _load_agent_settings.
+
 ENDCLASS.
 
 
@@ -137,40 +139,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
       me->mo_agent = i_o_agent.
 
-      DATA(ls_model) = me->mo_agent->get_model(
-        EXPORTING
-          i_api = CONV #( yif_aaic_const=>c_openai )
-      ).
-
-      IF ls_model-model IS NOT INITIAL.
-        me->_model = ls_model-model.
-      ENDIF.
-
-      IF ls_model-temperature IS NOT INITIAL.
-        me->_temperature = ls_model-temperature.
-      ENDIF.
-
-      IF ls_model-verbosity IS NOT INITIAL.
-        me->_verbosity = ls_model-verbosity.
-      ENDIF.
-
-      IF ls_model-reasoning IS NOT INITIAL.
-        me->_reasoning_effort = ls_model-reasoning.
-      ENDIF.
-
-      IF ls_model-max_tool_calls IS NOT INITIAL.
-        me->_max_tool_calls = ls_model-max_tool_calls.
-      ENDIF.
-
-      DATA(l_system_instructions) = me->mo_agent->get_system_instructions( ).
-
-      IF l_system_instructions IS NOT INITIAL.
-
-        me->set_system_instructions(
-          i_system_instructions = l_system_instructions
-        ).
-
-      ENDIF.
+      me->_load_agent_settings( ).
 
     ENDIF.
 
@@ -191,6 +160,44 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
   ENDMETHOD.
 
+  METHOD _load_agent_settings.
+
+    DATA(ls_model) = me->mo_agent->get_model(
+      EXPORTING
+        i_api = CONV #( yif_aaic_const=>c_openai )
+    ).
+
+    IF ls_model-model IS NOT INITIAL.
+      me->_model = ls_model-model.
+    ENDIF.
+
+    IF ls_model-temperature IS NOT INITIAL.
+      me->_temperature = ls_model-temperature.
+    ENDIF.
+
+    IF ls_model-verbosity IS NOT INITIAL.
+      me->_verbosity = ls_model-verbosity.
+    ENDIF.
+
+    IF ls_model-reasoning IS NOT INITIAL.
+      me->_reasoning_effort = ls_model-reasoning.
+    ENDIF.
+
+    IF ls_model-max_tool_calls IS NOT INITIAL.
+      me->_max_tool_calls = ls_model-max_tool_calls.
+    ENDIF.
+
+    DATA(l_system_instructions) = me->mo_agent->get_system_instructions( ).
+
+    IF l_system_instructions IS NOT INITIAL.
+
+      me->set_system_instructions(
+        i_system_instructions = l_system_instructions
+      ).
+
+    ENDIF.
+
+  ENDMETHOD.
 
   METHOD yif_aaic_chat~chat.
 
@@ -268,6 +275,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
     IF i_o_agent IS BOUND AND me->mo_agent IS NOT BOUND.
       me->mo_agent = i_o_agent.
+      me->_load_agent_settings( ).
     ENDIF.
 
     IF me->_messages IS INITIAL.
@@ -650,6 +658,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
     IF i_o_agent IS BOUND AND me->mo_agent IS NOT BOUND.
       me->mo_agent = i_o_agent.
+      me->_load_agent_settings( ).
     ENDIF.
 
     IF me->_messages IS INITIAL.

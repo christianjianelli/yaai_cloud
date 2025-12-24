@@ -56,11 +56,13 @@ CLASS ycl_aaic_anthropic DEFINITION
           _chat_messages       TYPE yif_aaic_anthropic~ty_chat_messages_t,
           _max_tool_calls      TYPE i.
 
+    METHODS _load_agent_settings.
+
 ENDCLASS.
 
 
 
-CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
+CLASS ycl_aaic_anthropic IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -109,32 +111,7 @@ CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
 
       me->mo_agent = i_o_agent.
 
-      DATA(ls_model) = me->mo_agent->get_model(
-        EXPORTING
-          i_api = CONV #( yif_aaic_const=>c_anthropic )
-      ).
-
-      IF ls_model-model IS NOT INITIAL.
-        me->_model = ls_model-model.
-      ENDIF.
-
-      IF ls_model-temperature IS NOT INITIAL.
-        me->_temperature = ls_model-temperature.
-      ENDIF.
-
-      IF ls_model-max_tool_calls IS NOT INITIAL.
-        me->_max_tool_calls = ls_model-max_tool_calls.
-      ENDIF.
-
-      DATA(l_system_instructions) = me->mo_agent->get_system_instructions( ).
-
-      IF l_system_instructions IS NOT INITIAL.
-
-        me->set_system_instructions(
-          i_system_instructions = l_system_instructions
-        ).
-
-      ENDIF.
+      me->_load_agent_settings( ).
 
     ENDIF.
 
@@ -155,6 +132,36 @@ CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
 
   ENDMETHOD.
 
+  METHOD _load_agent_settings.
+
+    DATA(ls_model) = me->mo_agent->get_model(
+      EXPORTING
+        i_api = CONV #( yif_aaic_const=>c_anthropic )
+    ).
+
+    IF ls_model-model IS NOT INITIAL.
+      me->_model = ls_model-model.
+    ENDIF.
+
+    IF ls_model-temperature IS NOT INITIAL.
+      me->_temperature = ls_model-temperature.
+    ENDIF.
+
+    IF ls_model-max_tool_calls IS NOT INITIAL.
+      me->_max_tool_calls = ls_model-max_tool_calls.
+    ENDIF.
+
+    DATA(l_system_instructions) = me->mo_agent->get_system_instructions( ).
+
+    IF l_system_instructions IS NOT INITIAL.
+
+      me->set_system_instructions(
+        i_system_instructions = l_system_instructions
+      ).
+
+    ENDIF.
+
+  ENDMETHOD.
 
   METHOD yif_aaic_anthropic~bind_tools.
 
@@ -188,6 +195,14 @@ CLASS YCL_AAIC_ANTHROPIC IMPLEMENTATION.
 
     IF me->_model IS INITIAL.
       RETURN.
+    ENDIF.
+
+    IF i_o_agent IS BOUND AND me->mo_agent IS NOT BOUND.
+
+      me->mo_agent = i_o_agent.
+
+      me->_load_agent_settings( ).
+
     ENDIF.
 
     DATA(lo_aaic_util) = NEW ycl_aaic_util( ).
