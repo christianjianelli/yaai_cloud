@@ -45,7 +45,7 @@ CLASS ycl_aaic_rag_tools IMPLEMENTATION.
     IF l_id IS NOT INITIAL.
       r_response = |Documentation created successfully! Documentation id:"{ l_id }". Documentation filename:"{ l_filename }"|.
     ELSE.
-      r_response = |Error while updating the documentation. Error: { l_error }|.
+      r_response = |Error while creating the documentation. Error: { l_error }|.
     ENDIF.
 
   ENDMETHOD.
