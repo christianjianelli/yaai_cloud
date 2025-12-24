@@ -5,34 +5,38 @@ CLASS ycl_aaic_planning_tools DEFINITION
 
   PUBLIC SECTION.
 
-    METHODS create_plan
-      IMPORTING
-                i_plan            TYPE string
-      RETURNING VALUE(r_response) TYPE yde_aaic_response.
+    INTERFACES yif_aaic_planning_tools.
 
-    METHODS get_plan
-      IMPORTING
-                i_id              TYPE string
-      RETURNING VALUE(r_response) TYPE yde_aaic_response.
+    ALIASES create_plan FOR yif_aaic_planning_tools~create_plan.
+    ALIASES get_plan    FOR yif_aaic_planning_tools~get_plan.
+    ALIASES update_plan FOR yif_aaic_planning_tools~update_plan.
+    ALIASES delete_plan FOR yif_aaic_planning_tools~delete_plan.
 
-    METHODS update_plan
+    METHODS constructor
       IMPORTING
-                i_id              TYPE string
-                i_plan            TYPE string
-      RETURNING VALUE(r_response) TYPE yde_aaic_response.
-
-    METHODS delete_plan
-      IMPORTING
-                i_id              TYPE string
-      RETURNING VALUE(r_response) TYPE yde_aaic_response.
+        i_o_agent TYPE REF TO yif_aaic_agent OPTIONAL.
 
   PROTECTED SECTION.
+
   PRIVATE SECTION.
+
+    DATA _o_agent TYPE REF TO yif_aaic_agent.
+
 ENDCLASS.
 
 
 
 CLASS ycl_aaic_planning_tools IMPLEMENTATION.
+
+  METHOD constructor.
+
+    IF i_o_agent IS SUPPLIED.
+
+      me->_o_agent = i_o_agent.
+
+    ENDIF.
+
+  ENDMETHOD.
 
   METHOD create_plan.
 
@@ -40,6 +44,17 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
 
     IF i_plan IS INITIAL.
       r_response = 'The plan content is mandatory.'.
+      RETURN.
+    ENDIF.
+
+    SELECT SINGLE id, chat_id, rag_id
+      FROM yaaic_agent_rag
+      WHERE id = @me->_o_agent->m_agent_id
+        AND chat_id = @me->_o_agent->m_chat_id
+        INTO @DATA(ls_agent_rag).
+
+    IF ls_agent_rag IS NOT INITIAL.
+      r_response = 'There is already a plan created. Use the get_plan tool (if available) to retrieve it.'.
       RETURN.
     ENDIF.
 
@@ -62,7 +77,11 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    r_response = |Plan created successfully! The plan id is: { l_id }|.
+    INSERT yaaic_agent_rag FROM @( VALUE #( id = me->_o_agent->m_agent_id
+                                            chat_id = me->_o_agent->m_chat_id
+                                            rag_id = l_id ) ).
+
+    r_response = 'Plan created successfully!'.
 
   ENDMETHOD.
 
@@ -70,14 +89,20 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
 
     CLEAR r_response.
 
-    IF i_id IS INITIAL.
-      r_response = 'The plan id is mandatory.'.
+    SELECT SINGLE id, chat_id, rag_id
+      FROM yaaic_agent_rag
+      WHERE id = @me->_o_agent->m_agent_id
+        AND chat_id = @me->_o_agent->m_chat_id
+        INTO @DATA(ls_agent_rag).
+
+    IF ls_agent_rag-rag_id IS INITIAL.
+      r_response = 'No plan found.'.
       RETURN.
     ENDIF.
 
     NEW ycl_aaic_rag_db( )->read(
       EXPORTING
-        i_id          = CONV #( i_id )
+        i_id          = ls_agent_rag-rag_id
       IMPORTING
         e_content     = r_response
         e_error       = DATA(l_error)
@@ -89,7 +114,7 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
     ENDIF.
 
     IF r_response IS NOT INITIAL.
-      r_response = |Plan { i_id } not found.|.
+      r_response = |No plan found.|.
       RETURN.
     ENDIF.
 
@@ -99,8 +124,14 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
 
     CLEAR r_response.
 
-    IF i_id IS INITIAL.
-      r_response = 'The plan id is mandatory.'.
+    SELECT SINGLE id, chat_id, rag_id
+      FROM yaaic_agent_rag
+      WHERE id = @me->_o_agent->m_agent_id
+        AND chat_id = @me->_o_agent->m_chat_id
+        INTO @DATA(ls_agent_rag).
+
+    IF ls_agent_rag-rag_id IS INITIAL.
+      r_response = 'No plan found.'.
       RETURN.
     ENDIF.
 
@@ -111,7 +142,7 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
 
     NEW ycl_aaic_rag_db( )->update(
       EXPORTING
-        i_id          = CONV #( i_id )
+        i_id          = ls_agent_rag-rag_id
         i_content     = i_plan
       IMPORTING
         e_updated     = DATA(l_updated)
@@ -124,7 +155,7 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
     ENDIF.
 
     IF l_updated = abap_true.
-      r_response = r_response = |Plan { i_id } updated successfully!|.
+      r_response = r_response = 'Plan updated successfully!'.
     ELSE.
       r_response = 'An unexpected error occurred'.
     ENDIF.
@@ -135,14 +166,20 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
 
     CLEAR r_response.
 
-    IF i_id IS INITIAL.
-      r_response = 'The plan id is mandatory.'.
+    SELECT SINGLE id, chat_id, rag_id
+      FROM yaaic_agent_rag
+      WHERE id = @me->_o_agent->m_agent_id
+        AND chat_id = @me->_o_agent->m_chat_id
+        INTO @DATA(ls_agent_rag).
+
+    IF ls_agent_rag-rag_id IS INITIAL.
+      r_response = 'No plan found.'.
       RETURN.
     ENDIF.
 
     NEW ycl_aaic_rag_db( )->delete(
       EXPORTING
-        i_id       = CONV #( i_id )
+        i_id       = ls_agent_rag-rag_id
       IMPORTING
         e_deleted  = DATA(l_deleted)
         e_error    = DATA(l_error)
@@ -154,7 +191,13 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
     ENDIF.
 
     IF l_deleted = abap_true.
-      r_response = r_response = |Plan { i_id } deleted successfully!|.
+
+      DELETE FROM yaaic_agent_rag
+        WHERE id = @me->_o_agent->m_agent_id
+          AND chat_id = @me->_o_agent->m_chat_id.
+
+      r_response = r_response = 'Plan deleted successfully!'.
+
     ELSE.
       r_response = 'An unexpected error occurred'.
     ENDIF.
