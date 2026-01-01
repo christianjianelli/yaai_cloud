@@ -2,12 +2,14 @@ INTERFACE yif_aaic_agent_db
   PUBLIC.
 
   TYPES: ty_agent_tools_t  TYPE STANDARD TABLE OF yaaic_agent_tool WITH EMPTY KEY,
+         ty_agent_docs_t   TYPE STANDARD TABLE OF yaaic_agent_rag WITH EMPTY KEY,
          ty_agent_models_t TYPE STANDARD TABLE OF yaaic_agent_mdl WITH EMPTY KEY.
 
   METHODS create
     IMPORTING
       i_s_agent        TYPE yaaic_agent
       i_t_agent_tools  TYPE ty_agent_tools_t  OPTIONAL
+      i_t_agent_docs   TYPE ty_agent_docs_t   OPTIONAL
       i_t_agent_models TYPE ty_agent_models_t OPTIONAL
     EXPORTING
       e_id             TYPE uuid
@@ -21,6 +23,7 @@ INTERFACE yif_aaic_agent_db
     EXPORTING
       e_s_agent        TYPE yaaic_agent
       e_t_agent_tools  TYPE ty_agent_tools_t
+      e_t_agent_docs   TYPE ty_agent_docs_t
       e_t_agent_models TYPE ty_agent_models_t
       e_error          TYPE string.
 
@@ -28,6 +31,7 @@ INTERFACE yif_aaic_agent_db
     IMPORTING
       i_s_agent        TYPE yaaic_agent
       i_t_agent_tools  TYPE ty_agent_tools_t OPTIONAL
+      i_t_agent_docs   TYPE ty_agent_docs_t   OPTIONAL
       i_t_agent_models TYPE ty_agent_models_t OPTIONAL
     EXPORTING
       e_updated        TYPE abap_bool

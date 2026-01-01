@@ -75,6 +75,31 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
 
     ENDIF.
 
+    IF i_t_agent_docs IS SUPPLIED.
+
+      DATA(lt_agent_docs) = i_t_agent_docs.
+
+      LOOP AT lt_agent_docs ASSIGNING FIELD-SYMBOL(<ls_agent_doc>).
+        <ls_agent_doc>-id = ls_agent-id.
+      ENDLOOP.
+
+      IF lt_agent_docs IS NOT INITIAL.
+
+        SORT lt_agent_docs BY rag_id.
+
+        DELETE ADJACENT DUPLICATES FROM lt_agent_docs COMPARING rag_id.
+
+        INSERT yaaic_agent_rag FROM TABLE @lt_agent_docs.
+
+        IF sy-subrc <> 0.
+          e_error = |Error while saving docs for Agent { i_s_agent-name }|.
+          RETURN.
+        ENDIF.
+
+      ENDIF.
+
+    ENDIF.
+
     IF i_t_agent_models IS SUPPLIED.
 
       DATA(lt_agent_models) = i_t_agent_models.
@@ -186,6 +211,33 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
 
         IF sy-subrc <> 0.
           e_error = |Error while saving tools for Agent { i_s_agent-name }|.
+          RETURN.
+        ENDIF.
+
+      ENDIF.
+
+    ENDIF.
+
+    DELETE FROM yaaic_agent_rag WHERE id = @i_s_agent-id.
+
+    IF i_t_agent_docs IS SUPPLIED.
+
+      DATA(lt_agent_docs) = i_t_agent_docs.
+
+      LOOP AT lt_agent_docs ASSIGNING FIELD-SYMBOL(<ls_agent_doc>).
+        <ls_agent_doc>-id = i_s_agent-id.
+      ENDLOOP.
+
+      IF lt_agent_docs IS NOT INITIAL.
+
+        SORT lt_agent_docs BY rag_id.
+
+        DELETE ADJACENT DUPLICATES FROM lt_agent_docs COMPARING rag_id.
+
+        INSERT yaaic_agent_rag FROM TABLE @lt_agent_docs.
+
+        IF sy-subrc <> 0.
+          e_error = |Error while saving docs for Agent { i_s_agent-name }|.
           RETURN.
         ENDIF.
 
