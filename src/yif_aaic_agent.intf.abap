@@ -8,7 +8,15 @@ INTERFACE yif_aaic_agent
            description TYPE yaaic_agent_tool-description,
          END OF ty_agent_tool_s,
 
-         ty_agent_tools_t TYPE STANDARD TABLE OF ty_agent_tool_s WITH DEFAULT KEY.
+         BEGIN OF ty_agent_doc_s,
+           rag_id      TYPE yde_aaic_rag_id,
+           filename    TYPE yde_aaic_filename,
+           description TYPE yde_aaic_description,
+           keywords    TYPE yde_aaic_keywords,
+         END OF ty_agent_doc_s,
+
+         ty_agent_tools_t TYPE STANDARD TABLE OF ty_agent_tool_s WITH DEFAULT KEY,
+         ty_agent_docs_t  TYPE STANDARD TABLE OF ty_agent_doc_s WITH DEFAULT KEY.
 
   DATA: m_agent_id TYPE yaaic_agent-id READ-ONLY,
         m_chat_id  TYPE yaaic_agent-id READ-ONLY.
@@ -28,6 +36,13 @@ INTERFACE yif_aaic_agent
               i_load_on_demand_tools TYPE abap_bool DEFAULT abap_false
                 PREFERRED PARAMETER i_agent_id
     RETURNING VALUE(r_t_agent_tools) TYPE ty_agent_tools_t.
+
+  METHODS get_docs
+    IMPORTING
+              i_agent_id            TYPE yaaic_agent-id OPTIONAL
+              i_agent_name          TYPE yaaic_agent-name OPTIONAL
+                PREFERRED PARAMETER i_agent_id
+    RETURNING VALUE(r_t_agent_docs) TYPE ty_agent_docs_t.
 
   METHODS get_prompt_template
     IMPORTING

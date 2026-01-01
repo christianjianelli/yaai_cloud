@@ -9,6 +9,7 @@ CLASS ycl_aaic_agent DEFINITION
 
     ALIASES get_system_instructions FOR yif_aaic_agent~get_system_instructions.
     ALIASES get_tools FOR yif_aaic_agent~get_tools.
+    ALIASES get_docs FOR yif_aaic_agent~get_docs.
     ALIASES get_model FOR yif_aaic_agent~get_model.
     ALIASES get_prompt_template FOR yif_aaic_agent~get_prompt_template.
     ALIASES m_agent_id FOR yif_aaic_agent~m_agent_id.
@@ -192,6 +193,36 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
       ENDSELECT.
 
     ENDIF.
+
+  ENDMETHOD.
+
+  METHOD yif_aaic_agent~get_docs.
+
+    IF me->m_agent_id IS NOT INITIAL.
+
+      SELECT a~id, b~rag_id, c~filename, c~description, c~keywords
+        FROM yaaic_agent AS a
+        INNER JOIN yaaic_agent_rag AS b
+        ON a~id = b~id
+        INNER JOIN yaaic_rag AS c
+        ON a~id = c~id
+        WHERE a~id = @me->m_agent_id
+        INTO TABLE @DATA(lt_docs).
+
+    ELSEIF i_agent_name IS SUPPLIED.
+
+      SELECT a~id, b~rag_id, c~filename, c~description, c~keywords
+        FROM yaaic_agent AS a
+        INNER JOIN yaaic_agent_rag AS b
+        ON a~id = b~id
+        INNER JOIN yaaic_rag AS c
+        ON a~id = c~id
+        WHERE a~name = @i_agent_name
+        INTO TABLE @lt_docs.                            "#EC CI_NOORDER
+
+    ENDIF.
+
+    r_t_agent_docs = CORRESPONDING #( lt_docs ).
 
   ENDMETHOD.
 

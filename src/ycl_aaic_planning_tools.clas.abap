@@ -48,12 +48,12 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
     ENDIF.
 
     SELECT SINGLE id, chat_id, rag_id
-      FROM yaaic_agent_rag
+      FROM yaaic_agent_plan
       WHERE id = @me->_o_agent->m_agent_id
         AND chat_id = @me->_o_agent->m_chat_id
-        INTO @DATA(ls_agent_rag).
+        INTO @DATA(ls_agent_plan).
 
-    IF ls_agent_rag IS NOT INITIAL.
+    IF ls_agent_plan IS NOT INITIAL.
       r_response = 'There is already a plan created. Use the get_plan tool (if available) to retrieve it.'.
       RETURN.
     ENDIF.
@@ -77,9 +77,9 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    INSERT yaaic_agent_rag FROM @( VALUE #( id = me->_o_agent->m_agent_id
-                                            chat_id = me->_o_agent->m_chat_id
-                                            rag_id = l_id ) ).
+    INSERT yaaic_agent_plan FROM @( VALUE #( id = me->_o_agent->m_agent_id
+                                             chat_id = me->_o_agent->m_chat_id
+                                             rag_id = l_id ) ).
 
     r_response = 'Plan created successfully!'.
 
@@ -90,19 +90,19 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
     CLEAR r_response.
 
     SELECT SINGLE id, chat_id, rag_id
-      FROM yaaic_agent_rag
+      FROM yaaic_agent_plan
       WHERE id = @me->_o_agent->m_agent_id
         AND chat_id = @me->_o_agent->m_chat_id
-        INTO @DATA(ls_agent_rag).
+        INTO @DATA(ls_agent_plan).
 
-    IF ls_agent_rag-rag_id IS INITIAL.
+    IF ls_agent_plan-rag_id IS INITIAL.
       r_response = 'No plan found.'.
       RETURN.
     ENDIF.
 
     NEW ycl_aaic_rag_db( )->read(
       EXPORTING
-        i_id          = ls_agent_rag-rag_id
+        i_id          = ls_agent_plan-rag_id
       IMPORTING
         e_content     = r_response
         e_error       = DATA(l_error)
@@ -125,12 +125,12 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
     CLEAR r_response.
 
     SELECT SINGLE id, chat_id, rag_id
-      FROM yaaic_agent_rag
+      FROM yaaic_agent_plan
       WHERE id = @me->_o_agent->m_agent_id
         AND chat_id = @me->_o_agent->m_chat_id
-        INTO @DATA(ls_agent_rag).
+        INTO @DATA(ls_agent_plan).
 
-    IF ls_agent_rag-rag_id IS INITIAL.
+    IF ls_agent_plan-rag_id IS INITIAL.
       r_response = 'No plan found.'.
       RETURN.
     ENDIF.
@@ -142,7 +142,7 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
 
     NEW ycl_aaic_rag_db( )->update(
       EXPORTING
-        i_id          = ls_agent_rag-rag_id
+        i_id          = ls_agent_plan-rag_id
         i_content     = i_plan
       IMPORTING
         e_updated     = DATA(l_updated)
@@ -167,19 +167,19 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
     CLEAR r_response.
 
     SELECT SINGLE id, chat_id, rag_id
-      FROM yaaic_agent_rag
+      FROM yaaic_agent_plan
       WHERE id = @me->_o_agent->m_agent_id
         AND chat_id = @me->_o_agent->m_chat_id
-        INTO @DATA(ls_agent_rag).
+        INTO @DATA(ls_agent_plan).
 
-    IF ls_agent_rag-rag_id IS INITIAL.
+    IF ls_agent_plan-rag_id IS INITIAL.
       r_response = 'No plan found.'.
       RETURN.
     ENDIF.
 
     NEW ycl_aaic_rag_db( )->delete(
       EXPORTING
-        i_id       = ls_agent_rag-rag_id
+        i_id       = ls_agent_plan-rag_id
       IMPORTING
         e_deleted  = DATA(l_deleted)
         e_error    = DATA(l_error)
@@ -192,7 +192,7 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
 
     IF l_deleted = abap_true.
 
-      DELETE FROM yaaic_agent_rag
+      DELETE FROM yaaic_agent_plan
         WHERE id = @me->_o_agent->m_agent_id
           AND chat_id = @me->_o_agent->m_chat_id.
 
