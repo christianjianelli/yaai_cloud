@@ -162,6 +162,11 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
       WHERE id = @e_s_agent-id
       INTO CORRESPONDING FIELDS OF TABLE @e_t_agent_tools.
 
+    SELECT id, rag_id
+      FROM yaaic_agent_rag
+      WHERE id = @e_s_agent-id
+       INTO CORRESPONDING FIELDS OF TABLE @e_t_agent_docs.
+
   ENDMETHOD.
 
 
