@@ -205,7 +205,7 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
         INNER JOIN yaaic_agent_rag AS b
         ON a~id = b~id
         INNER JOIN yaaic_rag AS c
-        ON a~id = c~id
+        ON b~rag_id = c~id
         WHERE a~id = @me->m_agent_id
         INTO TABLE @DATA(lt_docs).
 
@@ -216,7 +216,7 @@ CLASS ycl_aaic_agent IMPLEMENTATION.
         INNER JOIN yaaic_agent_rag AS b
         ON a~id = b~id
         INNER JOIN yaaic_rag AS c
-        ON a~id = c~id
+        ON b~rag_id = c~id
         WHERE a~name = @i_agent_name
         INTO TABLE @lt_docs.                            "#EC CI_NOORDER
 

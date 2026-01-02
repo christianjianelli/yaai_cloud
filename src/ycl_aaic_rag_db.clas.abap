@@ -45,15 +45,19 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
 
     CLEAR e_id.
 
-    SELECT id FROM yaaic_rag
-      WHERE filename = @i_filename
-      INTO @DATA(l_id)
-      UP TO 1 ROWS.
-    ENDSELECT.
+    IF i_filename IS NOT INITIAL.
 
-    IF sy-subrc = 0.
-      e_error = |File { i_filename } already exists in the database|.
-      RETURN.
+      SELECT id FROM yaaic_rag
+        WHERE filename = @i_filename
+        INTO @DATA(l_id)
+        UP TO 1 ROWS.
+      ENDSELECT.
+
+      IF sy-subrc = 0.
+        e_error = |File { i_filename } already exists in the database|.
+        RETURN.
+      ENDIF.
+
     ENDIF.
 
     ls_aaic_rag-id = xco_cp=>uuid( )->value.
