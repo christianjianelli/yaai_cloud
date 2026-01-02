@@ -81,7 +81,7 @@ CLASS ycl_aaic_rag_tools IMPLEMENTATION.
 
     NEW ycl_aaic_rag_db( )->read(
       EXPORTING
-        i_id = i_id
+        i_id = CONV #( i_id )
       IMPORTING
         e_content  = r_response
     ).
@@ -97,7 +97,7 @@ CLASS ycl_aaic_rag_tools IMPLEMENTATION.
 
     NEW ycl_aaic_rag_db( )->update(
       EXPORTING
-        i_id          = i_id
+        i_id          = CONV #( i_id )
         i_description = l_description
         i_keywords    = i_keywords
         i_content     = l_file_content

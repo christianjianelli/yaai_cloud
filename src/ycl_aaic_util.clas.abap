@@ -12,7 +12,9 @@ CLASS ycl_aaic_util DEFINITION
              description TYPE string,
            END OF ty_importing_params_s,
 
-           ty_importing_params_tt TYPE STANDARD TABLE OF ty_importing_params_s WITH EMPTY KEY.
+           ty_importing_params_tt TYPE STANDARD TABLE OF ty_importing_params_s WITH EMPTY KEY,
+
+           ty_splitted_string_tt  TYPE STANDARD TABLE OF string WITH EMPTY KEY.
 
     METHODS serialize
       IMPORTING
@@ -61,6 +63,13 @@ CLASS ycl_aaic_util DEFINITION
                 i_method_name        TYPE csequence
       RETURNING VALUE(r_json_schema) TYPE string.
 
+    METHODS split_string
+      IMPORTING
+        i_string            TYPE string
+        i_length            TYPE i
+      EXPORTING
+        e_t_splitted_string TYPE ty_splitted_string_tt.
+
   PROTECTED SECTION.
 
   PRIVATE SECTION.
@@ -69,7 +78,7 @@ ENDCLASS.
 
 
 
-CLASS YCL_AAIC_UTIL IMPLEMENTATION.
+CLASS ycl_aaic_util IMPLEMENTATION.
 
 
   METHOD serialize.
@@ -634,4 +643,100 @@ CLASS YCL_AAIC_UTIL IMPLEMENTATION.
     ENDTRY.
 
   ENDMETHOD.
+
+  METHOD split_string.
+
+    DATA lt_split TYPE STANDARD TABLE OF string WITH EMPTY KEY.
+
+    DATA: l_line      TYPE string,
+          l_remaining TYPE string.
+
+    SPLIT i_string AT space INTO TABLE lt_split.
+
+    LOOP AT lt_split ASSIGNING FIELD-SYMBOL(<l_word>).
+
+      DATA(l_len) = strlen( l_line ) + strlen( <l_word> ) + 1.
+
+      IF l_len <= i_length.
+
+        IF l_line IS INITIAL.
+          l_line = <l_word>.
+        ELSE.
+          l_line = |{ l_line } { <l_word> }|.
+        ENDIF.
+
+        CONTINUE.
+
+      ENDIF.
+
+      IF l_line IS INITIAL.
+
+        WHILE strlen( <l_word> ) >= i_length.
+
+          l_line = <l_word>(i_length).
+
+          APPEND l_line TO e_t_splitted_string.
+
+          FREE l_line.
+
+          <l_word> = <l_word>+i_length.
+
+        ENDWHILE.
+
+        l_line = <l_word>.
+
+        CONTINUE.
+
+      ELSE.
+
+        IF strlen( <l_word> ) > i_length.
+
+          WHILE strlen( <l_word> ) >= i_length.
+
+            DATA(l_room) = i_length - strlen( l_line ) - 1.
+
+            IF l_line IS NOT INITIAL.
+              l_line = |{ l_line } { <l_word>(l_room) }|.
+            ELSE.
+              l_line = <l_word>(l_room).
+            ENDIF.
+
+            <l_word> = <l_word>+l_room.
+
+            APPEND l_line TO e_t_splitted_string.
+
+            FREE l_line.
+
+          ENDWHILE.
+
+          l_line = <l_word>.
+
+          CONTINUE.
+
+        ELSE.
+
+          APPEND l_line TO e_t_splitted_string.
+
+          FREE l_line.
+
+          l_line = <l_word>.
+
+          CONTINUE.
+
+        ENDIF.
+
+      ENDIF.
+
+      APPEND l_line TO e_t_splitted_string.
+
+      FREE l_line.
+
+    ENDLOOP.
+
+    IF l_line IS NOT INITIAL.
+      APPEND l_line TO e_t_splitted_string.
+    ENDIF.
+
+  ENDMETHOD.
+
 ENDCLASS.

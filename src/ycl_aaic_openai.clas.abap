@@ -460,7 +460,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
         IF me->_openai_chat_comp_response-object = 'error'.
 
-          e_response = |**Error!** { me->_openai_chat_comp_response-code } { me->_openai_chat_comp_response-message }|.
+          e_response = |{ me->_openai_chat_comp_response-code }: { me->_openai_chat_comp_response-message }|.
 
           RAISE EVENT on_message_failed
             EXPORTING
@@ -918,7 +918,13 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
         IF _openai_generate_response-error IS NOT INITIAL.
 
-          e_response = |Error { _openai_generate_response-error-code }: { _openai_generate_response-error-message }|.
+          e_response = |{ _openai_generate_response-error-code }: { _openai_generate_response-error-message }|.
+
+          RAISE EVENT on_message_failed
+            EXPORTING
+              error_text = e_response.
+
+          EXIT.
 
         ENDIF.
 
