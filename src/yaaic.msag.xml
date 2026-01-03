@@ -86,6 +86,12 @@
      <MSGNR>012</MSGNR>
      <TEXT>HTTP response received</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>YAAIC</ARBGB>
+     <MSGNR>014</MSGNR>
+     <TEXT>Tool &amp;1 &amp;2 error: &amp;3 &amp;4</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>
