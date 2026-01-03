@@ -81,8 +81,15 @@ INTERFACE yif_aaic_google
            tools              TYPE /ui2/cl_json=>json,
          END OF ty_google_generate_req_sys_s,
 
+         BEGIN OF ty_error_s,
+           code    TYPE i,
+           message TYPE string,
+           status  TYPE string,
+         END OF ty_error_s,
+
          BEGIN OF ty_google_generate_response_s,
            candidates TYPE ty_candidates_t,
+           error      TYPE ty_error_s,
          END OF ty_google_generate_response_s.
 
   DATA: mo_function_calling TYPE REF TO yif_aaic_func_call_google READ-ONLY,

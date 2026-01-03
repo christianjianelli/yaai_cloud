@@ -314,6 +314,9 @@ CLASS ycl_aaic_google IMPLEMENTATION.
 
         DATA(ls_generate_request) = VALUE yif_aaic_google~ty_google_generate_request_s( contents = me->_chat_messages ).
 
+        "Do not send system messages to the API. They are being persisted just to be make them visible to the developer.
+        DELETE ls_generate_request-contents WHERE role = 'system'.
+
         ls_generate_request-tools = '[]'.
 
         IF me->mo_function_calling IS BOUND.
@@ -394,6 +397,18 @@ CLASS ycl_aaic_google IMPLEMENTATION.
         ).
 
         RAISE EVENT on_response_received.
+
+        IF ls_response-error IS NOT INITIAL.
+
+          e_response = |Error! code: { ls_response-error-code }, message: { ls_response-error-message }, status: { ls_response-error-status }|.
+
+          RAISE EVENT on_message_failed
+            EXPORTING
+              error_text = e_response.
+
+          EXIT.
+
+        ENDIF.
 
         LOOP AT ls_response-candidates ASSIGNING FIELD-SYMBOL(<ls_candidates>).
 
