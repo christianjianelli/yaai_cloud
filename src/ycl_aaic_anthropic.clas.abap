@@ -180,7 +180,9 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
 
     DATA lr_data TYPE REF TO data.
 
-    DATA lt_response_content TYPE yif_aaic_anthropic~ty_content_t.
+    DATA: lt_response_content     TYPE yif_aaic_anthropic~ty_content_t,
+          lt_response_content_des TYPE yif_aaic_anthropic~ty_content_t,
+          lt_response_content_aux TYPE yif_aaic_anthropic~ty_content_t.
 
     DATA ls_anthropic_chat_response TYPE yif_aaic_anthropic~ty_anthropic_chat_response_s.
 
@@ -348,6 +350,8 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
 
         ENDIF.
 
+        RAISE EVENT on_response_received.
+
         lo_aaic_util->deserialize(
           EXPORTING
             i_json = l_json
@@ -372,15 +376,6 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
 
         ENDIF.
 
-        APPEND INITIAL LINE TO me->_chat_messages ASSIGNING <ls_msg>.
-
-        <ls_msg> = VALUE #( role = ls_anthropic_chat_response-role
-                            content = ls_anthropic_chat_response-content ).
-
-        IF me->_o_persistence IS BOUND.
-          me->_o_persistence->persist_message( i_data = <ls_msg> ).
-        ENDIF.
-
         lo_aaic_util->deserialize(
           EXPORTING
             i_json = ls_anthropic_chat_response-content
@@ -388,17 +383,87 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
             e_data = lt_response_content
         ).
 
-        RAISE EVENT on_response_received.
+        FREE: lt_response_content_aux, lt_response_content_des.
 
-        IF ls_anthropic_chat_response-stop_reason = 'tool_use' AND me->mo_function_calling IS BOUND.
+        LOOP AT lt_response_content ASSIGNING FIELD-SYMBOL(<ls_content>).
 
-          LOOP AT lt_response_content ASSIGNING FIELD-SYMBOL(<ls_content>).
+          IF <ls_content>-type = 'text'.
 
-            IF <ls_content>-type = 'text'.
-              e_response = |{ e_response }{ cl_abap_char_utilities=>newline }{ <ls_content>-text }|.
+            lo_aaic_util->deserialize(
+              EXPORTING
+                i_json = ls_anthropic_chat_response-content
+              IMPORTING
+                e_data = lt_response_content_aux
+            ).
+
+            IF lt_response_content_aux IS INITIAL.
+
+              APPEND <ls_content> TO lt_response_content_des.
+
+              IF <ls_content>-type = 'text'.
+
+                APPEND INITIAL LINE TO me->_chat_messages ASSIGNING <ls_msg>.
+
+                <ls_msg> = VALUE #( role = ls_anthropic_chat_response-role
+                                    content = <ls_content>-text ).
+
+                IF me->_o_persistence IS BOUND.
+                  me->_o_persistence->persist_message( i_data = <ls_msg> ).
+                ENDIF.
+
+              ENDIF.
+
+            ELSE.
+
+              LOOP AT lt_response_content_aux ASSIGNING FIELD-SYMBOL(<ls_content_aux>).
+
+                APPEND <ls_content_aux> TO lt_response_content_des.
+
+                IF <ls_content_aux>-type = 'text'.
+
+                  APPEND INITIAL LINE TO me->_chat_messages ASSIGNING <ls_msg>.
+
+                  <ls_msg> = VALUE #( role = ls_anthropic_chat_response-role
+                                      content = <ls_content_aux>-text ).
+
+                  IF me->_o_persistence IS BOUND.
+                    me->_o_persistence->persist_message( i_data = <ls_msg> ).
+                  ENDIF.
+
+                ENDIF.
+
+              ENDLOOP.
+
             ENDIF.
 
+          ENDIF.
+
+        ENDLOOP.
+
+        IF lt_response_content_des IS NOT INITIAL.
+
+          FREE lt_response_content.
+
+          lt_response_content[] = lt_response_content_des[].
+
+        ENDIF.
+
+        DELETE lt_response_content WHERE type <> 'tool_use'.
+
+        IF lt_response_content IS INITIAL.
+          EXIT.
+        ENDIF.
+
+        IF ( to_lower( ls_anthropic_chat_response-stop_reason ) = 'tool_use' or
+             to_lower( ls_anthropic_chat_response-stop_reason ) = 'end_turn' ).
+
+          LOOP AT lt_response_content ASSIGNING <ls_content>.
+
             IF <ls_content>-type <> 'tool_use'.
+              CONTINUE.
+            ENDIF.
+
+            IF NOT me->mo_function_calling IS BOUND.
               CONTINUE.
             ENDIF.
 
