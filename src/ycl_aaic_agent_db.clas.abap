@@ -258,6 +258,12 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
 
       LOOP AT lt_agent_models ASSIGNING FIELD-SYMBOL(<ls_agent_model>).
         <ls_agent_model>-id = i_s_agent-id.
+
+        IF <ls_agent_model>-api <> yif_aaic_const=>c_openai.
+          CLEAR: <ls_agent_model>-reasoning,
+                 <ls_agent_model>-verbosity.
+        ENDIF.
+
       ENDLOOP.
 
       IF lt_agent_models IS NOT INITIAL.
