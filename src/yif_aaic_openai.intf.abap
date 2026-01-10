@@ -143,7 +143,11 @@ INTERFACE yif_aaic_openai
   TYPES: BEGIN OF ty_choices_s,
            index   TYPE i,
            message TYPE ty_type_message_chat_comp_s,
-         END OF ty_choices_s.
+         END OF ty_choices_s,
+
+         BEGIN OF ty_usage_s,
+           total_tokens TYPE i,
+         END OF ty_usage_s.
 
   TYPES: ty_choices_t TYPE STANDARD TABLE OF ty_choices_s WITH NON-UNIQUE KEY index.
 
@@ -154,6 +158,7 @@ INTERFACE yif_aaic_openai
            temperature TYPE string,
            error       TYPE ty_error_s,
            output      TYPE ty_output_t,
+           usage       TYPE ty_usage_s,
          END OF ty_openai_generate_response_s.
 
   TYPES: BEGIN OF ty_openai_chat_comp_resp_s,

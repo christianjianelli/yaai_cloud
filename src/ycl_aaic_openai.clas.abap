@@ -947,7 +947,8 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
                                 type = <ls_output>-type ).
 
             IF me->_o_persistence IS BOUND.
-              me->_o_persistence->persist_message( i_data = <ls_msg> ).
+              me->_o_persistence->persist_message( i_data = <ls_msg>
+                                                   i_tokens = _openai_generate_response-usage-total_tokens ).
             ENDIF.
 
             e_response = e_response && <ls_content>-text.
