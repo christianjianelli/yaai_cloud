@@ -208,9 +208,10 @@ CLASS ycl_aaic_db IMPLEMENTATION.
 
   METHOD yif_aaic_db~persist_message.
 
-    DATA: l_id     TYPE uuid,
-          l_seqno  TYPE i,
-          l_tokens TYPE i.
+    DATA: l_id     TYPE yde_aaic_chat_id,
+          l_seqno  TYPE yde_aaic_seqno,
+          l_tokens TYPE yde_aaic_tokens,
+          l_model  TYPE yde_aaic_model.
 
     CLEAR: e_id,
            e_persisted.
@@ -253,10 +254,12 @@ CLASS ycl_aaic_db IMPLEMENTATION.
 
     ENDIF.
 
-
-
     IF i_tokens IS SUPPLIED.
       l_tokens = i_tokens.
+    ENDIF.
+
+    IF i_model IS SUPPLIED.
+      l_model = i_model.
     ENDIF.
 
     IF i_message IS SUPPLIED.
@@ -264,7 +267,8 @@ CLASS ycl_aaic_db IMPLEMENTATION.
       DATA(ls_msg) = VALUE yaaic_msg( id = l_id
                                       seqno = l_seqno
                                       msg = i_message
-                                      tokens = l_tokens ).
+                                      tokens = l_tokens
+                                      model = l_model ).
 
     ENDIF.
 
@@ -275,7 +279,8 @@ CLASS ycl_aaic_db IMPLEMENTATION.
       ls_msg = VALUE yaaic_msg( id = l_id
                                 seqno = l_seqno
                                 msg = lo_aaic_util->serialize( i_data )
-                                tokens = l_tokens ).
+                                tokens = l_tokens
+                                model = l_model ).
 
     ENDIF.
 

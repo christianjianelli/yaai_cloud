@@ -59,7 +59,8 @@ CLASS ycl_aaic_google DEFINITION
 
     METHODS _append_to_history
       IMPORTING
-        i_s_response TYPE yif_aaic_google~ty_contents_response_s.
+        i_s_response TYPE yif_aaic_google~ty_contents_response_s
+        i_tokens     TYPE i OPTIONAL.
 
 ENDCLASS.
 
@@ -257,7 +258,8 @@ CLASS ycl_aaic_google IMPLEMENTATION.
         <ls_msg> = VALUE #( role = 'model' parts = VALUE #( ( l_greeting ) ) ).
 
         IF me->_o_persistence IS BOUND.
-          me->_o_persistence->persist_message( i_data = <ls_msg> ).
+          me->_o_persistence->persist_message( i_data = <ls_msg>
+                                               i_model = CONV #( me->_model ) ).
         ENDIF.
 
       ENDIF.
@@ -294,7 +296,8 @@ CLASS ycl_aaic_google IMPLEMENTATION.
     IF me->_o_persistence IS BOUND.
       me->_o_persistence->persist_message( i_data = <ls_msg>
                                            i_prompt = ls_prompt
-                                           i_async_task_id = i_async_task_id ).
+                                           i_async_task_id = i_async_task_id
+                                           i_model = CONV #( me->_model ) ).
     ENDIF.
 
     " In memory we keep the augmented prompt instead of the user message
@@ -391,9 +394,10 @@ CLASS ycl_aaic_google IMPLEMENTATION.
 
         lo_aaic_util->deserialize(
           EXPORTING
-            i_json = l_json
+            i_json       = l_json
+            i_camel_case = abap_true
           IMPORTING
-            e_data = ls_response
+            e_data       = ls_response
         ).
 
         RAISE EVENT on_response_received.
@@ -413,7 +417,8 @@ CLASS ycl_aaic_google IMPLEMENTATION.
         LOOP AT ls_response-candidates ASSIGNING FIELD-SYMBOL(<ls_candidates>).
 
           "Add LLM response to the chat history
-          me->_append_to_history( <ls_candidates>-content ).
+          me->_append_to_history( i_s_response = <ls_candidates>-content
+                                  i_tokens = ls_response-usage_metadata-total_token_count ).
 
           DATA(l_function_call) = abap_false.
 
@@ -625,7 +630,9 @@ CLASS ycl_aaic_google IMPLEMENTATION.
     APPEND ls_contents TO me->_chat_messages.
 
     IF me->_o_persistence IS BOUND.
-      me->_o_persistence->persist_message( i_data = ls_contents ).
+      me->_o_persistence->persist_message( i_data = ls_contents
+                                           i_tokens = i_tokens
+                                           i_model = CONV #( me->_model ) ).
     ENDIF.
 
   ENDMETHOD.

@@ -303,7 +303,8 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
                             type = 'message' ).
 
         IF me->_o_persistence IS BOUND.
-          me->_o_persistence->persist_message( i_data = <ls_msg> ).
+          me->_o_persistence->persist_message( i_data = <ls_msg>
+                                               i_model = CONV #( me->_model ) ).
         ENDIF.
 
       ENDIF.
@@ -365,7 +366,8 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       " persist the user message and the augmented prompt
       me->_o_persistence->persist_message( i_data = <ls_msg>
                                            i_prompt = ls_prompt
-                                           i_async_task_id = i_async_task_id ).
+                                           i_async_task_id = i_async_task_id
+                                           i_model = CONV #( me->_model ) ).
     ENDIF.
 
     " In memory we keep the augmented prompt instead of the user message
@@ -492,7 +494,8 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
                                 name = <ls_tool_calls>-function-name ).
 
             IF me->_o_persistence IS BOUND.
-              me->_o_persistence->persist_message( i_data = <ls_msg> ).
+              me->_o_persistence->persist_message( i_data = <ls_msg>
+                                                   i_model = CONV #( me->_model ) ).
             ENDIF.
 
             ASSIGN <ls_tool_calls>-function-arguments TO <l_data>.
@@ -535,7 +538,8 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
                                 output = l_tool_response ).
 
             IF me->_o_persistence IS BOUND.
-              me->_o_persistence->persist_message( i_data = <ls_msg> ).
+              me->_o_persistence->persist_message( i_data = <ls_msg>
+                                                   i_model = CONV #( me->_model ) ).
             ENDIF.
 
           ENDLOOP.
@@ -561,7 +565,8 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
                               content = e_response ).
 
           IF me->_o_persistence IS BOUND.
-            me->_o_persistence->persist_message( i_data = <ls_msg> ).
+            me->_o_persistence->persist_message( i_data = <ls_msg>
+                                                 i_model = CONV #( me->_model ) ).
           ENDIF.
 
         ENDLOOP.
@@ -672,7 +677,8 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
                             type = 'message' ).
 
         IF me->_o_persistence IS BOUND.
-          me->_o_persistence->persist_message( i_data = <ls_msg> ).
+          me->_o_persistence->persist_message( i_data = <ls_msg>
+                                               i_model = CONV #( me->_model ) ).
         ENDIF.
 
       ENDIF.
@@ -686,7 +692,8 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
                             type = 'message' ).
 
         IF me->_o_persistence IS BOUND.
-          me->_o_persistence->persist_message( i_data = <ls_msg> ).
+          me->_o_persistence->persist_message( i_data = <ls_msg>
+                                               i_model = CONV #( me->_model ) ).
         ENDIF.
 
       ENDIF.
@@ -746,7 +753,8 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       " persist the user message and the augmented prompt
       me->_o_persistence->persist_message( i_data = <ls_msg>
                                            i_prompt = ls_prompt
-                                           i_async_task_id = i_async_task_id ).
+                                           i_async_task_id = i_async_task_id
+                                           i_model = CONV #( me->_model ) ).
     ENDIF.
 
     " In memory we keep the augmented prompt instead of the user message
@@ -865,7 +873,8 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
                               name = <ls_output>-name ).
 
           IF me->_o_persistence IS BOUND.
-            me->_o_persistence->persist_message( i_data = <ls_msg> ).
+            me->_o_persistence->persist_message( i_data = <ls_msg>
+                                                 i_model = CONV #( me->_model ) ).
           ENDIF.
 
           ASSIGN <ls_output>-arguments TO <l_data>.
@@ -907,7 +916,8 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
                               output = l_tool_response ).
 
           IF me->_o_persistence IS BOUND.
-            me->_o_persistence->persist_message( i_data = <ls_msg> ).
+            me->_o_persistence->persist_message( i_data = <ls_msg>
+                                                 i_model = CONV #( me->_model ) ).
           ENDIF.
 
         ENDLOOP.
@@ -948,7 +958,8 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
             IF me->_o_persistence IS BOUND.
               me->_o_persistence->persist_message( i_data = <ls_msg>
-                                                   i_tokens = _openai_generate_response-usage-total_tokens ).
+                                                   i_tokens = _openai_generate_response-usage-total_tokens
+                                                   i_model = CONV #( me->_model ) ).
             ENDIF.
 
             e_response = e_response && <ls_content>-text.

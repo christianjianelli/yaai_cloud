@@ -34,6 +34,7 @@ INTERFACE yif_aaic_db
       i_prompt        TYPE data OPTIONAL
       i_async_task_id TYPE csequence OPTIONAL
       i_tokens        TYPE yde_aaic_tokens OPTIONAL
+      i_model         TYPE yde_aaic_model OPTIONAL
     EXPORTING
       e_id            TYPE uuid
       e_persisted     TYPE abap_bool.
