@@ -188,7 +188,8 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
 
     DATA: l_message TYPE string,
           l_prompt  TYPE string,
-          l_tools   TYPE string VALUE '[]'.
+          l_tools   TYPE string VALUE '[]',
+          l_tokens  TYPE i.
 
     CLEAR: e_response,
            e_failed.
@@ -224,7 +225,8 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
         <ls_msg> = VALUE #( role = 'assistant' content = lo_aaic_util->serialize( i_data = i_greeting ) ).
 
         IF me->_o_persistence IS BOUND.
-          me->_o_persistence->persist_message( i_data = <ls_msg> ).
+          me->_o_persistence->persist_message( i_data = <ls_msg>
+                                               i_model = CONV #( me->_model ) ).
         ENDIF.
 
       ENDIF.
@@ -259,7 +261,8 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
       " persist the user message and the augmented prompt
       me->_o_persistence->persist_message( i_data = <ls_msg>
                                            i_prompt = ls_prompt
-                                           i_async_task_id = i_async_task_id ).
+                                           i_async_task_id = i_async_task_id
+                                           i_model = CONV #( me->_model ) ).
     ENDIF.
 
     " In memory we keep the augmented prompt instead of the user message
@@ -376,6 +379,8 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
 
         ENDIF.
 
+        l_tokens = ls_anthropic_chat_response-usage-input_tokens + ls_anthropic_chat_response-usage-output_tokens.
+
         lo_aaic_util->deserialize(
           EXPORTING
             i_json = ls_anthropic_chat_response-content
@@ -408,7 +413,10 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
                                     content = <ls_content>-text ).
 
                 IF me->_o_persistence IS BOUND.
-                  me->_o_persistence->persist_message( i_data = <ls_msg> ).
+                  me->_o_persistence->persist_message( i_data = <ls_msg>
+                                                       i_tokens = l_tokens
+                                                       i_model = CONV #( me->_model ) ).
+                  CLEAR l_tokens.
                 ENDIF.
 
               ENDIF.
@@ -427,7 +435,10 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
                                       content = <ls_content_aux>-text ).
 
                   IF me->_o_persistence IS BOUND.
-                    me->_o_persistence->persist_message( i_data = <ls_msg> ).
+                    me->_o_persistence->persist_message( i_data = <ls_msg>
+                                                         i_tokens = l_tokens
+                                                         i_model = CONV #( me->_model ) ).
+                    CLEAR l_tokens.
                   ENDIF.
 
                 ENDIF.
@@ -487,7 +498,9 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
             <ls_msg> = VALUE #( role = 'user' content = l_tool_response ).
 
             IF me->_o_persistence IS BOUND.
-              me->_o_persistence->persist_message( i_data = <ls_msg> ).
+              me->_o_persistence->persist_message( i_data = <ls_msg>
+                                                   i_tokens = l_tokens
+                                                   i_model = CONV #( me->_model ) ).
             ENDIF.
 
           ENDLOOP.

@@ -52,7 +52,12 @@ INTERFACE yif_aaic_anthropic
   TYPES: BEGIN OF ty_error_s,
            type    TYPE string,
            message TYPE string,
-         END OF ty_error_s.
+         END OF ty_error_s,
+
+         BEGIN OF ty_usage_s,
+           input_tokens  TYPE i,
+           output_tokens TYPE i,
+         END OF ty_usage_s.
 
   TYPES: BEGIN OF ty_anthropic_chat_response_s,
            id          TYPE string,
@@ -60,6 +65,7 @@ INTERFACE yif_aaic_anthropic
            role        TYPE string,
            content     TYPE /ui2/cl_json=>json,
            stop_reason TYPE string,
+           usage       TYPE ty_usage_s,
            error       TYPE ty_error_s,
          END OF ty_anthropic_chat_response_s.
 
