@@ -10,6 +10,7 @@ CLASS ycl_aaic_anthropic DEFINITION
     ALIASES on_message_send FOR yif_aaic_chat~on_message_send.
     ALIASES on_response_received FOR yif_aaic_chat~on_response_received.
     ALIASES on_message_failed FOR yif_aaic_chat~on_message_failed.
+    ALIASES on_chat_is_blocked FOR yif_aaic_chat~on_chat_is_blocked.
 
     ALIASES set_model FOR yif_aaic_anthropic~set_model.
     ALIASES set_temperature FOR yif_aaic_anthropic~set_temperature.
@@ -200,6 +201,12 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
       RETURN.
     ENDIF.
 
+    IF me->_o_persistence IS BOUND AND
+       me->_o_persistence->is_chat_blocked( ).
+      RAISE EVENT on_chat_is_blocked.
+      EXIT.
+    ENDIF.
+
     IF i_o_agent IS BOUND AND me->mo_agent IS NOT BOUND.
 
       me->mo_agent = i_o_agent.
@@ -299,6 +306,12 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
     ENDIF.
 
     DO me->_max_tool_calls TIMES.
+
+      IF me->_o_persistence IS BOUND AND
+       me->_o_persistence->is_chat_blocked( ).
+        RAISE EVENT on_chat_is_blocked.
+        EXIT.
+      ENDIF.
 
       IF me->_o_connection->create( i_endpoint = me->m_endpoint ).
 
@@ -465,7 +478,7 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
           EXIT.
         ENDIF.
 
-        IF ( to_lower( ls_anthropic_chat_response-stop_reason ) = 'tool_use' or
+        IF ( to_lower( ls_anthropic_chat_response-stop_reason ) = 'tool_use' OR
              to_lower( ls_anthropic_chat_response-stop_reason ) = 'end_turn' ).
 
           LOOP AT lt_response_content ASSIGNING <ls_content>.

@@ -58,6 +58,9 @@ INTERFACE yif_aaic_db
     EXPORTING
       e_blocked TYPE abap_bool.
 
+  METHODS is_chat_blocked
+    RETURNING VALUE(r_blocked) TYPE abap_bool.
+
   METHODS release_chat
     EXPORTING
       e_released TYPE abap_bool.

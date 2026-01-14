@@ -10,6 +10,7 @@ CLASS ycl_aaic_openai DEFINITION
     ALIASES on_message_send FOR yif_aaic_chat~on_message_send.
     ALIASES on_response_received FOR yif_aaic_chat~on_response_received.
     ALIASES on_message_failed FOR yif_aaic_chat~on_message_failed.
+    ALIASES on_chat_is_blocked FOR yif_aaic_chat~on_chat_is_blocked.
 
     ALIASES set_model FOR yif_aaic_openai~set_model.
     ALIASES use_completions FOR yif_aaic_openai~use_completions.
@@ -269,6 +270,12 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       RETURN.
     ENDIF.
 
+    IF me->_o_persistence IS BOUND AND
+       me->_o_persistence->is_chat_blocked( ).
+       RAISE EVENT on_chat_is_blocked.
+      EXIT.
+    ENDIF.
+
     IF i_new = abap_true.
       FREE me->_messages.
     ENDIF.
@@ -392,6 +399,12 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
     ENDIF.
 
     DO me->_max_tool_calls TIMES.
+
+      IF me->_o_persistence IS BOUND AND
+         me->_o_persistence->is_chat_blocked( ).
+         RAISE EVENT on_chat_is_blocked.
+        EXIT.
+      ENDIF.
 
       IF me->_o_connection->create( i_endpoint = me->m_endpoint ).
 
@@ -657,6 +670,12 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
       RETURN.
     ENDIF.
 
+    IF me->_o_persistence IS BOUND AND
+       me->_o_persistence->is_chat_blocked( ).
+       RAISE EVENT on_chat_is_blocked.
+      EXIT.
+    ENDIF.
+
     IF i_new = abap_true.
       FREE me->_messages.
     ENDIF.
@@ -779,6 +798,12 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
     ENDIF.
 
     DO me->_max_tool_calls TIMES.
+
+      IF me->_o_persistence IS BOUND AND
+         me->_o_persistence->is_chat_blocked( ).
+         RAISE EVENT on_chat_is_blocked.
+        EXIT.
+      ENDIF.
 
       IF me->_o_connection->create( i_endpoint = me->m_endpoint ).
 

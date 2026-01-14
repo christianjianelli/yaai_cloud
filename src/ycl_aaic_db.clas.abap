@@ -16,6 +16,7 @@ CLASS ycl_aaic_db DEFINITION
     ALIASES get_chat FOR yif_aaic_db~get_chat.
     ALIASES block_chat FOR yif_aaic_db~block_chat.
     ALIASES release_chat FOR yif_aaic_db~release_chat.
+    ALIASES is_chat_blocked FOR yif_aaic_db~is_chat_blocked.
 
     ALIASES mt_messages FOR yif_aaic_db~mt_messages.
     ALIASES mt_tools FOR yif_aaic_db~mt_tools.
@@ -402,6 +403,12 @@ CLASS ycl_aaic_db IMPLEMENTATION.
 
   METHOD yif_aaic_db~block_chat.
 
+    e_blocked = abap_false.
+
+    IF me->m_id IS INITIAL.
+      RETURN.
+    ENDIF.
+
     UPDATE yaaic_chat
       SET blocked = @abap_true
       WHERE id = @me->m_id.
@@ -412,11 +419,26 @@ CLASS ycl_aaic_db IMPLEMENTATION.
 
   METHOD yif_aaic_db~release_chat.
 
+    e_released = abap_false.
+
+    IF me->m_id IS INITIAL.
+      RETURN.
+    ENDIF.
+
     UPDATE yaaic_chat
       SET blocked = @abap_false
       WHERE id = @me->m_id.
 
     e_released = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
+
+  ENDMETHOD.
+
+  METHOD is_chat_blocked.
+
+    SELECT SINGLE blocked
+      FROM yaaic_chat
+      WHERE id = @me->m_id
+      INTO @r_blocked.
 
   ENDMETHOD.
 ENDCLASS.

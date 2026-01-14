@@ -8,6 +8,7 @@ INTERFACE yif_aaic_chat
   EVENTS on_message_failed
     EXPORTING
       VALUE(error_text) TYPE string.
+  EVENTS on_chat_is_blocked.
 
   METHODS chat
     IMPORTING

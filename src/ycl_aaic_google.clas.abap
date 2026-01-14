@@ -10,6 +10,7 @@ CLASS ycl_aaic_google DEFINITION
     ALIASES on_message_send FOR yif_aaic_chat~on_message_send.
     ALIASES on_response_received FOR yif_aaic_chat~on_response_received.
     ALIASES on_message_failed FOR yif_aaic_chat~on_message_failed.
+    ALIASES on_chat_is_blocked FOR yif_aaic_chat~on_chat_is_blocked.
 
     ALIASES set_model FOR yif_aaic_google~set_model.
     ALIASES set_temperature FOR yif_aaic_google~set_temperature.
@@ -213,6 +214,12 @@ CLASS ycl_aaic_google IMPLEMENTATION.
 
     FREE e_t_response.
 
+    IF me->_o_persistence IS BOUND AND
+       me->_o_persistence->is_chat_blocked( ).
+      RAISE EVENT on_chat_is_blocked.
+      EXIT.
+    ENDIF.
+
     IF me->_o_connection IS NOT BOUND.
       me->_o_connection = NEW ycl_aaic_conn( i_api = yif_aaic_const=>c_google ).
     ENDIF.
@@ -312,6 +319,12 @@ CLASS ycl_aaic_google IMPLEMENTATION.
     ENDIF.
 
     DO me->_max_tool_calls TIMES.
+
+      IF me->_o_persistence IS BOUND AND
+       me->_o_persistence->is_chat_blocked( ).
+        RAISE EVENT on_chat_is_blocked.
+        EXIT.
+      ENDIF.
 
       IF me->_o_connection->create( i_endpoint = l_endpoint ).
 

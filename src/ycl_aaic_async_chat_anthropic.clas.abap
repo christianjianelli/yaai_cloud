@@ -34,6 +34,8 @@ CLASS ycl_aaic_async_chat_anthropic DEFINITION
       IMPORTING
         error_text.
 
+    METHODS on_chat_is_blocked FOR EVENT on_chat_is_blocked OF ycl_aaic_anthropic.
+
     METHODS on_tool_call FOR EVENT on_tool_call OF yif_aaic_func_call_anthropic
       IMPORTING
         class_name
@@ -200,6 +202,18 @@ CLASS ycl_aaic_async_chat_anthropic IMPLEMENTATION.
       DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
 
       lo_log->add( VALUE #( number = '007' type = 'E' message_v1 = error_text ) ).
+
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD on_chat_is_blocked.
+
+    IF me->_log = abap_true.
+
+      DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
+
+      lo_log->add( VALUE #( number = '015' type = 'E' message_v1 = me->_chat_id ) ).
 
     ENDIF.
 
