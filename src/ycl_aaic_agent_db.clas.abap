@@ -212,7 +212,7 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
 
         DELETE ADJACENT DUPLICATES FROM lt_agent_tools COMPARING class_name method_name.
 
-        INSERT yaaic_agent_tool FROM TABLE @lt_agent_tools.
+        INSERT yaaic_agent_tool FROM TABLE @lt_agent_tools ACCEPTING DUPLICATE KEYS.
 
         IF sy-subrc <> 0.
           e_error = |Error while saving tools for Agent { i_s_agent-name }|.
@@ -239,7 +239,7 @@ CLASS ycl_aaic_agent_db IMPLEMENTATION.
 
         DELETE ADJACENT DUPLICATES FROM lt_agent_docs COMPARING rag_id.
 
-        INSERT yaaic_agent_rag FROM TABLE @lt_agent_docs.
+        INSERT yaaic_agent_rag FROM TABLE @lt_agent_docs ACCEPTING DUPLICATE KEYS.
 
         IF sy-subrc <> 0.
           e_error = |Error while saving docs for Agent { i_s_agent-name }|.

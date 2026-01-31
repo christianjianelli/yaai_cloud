@@ -170,11 +170,8 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
 
     e_updated = abap_false.
 
-    IF i_description IS NOT SUPPLIED AND i_keywords IS NOT SUPPLIED.
-      RETURN.
-    ENDIF.
-
-    SELECT FROM yaaic_rag FIELDS id, filename, description, keywords
+    SELECT id, filename
+      FROM yaaic_rag
       WHERE id = @i_id
          OR filename = @i_filename
       INTO @DATA(ls_rag)
@@ -184,31 +181,52 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
     IF sy-subrc = 0.
 
       IF i_description IS SUPPLIED.
-        ls_rag-description = i_description.
+
+        UPDATE yaaic_rag
+          SET description = @i_description
+          WHERE id = @ls_rag-id.
+
+        IF sy-subrc <> 0.
+          e_error = 'Error while updating the document'.
+          RETURN.
+        ENDIF.
+
       ENDIF.
 
       IF i_keywords IS SUPPLIED.
-        ls_rag-keywords = i_keywords.
+
+        UPDATE yaaic_rag
+          SET keywords = @i_keywords
+          WHERE id = @ls_rag-id.
+
+        IF sy-subrc <> 0.
+          ROLLBACK WORK.
+          e_error = 'Error while updating the document'.
+          RETURN.
+        ENDIF.
+
       ENDIF.
 
     ELSE.
-
       e_error = |File { i_filename } not found in the database|.
-
       RETURN.
+    ENDIF.
+
+    IF i_append = abap_true AND i_content IS SUPPLIED.
+
+      me->read(
+        EXPORTING
+          i_id      = ls_rag-id
+        IMPORTING
+          e_content = DATA(l_content)
+      ).
+
+      l_content = l_content && cl_abap_char_utilities=>cr_lf && i_content.
 
     ENDIF.
 
-    UPDATE yaaic_rag
-      SET description = @ls_rag-description,
-          keywords = @ls_rag-keywords
-      WHERE id = @ls_rag-id.
-
-    IF sy-subrc = 0.
-      e_updated = abap_true.
-    ELSE.
-      e_updated = abap_false.
-      e_error = 'Error while updating the document'.
+    IF l_content IS INITIAL.
+      l_content = i_content.
     ENDIF.
 
     IF i_content IS SUPPLIED.
@@ -217,7 +235,7 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
         EXPORTING
           i_id         = ls_rag-id
           i_filename   = CONV #( ls_rag-filename )
-          i_content    = i_content
+          i_content    = l_content
         IMPORTING
           e_t_rag_data = DATA(lt_aaic_rag_data)
       ).
@@ -229,16 +247,18 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
 
         INSERT yaaic_rag_data FROM TABLE @lt_aaic_rag_data.
 
-        IF sy-subrc = 0.
-          e_updated = abap_true.
-        ELSE.
+        IF sy-subrc <> 0.
+          ROLLBACK WORK.
           e_updated = abap_false.
           e_error = 'Error while updating the file content'.
+          RETURN.
         ENDIF.
 
       ENDIF.
 
     ENDIF.
+
+    e_updated = abap_true.
 
   ENDMETHOD.
 

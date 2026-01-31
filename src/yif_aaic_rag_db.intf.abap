@@ -47,6 +47,7 @@ INTERFACE yif_aaic_rag_db
       i_description TYPE csequence OPTIONAL
       i_keywords    TYPE csequence OPTIONAL
       i_content     TYPE string OPTIONAL
+      i_append      TYPE abap_bool DEFAULT abap_true
     EXPORTING
       e_updated     TYPE abap_bool
       e_error       TYPE string.

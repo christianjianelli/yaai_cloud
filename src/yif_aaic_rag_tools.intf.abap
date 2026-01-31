@@ -19,6 +19,7 @@ INTERFACE yif_aaic_rag_tools
               i_description     TYPE yde_aaic_description OPTIONAL
               i_keywords        TYPE yde_aaic_keywords OPTIONAL
               i_content         TYPE yde_aaic_file_content_str
+              i_append          TYPE abap_bool DEFAULT abap_true
     RETURNING VALUE(r_response) TYPE yde_aaic_response.
 
   METHODS get_list_of_documents

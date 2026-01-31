@@ -101,6 +101,7 @@ CLASS ycl_aaic_rag_tools IMPLEMENTATION.
         i_description = l_description
         i_keywords    = i_keywords
         i_content     = l_file_content
+        i_append      = i_append
       IMPORTING
         e_updated  = DATA(l_updated)
         e_error  = DATA(l_error)
@@ -149,13 +150,21 @@ CLASS ycl_aaic_rag_tools IMPLEMENTATION.
 
   METHOD if_oo_adt_classrun~main.
 
-    me->_o_agent = NEW ycl_aaic_agent(
-      i_agent_id = CONV #( 'C6111BEC04B71FE0B9DFCCB09425F70E' )
-    ).
+*    me->_o_agent = NEW ycl_aaic_agent(
+*      i_agent_id = CONV #( 'C6111BEC04B71FE0B9DFCCB09425F70E' )
+*    ).
+*
+*    out->write( me->get_list_of_documents( ) ).
+*
+*    out->write( me->get_documentation( CONV #( '96BEA4B5DF531FD0B9DFBF81343EBF7A' ) ) ).
 
-    out->write( me->get_list_of_documents( ) ).
 
-    out->write( me->get_documentation( CONV #( '96BEA4B5DF531FD0B9DFBF81343EBF7A' ) ) ).
+     out->write( me->update_documentation(
+       EXPORTING
+         i_id          = 'AE33CAD4D4B61FE0BFD0963F147A65C5'
+         i_content     = 'Here goes some appended content ...'
+         i_append      = abap_true
+     ) ).
 
   ENDMETHOD.
 
