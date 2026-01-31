@@ -72,7 +72,7 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    IF l_id IS NOT INITIAL.
+    IF l_id IS INITIAL.
       r_response = 'An unexpected error occurred'.
       RETURN.
     ENDIF.
@@ -144,6 +144,7 @@ CLASS ycl_aaic_planning_tools IMPLEMENTATION.
       EXPORTING
         i_id          = ls_agent_plan-rag_id
         i_content     = i_plan
+        i_append      = i_append
       IMPORTING
         e_updated     = DATA(l_updated)
         e_error       = DATA(l_error)

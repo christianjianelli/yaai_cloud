@@ -12,6 +12,7 @@ INTERFACE yif_aaic_planning_tools
   METHODS update_plan
     IMPORTING
               i_plan            TYPE string
+              i_append          TYPE abap_bool DEFAULT abap_true
     RETURNING VALUE(r_response) TYPE yde_aaic_response.
 
   METHODS delete_plan
