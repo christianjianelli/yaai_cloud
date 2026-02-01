@@ -165,7 +165,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
     DATA(ls_model) = me->mo_agent->get_model(
       EXPORTING
-        i_api = CONV #( yif_aaic_const=>c_openai )
+        i_api = CONV #( me->_o_connection->m_api )
     ).
 
     IF ls_model-model IS NOT INITIAL.
@@ -265,6 +265,8 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
            e_failed.
 
     FREE e_t_response.
+
+    me->_system_instructions_role = 'system'.
 
     IF me->_model IS INITIAL.
       RETURN.

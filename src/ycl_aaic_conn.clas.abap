@@ -63,6 +63,8 @@ CLASS YCL_AAIC_CONN IMPLEMENTATION.
 
     IF i_api IS SUPPLIED.
 
+      me->m_api = i_api.
+
       SELECT SINGLE base_url
         FROM yaaic_api
         WHERE id = @i_api
