@@ -46,7 +46,7 @@ CLASS ycl_aaic_openai DEFINITION
         i_api                 TYPE csequence OPTIONAL
         i_model               TYPE csequence OPTIONAL
         i_use_completions     TYPE abap_bool DEFAULT abap_false
-        i_parallel_tool_calls TYPE abap_bool DEFAULT abap_false
+        i_parallel_tool_calls TYPE abap_bool DEFAULT abap_true
         i_safety_identifier   TYPE csequence OPTIONAL
         i_t_history           TYPE yif_aaic_openai~ty_generate_messages_t OPTIONAL
         i_o_prompt            TYPE REF TO yif_aaic_prompt OPTIONAL
