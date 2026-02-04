@@ -315,7 +315,36 @@ CLASS ycl_aaic_async_chat_mistral IMPLEMENTATION.
 
       DATA(lo_log) = NEW ycl_aaic_log( CONV #( me->_chat_id ) ).
 
-      lo_log->add( VALUE #( number = '010' type = 'E' message_v1 = error_text ) ).
+      DATA(ls_msg) = VALUE bapiret2( number = '010' type = 'E' message_v1 = error_text ).
+
+      IF strlen( error_text ) > 50.
+
+        NEW ycl_aaic_util( )->split_string(
+          EXPORTING
+            i_string            = error_text
+            i_length            = 50
+          IMPORTING
+            e_t_splitted_string = DATA(lt_splitted_string)
+        ).
+
+        LOOP AT lt_splitted_string ASSIGNING FIELD-SYMBOL(<ls_line>).
+
+          CASE sy-tabix.
+            WHEN 1.
+              ls_msg-message_v1 = <ls_line>.
+            WHEN 2.
+              ls_msg-message_v2 = <ls_line>.
+            WHEN 3.
+              ls_msg-message_v3 = <ls_line>.
+            WHEN 4.
+              ls_msg-message_v4 = <ls_line>.
+          ENDCASE.
+
+        ENDLOOP.
+
+      ENDIF.
+
+      lo_log->add( ls_msg ).
 
     ENDIF.
 

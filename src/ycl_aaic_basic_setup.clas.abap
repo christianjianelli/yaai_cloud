@@ -30,44 +30,44 @@ CLASS ycl_aaic_basic_setup IMPLEMENTATION.
                                               ( id = 'MISTRAL' model = 'mistral-medium-latest' default_model = abap_true )
                                               ( id = 'MISTRAL' model = 'mistral-large-latest' default_model = abap_false ) ) ) ACCEPTING DUPLICATE KEYS.
 
-    INSERT yaaic_tool FROM TABLE @( VALUE #( ( class_name = 'ycl_aaic_func_call_tools'
-                                               method_name = 'get_available_tools'
+    INSERT yaaic_tool FROM TABLE @( VALUE #( ( class_name = 'YCL_AAIC_FUNC_CALL_TOOLS'
+                                               method_name = 'GET_AVAILABLE_TOOLS'
                                                description = 'Use this tool to retrieve the list of tools available for you to use.' )
 
-                                             ( class_name = 'ycl_aaic_func_call_tools'
-                                               method_name = 'request_tools'
+                                             ( class_name = 'YCL_AAIC_FUNC_CALL_TOOLS'
+                                               method_name = 'REQUEST_TOOLS'
                                                description = 'Use this tool to request the schema of the tools you want to use.' )
 
-                                             ( class_name = 'ycl_aaic_rag_tools'
-                                               method_name = 'get_list_of_documents'
+                                             ( class_name = 'YCL_AAIC_RAG_TOOLS'
+                                               method_name = 'GET_LIST_OF_DOCUMENTS'
                                                description = 'Use this tool to retrieve the list of documents available for you.' )
 
-                                             ( class_name = 'ycl_aaic_rag_tools'
-                                               method_name = 'get_documentation'
+                                             ( class_name = 'YCL_AAIC_RAG_TOOLS'
+                                               method_name = 'GET_DOCUMENTATION'
                                                description = 'Use this tool to retrieve the content of the documentation.' )
 
-                                             ( class_name = 'ycl_aaic_rag_tools'
-                                               method_name = 'create_documentation'
+                                             ( class_name = 'YCL_AAIC_RAG_TOOLS'
+                                               method_name = 'CREATE_DOCUMENTATION'
                                                description = 'Use this tool to create a documentation.' )
 
-                                             ( class_name = 'ycl_aaic_rag_tools'
-                                               method_name = 'update_documentation'
+                                             ( class_name = 'YCL_AAIC_RAG_TOOLS'
+                                               method_name = 'UPDATE_DOCUMENTATION'
                                                description = 'Use this tool to create a documentation.' )
 
-                                             ( class_name = 'ycl_aaic_planning_tools'
-                                               method_name = 'create_plan'
+                                             ( class_name = 'YCL_AAIC_PLANNING_TOOLS'
+                                               method_name = 'CREATE_PLAN'
                                                description = 'Use this tool to create a plan in markdown format.' )
 
-                                             ( class_name = 'ycl_aaic_planning_tools'
-                                               method_name = 'update_plan'
+                                             ( class_name = 'YCL_AAIC_PLANNING_TOOLS'
+                                               method_name = 'UPDATE_PLAN'
                                                description = 'Use this tool to update a plan in markdown format.' )
 
-                                             ( class_name = 'ycl_aaic_planning_tools'
-                                               method_name = 'get_plan'
+                                             ( class_name = 'YCL_AAIC_PLANNING_TOOLS'
+                                               method_name = 'GET_PLAN'
                                                description = 'Use this tool to retrieve the content of a plan.' )
 
-                                             ( class_name = 'ycl_aaic_planning_tools'
-                                               method_name = 'delete_plan'
+                                             ( class_name = 'YCL_AAIC_PLANNING_TOOLS'
+                                               method_name = 'DELETE_PLAN'
                                                description = 'Use this tool to delete a plan.' )
 
                                                     ) ) ACCEPTING DUPLICATE KEYS.

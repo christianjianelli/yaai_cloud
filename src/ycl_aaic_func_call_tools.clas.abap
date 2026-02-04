@@ -140,21 +140,21 @@ CLASS YCL_AAIC_FUNC_CALL_TOOLS IMPLEMENTATION.
   METHOD if_oo_adt_classrun~main.
 
 *    me->_o_agent = NEW ycl_aaic_agent(
-*      i_agent_id = CONV #( '7EA3422BA1AC1FE0AF9AFAC0DF03AC74' )
-*      i_chat_id  = CONV #( '' )
+*      i_agent_id = CONV #( 'C6111BEC04B71FE0B9DFCCB09425F70E' )
+*      i_chat_id  = CONV #( ' ' )
 *    ).
-*
-*    out->write( me->get_available_tools( ) ).
 
+*    out->write( me->get_available_tools( ) ).
+*
 *    DATA(lo_aaic_db) = NEW ycl_aaic_db( i_api = yif_aaic_const=>c_openai ).
 *
 *    me->_o_agent = NEW ycl_aaic_agent(
-*      i_agent_id = CONV #( '7EA3422BA1AC1FE0AF9AFAC0DF03AC74' )
+*      i_agent_id = CONV #( 'C6111BEC04B71FE0B9DFCCB09425F70E' )
 *      i_chat_id  = lo_aaic_db->m_id
 *    ).
-*
-*    out->write( me->request_tools( EXPORTING i_t_tools = VALUE #( ( class_name = 'zcl_aaic_math_tools'
-*                                                                    method_name = 'add' ) ) ) ).
+
+*    out->write( me->request_tools( EXPORTING i_t_tools = VALUE #( ( class_name = 'YCL_AAIC_DATA_ELEMENT_TOOLS'
+*                                                                    method_name = 'CREATE' ) ) ) ).
 
   ENDMETHOD.
 
