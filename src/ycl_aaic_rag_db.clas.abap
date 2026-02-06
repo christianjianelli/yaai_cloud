@@ -43,7 +43,7 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
           l_remaining TYPE i.
 
 
-    CLEAR e_id.
+    CLEAR: e_id, e_error.
 
     IF i_filename IS NOT INITIAL.
 
@@ -90,10 +90,13 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
 
     DATA l_bin_data TYPE xstring.
 
-    CLEAR: e_filename,
+    CLEAR: e_id,
+           e_filename,
            e_description,
            e_keywords,
-           e_content.
+           e_content,
+           e_error.
+
 
     SELECT FROM yaaic_rag FIELDS id, filename, description, keywords
       WHERE id = @i_id
@@ -170,6 +173,8 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
 
     e_updated = abap_false.
 
+    CLEAR e_error.
+
     SELECT id, filename
       FROM yaaic_rag
       WHERE id = @i_id
@@ -225,11 +230,11 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
 
     ENDIF.
 
-    IF l_content IS INITIAL.
-      l_content = i_content.
-    ENDIF.
-
     IF i_content IS SUPPLIED.
+
+      IF l_content IS INITIAL.
+        l_content = i_content.
+      ENDIF.
 
       me->convert_file_content(
         EXPORTING
@@ -266,6 +271,8 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
   METHOD yif_aaic_rag_db~delete.
 
     e_deleted = abap_false.
+
+    CLEAR e_error.
 
     SELECT FROM yaaic_rag FIELDS id
       WHERE id = @i_id
@@ -336,6 +343,8 @@ CLASS ycl_aaic_rag_db IMPLEMENTATION.
     DATA: l_offset    TYPE i,
           l_line_no   TYPE i,
           l_remaining TYPE i.
+
+    FREE e_t_rag_data.
 
     DATA(l_content_bin) = xco_cp=>string( i_content )->as_xstring( xco_cp_character=>code_page->utf_8 )->value.
 
