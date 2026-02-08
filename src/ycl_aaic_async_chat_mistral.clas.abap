@@ -117,7 +117,8 @@ CLASS ycl_aaic_async_chat_mistral IMPLEMENTATION.
     SET HANDLER me->on_tool_call_response FOR ALL INSTANCES.
     SET HANDLER me->on_tool_call_error FOR ALL INSTANCES.
 
-    DATA(lo_aaic_mistral) = NEW ycl_aaic_openai( i_model = me->_model
+    DATA(lo_aaic_mistral) = NEW ycl_aaic_openai( i_api = yif_aaic_const=>c_mistral
+                                                 i_model = me->_model
                                                  i_o_connection = lo_aaic_conn
                                                  i_o_persistence = lo_aaic_db
                                                  i_o_agent = lo_agent ).
