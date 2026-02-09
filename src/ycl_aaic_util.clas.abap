@@ -4,6 +4,8 @@ CLASS ycl_aaic_util DEFINITION
 
   PUBLIC SECTION.
 
+    INTERFACES if_oo_adt_classrun.
+
     TYPES: BEGIN OF ty_importing_params_s,
              name        TYPE string,
              type        TYPE string,
@@ -651,7 +653,12 @@ CLASS ycl_aaic_util IMPLEMENTATION.
     DATA: l_line      TYPE string,
           l_remaining TYPE string.
 
-    SPLIT i_string AT space INTO TABLE lt_split.
+    " Limit string size to 500
+    IF strlen( i_string ) < 500.
+      SPLIT i_string AT space INTO TABLE lt_split.
+    ELSE.
+      SPLIT i_string(500) AT space INTO TABLE lt_split.
+    ENDIF.
 
     LOOP AT lt_split ASSIGNING FIELD-SYMBOL(<l_word>).
 
@@ -693,15 +700,23 @@ CLASS ycl_aaic_util IMPLEMENTATION.
 
           WHILE strlen( <l_word> ) >= i_length.
 
-            DATA(l_room) = i_length - strlen( l_line ) - 1.
-
-            IF l_line IS NOT INITIAL.
-              l_line = |{ l_line } { <l_word>(l_room) }|.
-            ELSE.
-              l_line = <l_word>(l_room).
+            IF sy-index > 1000.
+              EXIT. " Prevent accidental infinite loop
             ENDIF.
 
-            <l_word> = <l_word>+l_room.
+            DATA(l_room) = i_length - strlen( l_line ).
+
+            IF l_room > 0.
+
+              IF l_line IS NOT INITIAL.
+                l_line = |{ l_line }{ <l_word>(l_room) }|.
+              ELSE.
+                l_line = <l_word>(l_room).
+              ENDIF.
+
+              <l_word> = <l_word>+l_room.
+
+            ENDIF.
 
             APPEND l_line TO e_t_splitted_string.
 
@@ -736,6 +751,22 @@ CLASS ycl_aaic_util IMPLEMENTATION.
     IF l_line IS NOT INITIAL.
       APPEND l_line TO e_t_splitted_string.
     ENDIF.
+
+  ENDMETHOD.
+
+  METHOD if_oo_adt_classrun~main.
+
+    me->split_string(
+      EXPORTING
+        i_string            = 'Provide a description for Provideadescriptionforthetemplatetodescribeitspurposeandhelpfuturedevelopersunderstandit.'
+        i_length            = '50'
+      IMPORTING
+        e_t_splitted_string = DATA(lt_splitted_string)
+    ).
+
+    LOOP AT lt_splitted_string ASSIGNING FIELD-SYMBOL(<lt_splitted_string>).
+      out->write( <lt_splitted_string> ).
+    ENDLOOP.
 
   ENDMETHOD.
 
