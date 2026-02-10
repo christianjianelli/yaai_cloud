@@ -509,8 +509,13 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
                                 name = <ls_tool_calls>-function-name ).
 
             IF me->_o_persistence IS BOUND.
+
               me->_o_persistence->persist_message( i_data = <ls_msg>
+                                                   i_tokens = _openai_chat_comp_response-usage-total_tokens
                                                    i_model = CONV #( me->_model ) ).
+
+              CLEAR _openai_chat_comp_response-usage-total_tokens.
+
             ENDIF.
 
             ASSIGN <ls_tool_calls>-function-arguments TO <l_data>.
@@ -581,6 +586,7 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
 
           IF me->_o_persistence IS BOUND.
             me->_o_persistence->persist_message( i_data = <ls_msg>
+                                                 i_tokens = _openai_chat_comp_response-usage-total_tokens
                                                  i_model = CONV #( me->_model ) ).
           ENDIF.
 
@@ -900,8 +906,13 @@ CLASS ycl_aaic_openai IMPLEMENTATION.
                               name = <ls_output>-name ).
 
           IF me->_o_persistence IS BOUND.
+
             me->_o_persistence->persist_message( i_data = <ls_msg>
+                                                 i_tokens = _openai_generate_response-usage-total_tokens
                                                  i_model = CONV #( me->_model ) ).
+
+            CLEAR _openai_generate_response-usage-total_tokens.
+
           ENDIF.
 
           ASSIGN <ls_output>-arguments TO <l_data>.

@@ -349,6 +349,16 @@ CLASS ycl_aaic_db IMPLEMENTATION.
 
     l_seqno = 0.
 
+    SELECT SINGLE @abap_true
+      FROM yaaic_msg
+      WHERE id = @l_id
+        AND seqno = @l_seqno
+        INTO @DATA(l_exists).
+
+    IF sy-subrc = 0.
+      e_persisted = abap_true.
+    ENDIF.
+
     IF i_system_instructions IS SUPPLIED.
 
       DATA(ls_msg) = VALUE yaaic_msg( id = l_id

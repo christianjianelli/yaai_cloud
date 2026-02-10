@@ -265,11 +265,21 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
     ENDIF.
 
     IF me->_o_persistence IS BOUND.
+
       " persist the user message and the augmented prompt
       me->_o_persistence->persist_message( i_data = <ls_msg>
                                            i_prompt = ls_prompt
                                            i_async_task_id = i_async_task_id
                                            i_model = CONV #( me->_model ) ).
+
+      IF me->_system_instructions IS NOT INITIAL.
+
+        DATA(ls_msg) = VALUE yif_aaic_anthropic~ty_chat_message_s( role = 'system' content = me->_system_instructions ).
+
+        me->_o_persistence->persist_system_instructions( i_data = ls_msg ).
+
+      ENDIF.
+
     ENDIF.
 
     " In memory we keep the augmented prompt instead of the user message
@@ -325,6 +335,10 @@ CLASS ycl_aaic_anthropic IMPLEMENTATION.
           ).
 
         ENDIF.
+
+        "Do not send system messages to the API. They are being persisted just to be make them visible to the developer.
+        "The system instructions are passed in the system field (see the serialization below).
+        DELETE me->_chat_messages WHERE role = 'system'.
 
         DATA(l_json) = lo_aaic_util->serialize( i_data = VALUE yif_aaic_anthropic~ty_anthropic_chat_request_s( model = me->_model
                                                                                                                temperature = me->_temperature

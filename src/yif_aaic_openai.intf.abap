@@ -169,7 +169,9 @@ INTERFACE yif_aaic_openai
            message TYPE string,
            type    TYPE string,
            code    TYPE string,
+           detail  TYPE string,
            choices TYPE ty_choices_t,
+           usage   TYPE ty_usage_s,
          END OF ty_openai_chat_comp_resp_s.
 
   TYPES: BEGIN OF ty_openai_embed_request_s,
