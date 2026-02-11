@@ -18,6 +18,7 @@ INTERFACE yif_aaic_async
              mc_task_finished  TYPE yaaic_async-status VALUE 'Finished'  ##NO_TEXT,
              mc_task_paused    TYPE yaaic_async-status VALUE 'Paused'    ##NO_TEXT,
              mc_task_failed    TYPE yaaic_async-status VALUE 'Failed'    ##NO_TEXT,
+             mc_task_unknown   TYPE yaaic_async-status VALUE 'Unknown'   ##NO_TEXT,
              mc_task_cancelled TYPE yaaic_async-status VALUE 'Cancelled' ##NO_TEXT.
 
   METHODS create
