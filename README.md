@@ -129,13 +129,18 @@ ENDCLASS.
 ![Output of the ABAP AI quickstart example](docs/images/quickstart2.png)
 
 
-## User Interface - ABAP AI Chat
-In a BTP ABAP environment, the user interface must be a web application. ABAP AI tools Cloud includes a basic chat interface that you can use immediately or create a copy and modify it to fit your requirements.
+## User Interface - ABAP AI tools Cloud Cockpit
+The [ABAP AI tools Cloud Cockpit](https://github.com/christianjianelli/yaai_cloud_cockpit) is a frontend tool designed to streamline the creation and management of AI Agents using the ABAP AI tools Cloud. 
+We recommend using the Cockpit to explore the full potential of the ABAP AI tools Cloud — [visit the repository](https://github.com/christianjianelli/yaai_cloud_cockpit) and read its documentation.
 
-While ABAP AI tools Cloud does not directly provide a SAPUI5 or SAP Fiori Elements chat user interface, this documentation explains how to integrate an ABAP AI chat into a SAPUI5 Freestyle application or a SAP Fiori Elements application.
+<p style="margin-left: 50px">
+   <img src="docs/images/cockpit-main-view-screenshot.jpg" alt="Main View" width="600px">
+</p>
 
 ### HTTP Services
-ABAP AI tools Cloud provides several HTTP services, each offering a basic chat user interface for interacting with different LLM providers and models.
+ABAP AI tools Cloud includes a basic chat interface that you can use immediately or create a copy and modify it to fit your requirements.
+
+There are four HTTP services, each offering a basic chat user interface for interacting with different LLM providers and models.
 
 **Available Chat UIs:**
 1. **OpenAI Chat UI** – Interact with OpenAI models through a simple web-based chat interface.
@@ -144,6 +149,10 @@ ABAP AI tools Cloud provides several HTTP services, each offering a basic chat u
 4. **Mistral Chat UI** – Connect to Mistral models with a compatible chat UI.
 
 You can use these UIs as-is, or create a copy and modify it to fit your specific requirements.
+
+### SAPUI5/SAP Fiori Elements Integration
+
+While ABAP AI tools Cloud does not directly provide a SAPUI5 or SAP Fiori Elements chat user interface, this documentation explains how to integrate an ABAP AI chat into a SAPUI5 Freestyle application or a SAP Fiori Elements application.
 
 ### SAPUI5 Freestyle Application
 Since SAPUI5 does not have dedicated controls to build a chat interface we need to build a custom one. This documentation provides instructions and code for adding a basic chat interface to a SAPUI5 Freestyle application. It is a simple starting point so you can quickly connect your app to the ABAP AI tools.   
